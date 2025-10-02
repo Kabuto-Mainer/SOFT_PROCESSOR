@@ -10,12 +10,12 @@
 
 
 int main() {
-    my_disassembler(NAME_TEXT_FILE, NAME_DISASMB_FILE);
-
+    my_textbin_to_asm(NAME_TEXT_FILE, NAME_DISASMB_FILE);
+    my_bincode_to_asm(NAME_BIN_FILE, NAME_DISASMB_FILE);
     return 0;
 }
 
-int my_disassembler(const char* name_byte_file, const char* name_text_file) {
+int my_textbin_to_asm(const char* name_byte_file, const char* name_text_file) {
     assert(name_byte_file);
     assert(name_text_file);
 
@@ -65,7 +65,52 @@ int my_disassembler(const char* name_byte_file, const char* name_text_file) {
     return 0;
 }
 
+int my_bincode_to_asm(const char* name_bin_file, const char* name_text_file) {
+    assert(name_bin_file);
+    assert(name_text_file);
+
+    FILE* asm_stream = fopen_file(name_bin_file, "rb");
+    FILE* text_stream = fopen_file(name_text_file, "w");
+
+    size_t amount_elements = 0;
+    if (fread(&amount_elements, sizeof(int), 1, asm_stream) != 1) {
+        fclose_file(asm_stream);
+        printf("ERROR: read amount_elements not correct\n");
+        return -1;
+    }
+
+// TODO Сделать просто смещение указателя в FILE
+    int trash = 0;
+    fread(&trash, sizeof(int), 1, asm_stream);
+
+    int* bin_code = create_int_buffer(amount_elements);
+    if (bin_code == NULL) {
+        return -1;
+    }
+
+//TODO Check
+    fread(bin_code, sizeof(int), amount_elements, asm_stream);
+
+    fclose_file(asm_stream);
 
 
+    for (unsigned int current_element = 0; current_element < amount_elements - 2; current_element++) {
+        switch (bin_code[current_element]) {
+            case INT_PUSH: {
+                current_element++;
 
+                fprintf(text_stream, "%s %d\n", STR_MASS_COMANDS[INT_PUSH], bin_code[current_element]);
+                break;
+            }
+
+            default: {
+                fprintf(text_stream, "%s\n", STR_MASS_COMANDS[bin_code[current_element]]);
+                break;
+            }
+        }
+    }
+    fclose_file(text_stream);
+    free(bin_code);
+    return 0;
+}
 

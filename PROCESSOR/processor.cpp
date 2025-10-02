@@ -22,7 +22,7 @@ int my_processor(const char* name_bin_file) {
     FILE* bin_file = fopen_file(name_bin_file, "rb");
 
 
-    size_t amount_elements = 0;
+    int amount_elements = 0;
     if (fread(&amount_elements, sizeof(int), 1, bin_file) != 1) {
         fclose_file(bin_file);
         printf("ERROR: read amount_elements not correct\n");
@@ -43,11 +43,8 @@ int my_processor(const char* name_bin_file) {
         return -1;
     }
 
+// TODO check creating with amount_elements - 2
     int* bin_code = create_int_buffer(amount_elements);
-    // int read_size = fread(bin_code, sizeof(int), amount_elements, bin_file);
-    // printf("read_size: %d\n", read_size);
-    // printf("amount_elements: %d\n", amount_elements);
-    // return 0;
     if (fread(bin_code, sizeof(int), amount_elements, bin_file) != amount_elements - 2) {
         stack_destruct(&stack);
         free(bin_code);
