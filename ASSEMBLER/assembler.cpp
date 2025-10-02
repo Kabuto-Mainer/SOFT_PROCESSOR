@@ -79,12 +79,7 @@ int my_assembler(const char* name_input_file, const char* name_asm_file, const c
     while (current_symbol <= amount_symbols) {
         size_t add_index = find_char(text_str + current_symbol, ' ');
         if (add_index == 0) {
-            printf("%s:%d: ", name_input_file, amount_cmd + 1);
-            printf("ERROR: invalid syntax\n");
-
-            free(bin_code);
-            free(text_str);
-            return -1;
+            EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, "invalid syntax", -1);
         }
 
         text_str[current_symbol + add_index] = '\0';
@@ -113,12 +108,7 @@ int my_assembler(const char* name_input_file, const char* name_asm_file, const c
         if (strcmp(comand, STR_MASS_COMANDS[INT_PUSH]) == 0) {
             add_index = find_char(text_str + current_symbol, '\n');
             if (add_index == 0) {
-                printf("%s:%d: ", name_input_file, amount_cmd + 1);
-                printf("ERROR: invalid syntax\n");
-
-                free(bin_code);
-                free(text_str);
-                return -1;
+                EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, "invalid syntax", -1);
             }
 
             text_str[current_symbol + add_index] = '\0';
@@ -128,17 +118,13 @@ int my_assembler(const char* name_input_file, const char* name_asm_file, const c
             current_symbol += add_index + 1;
 
             if (argument < MIN_MEAN || argument > MAX_MEAN) {
-                printf("%s:%d: ", name_input_file, amount_cmd + 1);
-                printf("ERROR: too big num in argument\n");
-                free(text_str);
-                free(bin_code);
-                return -1;
+                EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, "too big num in argument", -1);
             }
 
             bin_code[current_size++] = INT_PUSH;
             bin_code[current_size++] = argument;
 
-#if PRINT_TO_TEXT_FILE == 1
+#if PRINT_TO_TEXT_FILE == ON
             fprintf(text_stream, "%d %d\n", INT_PUSH, argument);
 #endif
             push_counter++;
@@ -146,88 +132,58 @@ int my_assembler(const char* name_input_file, const char* name_asm_file, const c
 
         else if (strcmp(comand, STR_MASS_COMANDS[INT_ADD]) == 0) {
             if (push_counter < 2) {
-                printf("%s:%d: ", name_input_file, amount_cmd + 1);
-                printf("ERROR: too few arguments to ADD\n");
-                free(bin_code);
-                free(text_str);
-                return -1;
+                EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, "too few arguments to ADD", -1);
             }
 
             bin_code[current_size++] = INT_ADD;
 
-#if PRINT_TO_TEXT_FILE == 1
-            fprintf(text_stream, "%d\n", INT_ADD);
-#endif
+            PRINT_TEXT(text_stream, INT_ADD);
             push_counter--;
         }
 
         else if (strcmp(comand, STR_MASS_COMANDS[INT_SUB]) == 0) {
             if (push_counter < 2) {
-                printf("%s:%d: ", name_input_file, amount_cmd + 1);
-                printf("ERROR: too few arguments to SUB\n");
-                free(bin_code);
-                free(text_str);
-                return -1;
+                EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, "too few arguments to SUB", -1);
             }
 
             bin_code[current_size++] = INT_SUB;
 
-#if PRINT_TO_TEXT_FILE == 1
-            fprintf(text_stream, "%d\n", INT_SUB);
-#endif
+            PRINT_TEXT(text_stream, INT_SUB);
             push_counter--;
         }
 
         else if (strcmp(comand, STR_MASS_COMANDS[INT_DIV]) == 0) {
             if (push_counter < 2) {
-                printf("%s:%d: ", name_input_file, amount_cmd + 1);
-                printf("ERROR: too few arguments to DIV\n");
-                free(bin_code);
-                free(text_str);
-                return -1;
+                EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, "too few arguments to DIV", -1);
             }
 
             bin_code[current_size++] = INT_DIV;
 
-#if PRINT_TO_TEXT_FILE == 1
-            fprintf(text_stream, "%d\n", INT_DIV);
-#endif
+            PRINT_TEXT(text_stream, INT_DIV);
             push_counter--;
             amount_div_result--;
         }
 
         else if (strcmp(comand, STR_MASS_COMANDS[INT_MUL]) == 0) {
             if (push_counter < 2) {
-                printf("%s:%d: ", name_input_file, amount_cmd + 1);
-                printf("ERROR: too few arguments to MULL\n");
-                free(bin_code);
-                free(text_str);
-                return -1;
+                EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, "too few arguments to MUL", -1);
             }
 
             bin_code[current_size++] = INT_MUL;
 
-#if PRINT_TO_TEXT_FILE == 1
-            fprintf(text_stream, "%d\n", INT_MUL);
-#endif
+            PRINT_TEXT(text_stream, INT_MUL);
             push_counter--;
             amount_div_result++;
         }
 
         else if (strcmp(comand, STR_MASS_COMANDS[INT_OUT]) == 0) {
             if (push_counter < 1) {
-                printf("%s:%d: ", name_input_file, amount_cmd + 1);
-                printf("ERROR: too few argument to OUT\n");
-                free(bin_code);
-                free(text_str);
-                return -1;
+                EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, "too few arguments to OUT", -1);
             }
 
             bin_code[current_size++] = INT_OUT;
 
-#if PRINT_TO_TEXT_FILE == 1
-            fprintf(text_stream, "%d\n", INT_OUT);
-#endif
+            PRINT_TEXT(text_stream, INT_OUT);
             push_counter--;
         }
 
@@ -236,18 +192,12 @@ int my_assembler(const char* name_input_file, const char* name_asm_file, const c
 
             amount_cmd++;
 
-#if PRINT_TO_TEXT_FILE == 1
-            fprintf(text_stream, "%d\n", INT_HLT);
-#endif
+            PRINT_TEXT(text_stream, INT_HLT);
             break;
         }
 
         else {
-            printf("%s:%d: ", name_input_file, amount_cmd + 1);
-            printf("Invalid syntax error\n");
-            free(bin_code);
-            free(text_str);
-            return -1;
+            EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, "invalid syntax", -1);
         }
         amount_cmd++;
     }
