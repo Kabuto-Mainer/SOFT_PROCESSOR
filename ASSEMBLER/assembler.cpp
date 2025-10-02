@@ -79,7 +79,7 @@ int my_assembler(const char* name_input_file, const char* name_asm_file, const c
     while (current_symbol <= amount_symbols) {
         size_t add_index = find_char(text_str + current_symbol, ' ');
         if (add_index == 0) {
-            EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, "invalid syntax", -1);
+            EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, SYNTAX);
         }
 
         text_str[current_symbol + add_index] = '\0';
@@ -104,11 +104,11 @@ int my_assembler(const char* name_input_file, const char* name_asm_file, const c
         if (max_push < push_counter) {
             max_push = push_counter;
         }
-
+//--------------------------------------------------------------
         if (strcmp(comand, STR_MASS_COMANDS[INT_PUSH]) == 0) {
             add_index = find_char(text_str + current_symbol, '\n');
             if (add_index == 0) {
-                EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, "invalid syntax", -1);
+                EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, NO_ARG);
             }
 
             text_str[current_symbol + add_index] = '\0';
@@ -118,7 +118,7 @@ int my_assembler(const char* name_input_file, const char* name_asm_file, const c
             current_symbol += add_index + 1;
 
             if (argument < MIN_MEAN || argument > MAX_MEAN) {
-                EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, "too big num in argument", -1);
+                EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, LIMIT);
             }
 
             bin_code[current_size++] = INT_PUSH;
@@ -129,10 +129,10 @@ int my_assembler(const char* name_input_file, const char* name_asm_file, const c
 #endif
             push_counter++;
         }
-
+//---------------------------------------------------------------------------------
         else if (strcmp(comand, STR_MASS_COMANDS[INT_ADD]) == 0) {
             if (push_counter < 2) {
-                EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, "too few arguments to ADD", -1);
+                EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, FEW_ADD);
             }
 
             bin_code[current_size++] = INT_ADD;
@@ -140,10 +140,10 @@ int my_assembler(const char* name_input_file, const char* name_asm_file, const c
             PRINT_TEXT(text_stream, INT_ADD);
             push_counter--;
         }
-
+//-------------------------------------------------------------------------------------
         else if (strcmp(comand, STR_MASS_COMANDS[INT_SUB]) == 0) {
             if (push_counter < 2) {
-                EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, "too few arguments to SUB", -1);
+                EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, FEW_SUB);
             }
 
             bin_code[current_size++] = INT_SUB;
@@ -151,10 +151,10 @@ int my_assembler(const char* name_input_file, const char* name_asm_file, const c
             PRINT_TEXT(text_stream, INT_SUB);
             push_counter--;
         }
-
+//-------------------------------------------------------------------------------------
         else if (strcmp(comand, STR_MASS_COMANDS[INT_DIV]) == 0) {
             if (push_counter < 2) {
-                EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, "too few arguments to DIV", -1);
+                EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, FEW_DIV);
             }
 
             bin_code[current_size++] = INT_DIV;
@@ -163,10 +163,10 @@ int my_assembler(const char* name_input_file, const char* name_asm_file, const c
             push_counter--;
             amount_div_result--;
         }
-
+//-------------------------------------------------------------------------------------
         else if (strcmp(comand, STR_MASS_COMANDS[INT_MUL]) == 0) {
             if (push_counter < 2) {
-                EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, "too few arguments to MUL", -1);
+                EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, FEW_MUL);
             }
 
             bin_code[current_size++] = INT_MUL;
@@ -175,10 +175,10 @@ int my_assembler(const char* name_input_file, const char* name_asm_file, const c
             push_counter--;
             amount_div_result++;
         }
-
+//-------------------------------------------------------------------------------------
         else if (strcmp(comand, STR_MASS_COMANDS[INT_OUT]) == 0) {
             if (push_counter < 1) {
-                EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, "too few arguments to OUT", -1);
+                EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, FEW_OUT);
             }
 
             bin_code[current_size++] = INT_OUT;
@@ -186,7 +186,7 @@ int my_assembler(const char* name_input_file, const char* name_asm_file, const c
             PRINT_TEXT(text_stream, INT_OUT);
             push_counter--;
         }
-
+//-------------------------------------------------------------------------------------
         else if (strcmp(comand, STR_MASS_COMANDS[INT_HLT]) == 0) {
             bin_code[current_size++] = INT_HLT;
 
@@ -195,9 +195,9 @@ int my_assembler(const char* name_input_file, const char* name_asm_file, const c
             PRINT_TEXT(text_stream, INT_HLT);
             break;
         }
-
+//-------------------------------------------------------------------------------------
         else {
-            EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, "invalid syntax", -1);
+            EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, UNKNOWN_CMD);
         }
         amount_cmd++;
     }
