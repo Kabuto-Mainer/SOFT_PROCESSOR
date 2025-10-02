@@ -60,6 +60,7 @@ char* create_char_buffer(const size_t start_size) {
     return buffer_address;
 }
 
+
 int* realloc_buffer(int* address, const size_t max_size) {
     int* buffer_address = (int*) realloc(address, max_size * MOD_REALLOC * sizeof(int));
 
@@ -71,3 +72,25 @@ int* realloc_buffer(int* address, const size_t max_size) {
     return buffer_address;
 }
 
+
+
+size_t pass_space(const char* string_place, size_t index) {
+    assert(string_place);
+
+    while (string_place[index] == ' ') {
+        index++;
+    }
+    return index;
+}
+
+
+size_t find_char (const char* string, const char symbol) {
+    assert(string);
+
+    for (size_t i = 0; ; i++) {
+        if (*(string + i) == symbol || *(string + i) == '\n') {
+            return i;
+        }
+    }
+    return 0;
+}

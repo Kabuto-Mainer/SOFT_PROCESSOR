@@ -9,56 +9,34 @@
 #include "../COMMON/const.h"
 
 int main(void) {
-    my_assembler(NAME_INPUT_FILE, NAME_BIN_FILE, NAME_TEXT_FILE);
+    my_assembler(NAME_ASM_FILE, NAME_BIN_FILE, NAME_TEXT_FILE);
 
     return 0;
 }
 
 
-size_t pass_space(const char* string_place, size_t index) {
-    assert(string_place);
-
-    while (string_place[index] == ' ') {
-        index++;
-    }
-    return index;
-}
-
-
-size_t find_char (const char* string, const char symbol) {
-    assert(string);
-
-    for (size_t i = 0; ; i++) {
-        if (*(string + i) == symbol || *(string + i) == '\n') {
-            return i;
-        }
-    }
-    return 0;
-}
-
-
-int my_assembler(const char* name_input_file, const char* name_asm_file, const char* name_text_file) {
-    assert(name_input_file);
+int my_assembler(const char* name_asm_file, const char* name_byte_file, const char* name_text_file) {
     assert(name_asm_file);
+    assert(name_byte_file);
     assert(name_text_file);
 
-    // printf("Name input: %s\n", name_input_file);
-    // printf("Name asm: %s\n", name_asm_file);
+    // printf("Name input: %s\n", name_asm_file);
+    // printf("Name asm: %s\n", name_byte_file);
     // printf("Name text: %s\n", name_text_file);
 
-    FILE* input_stream = fopen_file(name_input_file, "rb");
+    FILE* asm_stream = fopen_file(name_asm_file, "rb");
 
 #if PRINT_TO_TEXT_FILE == ON
     FILE* text_stream = fopen_file(name_text_file, "w");
 #endif
 
-    char* text_str = create_char_buffer(file_size_check(name_input_file) + 1);
-    if (text_str == NULL) {
+    char* asm_code = create_char_buffer(file_size_check(name_asm_file) + 1);
+    if (asm_code == NULL) {
         return -1;
     }
 
-    size_t amount_symbols = fread(text_str, sizeof(char), file_size_check(name_input_file), input_stream);
-    text_str[amount_symbols] = '\0';
+    size_t amount_symbols = fread(asm_code, sizeof(char), file_size_check(name_asm_file), asm_stream);
+    asm_code[amount_symbols] = '\0';
     size_t current_symbol = 0;
 
 
@@ -77,20 +55,22 @@ int my_assembler(const char* name_input_file, const char* name_asm_file, const c
 
 
     while (current_symbol <= amount_symbols) {
-        size_t add_index = find_char(text_str + current_symbol, ' ');
+        size_t add_index = find_char(asm_code + current_symbol, ' ');
         if (add_index == 0) {
-            EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, SYNTAX);
+            EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, SYNTAX);
         }
 
-        text_str[current_symbol + add_index] = '\0';
+        asm_code[current_symbol + add_index] = '\0';
 
-        char* comand = text_str + current_symbol;
+        char* comand = asm_code + current_symbol;
         current_symbol += add_index + 1;
         // PUSH 30  ~~ ADD\nDIV
         // -----^    -------^
 
         int argument = 0;
 
+// Проверки размеров
+//-----------------------------------------------------------------
         if (current_size == max_size - (2 * sizeof(int))) {
             bin_code = realloc_buffer(bin_code, (size_t) max_size);
 
@@ -106,19 +86,19 @@ int my_assembler(const char* name_input_file, const char* name_asm_file, const c
         }
 //--------------------------------------------------------------
         if (strcmp(comand, STR_MASS_COMANDS[INT_PUSH]) == 0) {
-            add_index = find_char(text_str + current_symbol, '\n');
+            add_index = find_char(asm_code + current_symbol, '\n');
             if (add_index == 0) {
-                EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, NO_ARG);
+                EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, NO_ARG);
             }
 
-            text_str[current_symbol + add_index] = '\0';
-            argument = atoi(text_str + current_symbol);
+            asm_code[current_symbol + add_index] = '\0';
+            argument = atoi(asm_code + current_symbol);
             argument *= MODE_DECISION;
 
             current_symbol += add_index + 1;
 
             if (argument < MIN_MEAN || argument > MAX_MEAN) {
-                EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, LIMIT);
+                EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, LIMIT);
             }
 
             bin_code[current_size++] = INT_PUSH;
@@ -132,7 +112,7 @@ int my_assembler(const char* name_input_file, const char* name_asm_file, const c
 //---------------------------------------------------------------------------------
         else if (strcmp(comand, STR_MASS_COMANDS[INT_ADD]) == 0) {
             if (push_counter < 2) {
-                EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, FEW_ADD);
+                EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, FEW_ADD);
             }
 
             bin_code[current_size++] = INT_ADD;
@@ -143,7 +123,7 @@ int my_assembler(const char* name_input_file, const char* name_asm_file, const c
 //-------------------------------------------------------------------------------------
         else if (strcmp(comand, STR_MASS_COMANDS[INT_SUB]) == 0) {
             if (push_counter < 2) {
-                EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, FEW_SUB);
+                EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, FEW_SUB);
             }
 
             bin_code[current_size++] = INT_SUB;
@@ -154,7 +134,7 @@ int my_assembler(const char* name_input_file, const char* name_asm_file, const c
 //-------------------------------------------------------------------------------------
         else if (strcmp(comand, STR_MASS_COMANDS[INT_DIV]) == 0) {
             if (push_counter < 2) {
-                EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, FEW_DIV);
+                EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, FEW_DIV);
             }
 
             bin_code[current_size++] = INT_DIV;
@@ -166,7 +146,7 @@ int my_assembler(const char* name_input_file, const char* name_asm_file, const c
 //-------------------------------------------------------------------------------------
         else if (strcmp(comand, STR_MASS_COMANDS[INT_MUL]) == 0) {
             if (push_counter < 2) {
-                EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, FEW_MUL);
+                EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, FEW_MUL);
             }
 
             bin_code[current_size++] = INT_MUL;
@@ -178,7 +158,7 @@ int my_assembler(const char* name_input_file, const char* name_asm_file, const c
 //-------------------------------------------------------------------------------------
         else if (strcmp(comand, STR_MASS_COMANDS[INT_OUT]) == 0) {
             if (push_counter < 1) {
-                EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, FEW_OUT);
+                EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, FEW_OUT);
             }
 
             bin_code[current_size++] = INT_OUT;
@@ -197,7 +177,7 @@ int my_assembler(const char* name_input_file, const char* name_asm_file, const c
         }
 //-------------------------------------------------------------------------------------
         else {
-            EXIT_FUNCTION(name_input_file, amount_cmd, bin_code, text_str, UNKNOWN_CMD);
+            EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, UNKNOWN_CMD);
         }
         amount_cmd++;
     }
@@ -205,9 +185,9 @@ int my_assembler(const char* name_input_file, const char* name_asm_file, const c
     bin_code[0] = (int) current_size;
     bin_code[1] = max_push;
 
-    fclose_file(input_stream);
+    fclose_file(asm_stream);
 
-    FILE* bin_file = fopen_file(name_asm_file, "wb");
+    FILE* bin_file = fopen_file(name_byte_file, "wb");
     if (fwrite(bin_code, sizeof(int), current_size, bin_file) != current_size) {
         printf("ERROR: write bin_code to bin_file was failed\n");
         free(bin_code);
@@ -216,7 +196,7 @@ int my_assembler(const char* name_input_file, const char* name_asm_file, const c
     fclose_file(bin_file);
 
     free(bin_code);
-    free(text_str);
+    free(asm_code);
     printf("Compilation was completed\n");
     return 0;
 }

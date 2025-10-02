@@ -16,47 +16,47 @@ int main(void) {
 }
 
 
-int my_processor(const char* name_asm_file) {
-    assert(name_asm_file);
+int my_processor(const char* name_bin_file) {
+    assert(name_bin_file);
 
-    FILE* file_bin = fopen_file(name_asm_file, "rb");
+    FILE* bin_file = fopen_file(name_bin_file, "rb");
 
 
     size_t amount_elements = 0;
-    if (fread(&amount_elements, sizeof(int), 1, file_bin) != 1) {
-        fclose_file(file_bin);
+    if (fread(&amount_elements, sizeof(int), 1, bin_file) != 1) {
+        fclose_file(bin_file);
         printf("ERROR: read amount_elements not correct\n");
         return -1;
     }
 
     int size_stack = 0;
-    if (fread(&size_stack, sizeof(int), 1, file_bin) != 1) {
-        fclose_file(file_bin);
+    if (fread(&size_stack, sizeof(int), 1, bin_file) != 1) {
+        fclose_file(bin_file);
         printf("ERROR: read size_check not correct\n");
         return -1;
     }
 
     stack_struct stack = {};
     if (stack_stk(&stack, size_stack, __FILE__,  __LINE__, NAME_RETURN(stack)) != 0) {
-        fclose_file(file_bin);
+        fclose_file(bin_file);
         printf("ERROR: creating stack was not completed\n");
         return -1;
     }
 
     int* bin_code = create_int_buffer(amount_elements);
-    // int read_size = fread(bin_code, sizeof(int), amount_elements, file_bin);
+    // int read_size = fread(bin_code, sizeof(int), amount_elements, bin_file);
     // printf("read_size: %d\n", read_size);
     // printf("amount_elements: %d\n", amount_elements);
     // return 0;
-    if (fread(bin_code, sizeof(int), amount_elements, file_bin) != amount_elements - 2) {
+    if (fread(bin_code, sizeof(int), amount_elements, bin_file) != amount_elements - 2) {
         stack_destruct(&stack);
         free(bin_code);
-        fclose_file(file_bin);
+        fclose_file(bin_file);
         printf("ERROR: with read bin_code\n");
         return -1;
     }
 
-    fclose_file(file_bin);
+    fclose_file(bin_file);
 
 
     for (unsigned int current_element = 0; current_element < amount_elements - 2; current_element++) {

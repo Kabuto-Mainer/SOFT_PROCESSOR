@@ -27,6 +27,10 @@ size_t file_size_check(const char* name_file);
 int* create_int_buffer(const size_t start_size);
 char* create_char_buffer(const size_t start_size);
 
+size_t pass_space(const char* string_place, size_t index);
+size_t find_char (const char* string, const char symbol);
+
+
 
 int* realloc_buffer(int* address, const size_t max_size);
 
