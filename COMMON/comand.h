@@ -14,7 +14,9 @@ const char STR_MASS_COMANDS[10][6] = {
                         "MUL",
                         "SQRT",
                         "OUT",
-                        "HLT"
+                        "HLT",
+                        "POPR",
+                        "PUSHR"
 };
 
 enum INT_COMANDS{
@@ -25,12 +27,37 @@ enum INT_COMANDS{
     INT_MUL = 4,
     INT_SQRT = 5,
     INT_OUT = 6,
-    INT_HLT = 7
+    INT_HLT = 7,
+    INT_POPR = 8,
+    INT_PUSHR = 9
 };
+
+enum INT_REG{
+    AX = 0,
+    BX = 1,
+    CX = 2,
+    DX = 3,
+    EX = 4,
+    FX = 5,
+    GX = 6,
+    HX = 7,
+};
+
+const char CHAR_REG[][4] = {
+    "AX",
+    "BX",
+    "CX",
+    "DX",
+    "EX",
+    "FX",
+    "GX",
+    "HX"
+};
+
 
 const int AMOUNT_SUP_NUM = 4;
 
 const int OWN_SIGNATURE = 1388;
-const int CURRENT_VERSION = 2;
+const int CURRENT_VERSION = 3;
 
 #endif // COMAND_H

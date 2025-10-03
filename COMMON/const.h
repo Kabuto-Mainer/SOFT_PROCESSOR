@@ -8,7 +8,7 @@
 #define DEBUG 1
 
 
-#define MOD_WORK PROCESSOR
+#define MOD_WORK DEBUG
 
 // Канареечная зашита
 #define BIRD_SECURE OFF
@@ -31,13 +31,12 @@ const char name_type[] = "int";
    printf("%d", num); \
 }
 
+// Количество регистров
+const int AMOUNT_REGISTERS = 8;
+
 // Множитель realloc
 const int MOD_REALLOC = 2;
 const int REALLOC_CONST = 5;
-
-// Множитель для увеличения точности
-// Работает не самым лучшим образом
-const int MODE_DECISION = 1;
 
 // Начальное количество команд
 const size_t START_AMOUNT_CMD = 40;
@@ -60,19 +59,5 @@ const int AMOUNT_PRINT_ELEMENT = 10;
 
 // Куропатка или Канарейка
 const stmn_t BIRD_NUM = 7777;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #endif // CONST_H

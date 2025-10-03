@@ -2,14 +2,15 @@
 #define S_DEFINE_H
 
 #include <stdio.h>
-#include "stack.h"
+
 #include "../COMMON/const.h"
+// #include "stack.h"
 
 
 //---------------------------------------------------------------
 // Если мы хотим настраивать режим работы прямо отсюда
 #ifndef MOD_WORK
-#define MOD_WORK PROCESSOR
+#define MOD_WORK DEBUG
 #endif
 //---------------------------------------------------------------
 

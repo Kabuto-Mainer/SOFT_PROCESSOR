@@ -4,6 +4,7 @@
 #include <string.h>
 #include <math.h>
 
+#include "stack_define.h"
 #include "processor.h"
 #include "stack.h"
 #include "../COMMON/support.h"
@@ -91,25 +92,19 @@ int my_processor(const char* name_bin_file) {
     assert(name_bin_file);
 
     int amount_elements = 0;
-    int size_stack = 0;
+    proc_struct proc = {};
 
-    int* bin_code = create_bin_buffer(name_bin_file, &amount_elements, &size_stack);
-    if (bin_code == NULL) {
+    if (processor_stk(&proc, name_bin_file, &amount_elements) == -1) {
+        printf("ERROR: processor_stk return -1\n");
         return -1;
     }
 
-    stack_struct stack = {};
-    if (stack_stk(&stack, size_stack, __FILE__,  __LINE__, NAME_RETURN(stack)) != 0) {
-        printf("ERROR: creating stack was not completed\n");
-        return -1;
-    }
-
-    for (unsigned int current_element = 0; current_element <size_t( amount_elements - 2); current_element++) {
-        switch (bin_code[current_element]) {
+    for ( ; size_t (proc.C_E) < size_t (amount_elements - AMOUNT_SUP_NUM); (proc.C_E)++) {
+        switch (proc.bin_code[proc.C_E]) {
             case INT_PUSH: {
-                current_element++;
+                proc.C_E++;
 
-                stack_push(&stack, bin_code[current_element]);
+                stack_push(&(proc.stack), proc.bin_code[proc.C_E]);
                 break;
             }
 
@@ -117,10 +112,10 @@ int my_processor(const char* name_bin_file) {
                 int arg_1 = 0;
                 int arg_2 = 0;
 
-                stack_pop(&stack, &arg_1);
-                stack_pop(&stack, &arg_2);
+                stack_pop(&(proc.stack), &arg_1);
+                stack_pop(&(proc.stack), &arg_2);
 
-                stack_push(&stack, arg_1 + arg_2);
+                stack_push(&(proc.stack), arg_1 + arg_2);
                 break;
             }
 
@@ -128,10 +123,10 @@ int my_processor(const char* name_bin_file) {
                 int arg_1 = 0;
                 int arg_2 = 0;
 
-                stack_pop(&stack, &arg_1);
-                stack_pop(&stack, &arg_2);
+                stack_pop(&(proc.stack), &arg_1);
+                stack_pop(&(proc.stack), &arg_2);
 
-                stack_push(&stack, arg_1 - arg_2);
+                stack_push(&(proc.stack), arg_1 - arg_2);
                 break;
             }
 
@@ -139,17 +134,16 @@ int my_processor(const char* name_bin_file) {
                 int arg_1 = 0;
                 int arg_2 = 0;
 
-                stack_pop(&stack, &arg_1);
-                stack_pop(&stack, &arg_2);
+                stack_pop(&(proc.stack), &arg_1);
+                stack_pop(&(proc.stack), &arg_2);
 
                 if (arg_2 == 0) {
                     printf("ERROR: division by zero is not correct\n");
-                    stack_destruct(&stack);
-                    free(bin_code);
+                    processor_destruct(&proc);
                     return -1;
                 }
 
-                stack_push(&stack, arg_1 / arg_2);
+                stack_push(&(proc.stack), arg_1 / arg_2);
                 break;
             }
 
@@ -157,46 +151,96 @@ int my_processor(const char* name_bin_file) {
                 int arg_1 = 0;
                 int arg_2 = 0;
 
-                stack_pop(&stack, &arg_1);
-                stack_pop(&stack, &arg_2);
+                stack_pop(&(proc.stack), &arg_1);
+                stack_pop(&(proc.stack), &arg_2);
 
-                stack_push(&stack, arg_1 * arg_2);
+                stack_push(&(proc.stack), arg_1 * arg_2);
                 break;
             }
 
             case INT_SQRT: {
                 int arg = 0;
 
-                stack_pop(&stack, &arg);
-                stack_push(&stack, (int) sqrt(arg));
+                stack_pop(&(proc.stack), &arg);
+                stack_push(&(proc.stack), (int) sqrt(arg));
                 break;
             }
 
             case INT_OUT: {
                 int arg = 0;
 
-                stack_pop(&stack, &arg);
+                stack_pop(&(proc.stack), &arg);
                 printf("%d\n", arg);
                 break;
             }
 
             case INT_HLT: {
-                stack_destruct(&stack);
-                free(bin_code);
-
+                processor_destruct(&proc);
                 return 0;
             }
 
-            default: {
-                stack_destruct(&stack);
-                free(bin_code);
+            case INT_POPR: {
+                int reg = proc.bin_code[++proc.C_E];
+                int num = 0;
 
+                stack_pop(&(proc.stack), &num);
+                proc.registers[reg] = num;
+                break;
+            }
+
+            case INT_PUSHR: {
+                int reg = proc.bin_code[++proc.C_E];
+                int num = proc.registers[reg];
+
+                stack_push(&(proc.stack), num);
+                break;
+            }
+
+            default: {
+                processor_destruct(&proc);
                 printf("ERROR: unknown command\n");
                 return -1;
             }
         }
     }
-    stack_destruct(&stack);
-    free(bin_code);
+    processor_destruct(&proc);
     return -1;
+}
+
+
+int processor_stk(proc_struct* proc,
+                  const char* name_bin_file,
+                  int* amount_elements) {
+    assert(proc);
+    assert(name_bin_file);
+
+    int size_stack = 0;
+
+    int* bin_code = create_bin_buffer(name_bin_file, amount_elements, &size_stack);
+    if (bin_code == NULL) {
+        return -1;
+    }
+    proc->bin_code = bin_code;
+
+    if (stack_stk(&(proc->stack), size_stack, __FILE__,  __LINE__, NAME_RETURN(stack)) != 0) {
+        printf("ERROR: creating stack was not completed\n");
+        return -1;
+    }
+
+    for (int i = 0; i < AMOUNT_REGISTERS; i++) {
+        proc->registers[i] = 0;
+    }
+
+    proc->C_E = 0;
+
+    return 0;
+}
+
+int processor_destruct(proc_struct* proc) {
+    assert(proc);
+
+    stack_destruct(&(proc->stack));
+    free(proc->bin_code);
+
+    return 0;
 }

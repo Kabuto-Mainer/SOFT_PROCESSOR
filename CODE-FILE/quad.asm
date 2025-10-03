@@ -1,6 +1,7 @@
-; Test comment
-PUSH 10; test
+PUSH 10
 PUSH 20
+POPR HX
+PUSHR HX
 ADD
 OUT
 HLT

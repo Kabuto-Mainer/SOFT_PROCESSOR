@@ -27,10 +27,14 @@ enum asm_error_t{
     FEW_SQRT = -9,
     UNKNOWN_CMD = -10,
     NULL_ADR = -11,
-    FILE_ERR = -12
+    FILE_ERR = -12,
+    FEW_REG = -13,
+    ERR_PUSHR = -14,
+    INVALID_REG = -15,
+    NO_VARIABLE = -16
 };
 
-const int AMOUNT_ERRORS = 12;
+const int AMOUNT_ERRORS = 17;
 
 char DESCRIPTION_ERRORS[AMOUNT_ERRORS][40] = {
     "syntax is not valid\n",
@@ -44,11 +48,12 @@ char DESCRIPTION_ERRORS[AMOUNT_ERRORS][40] = {
     "too few argument to SQRTn",
     "unknown command\n",
     "null address\n",
-    "error with writing to file"
+    "error with writing to file",
+    "no register\n",
+    "no variable ib register\n",
+    "invalid register\n",
+    "no variable in register\n"
 };
-
-
-const int AMOUNT_VARIABLES = 3;
 
 
 #define EXIT_FUNCTION(name_file, amount_cmd, bin_code, text_str, return_error) \
@@ -66,6 +71,7 @@ asm_error_t my_assembler(const char* name_asm_file,
 int check_realloc(int** bin_code, size_t* max_size, size_t current_size);
 size_t skip_comment(const char* asm_code, const char last_char);
 
+int char_reg_to_int(const char* name_reg);
 
 // Синтаксис KBC - язык
 const char DEC_VAR = '$';
