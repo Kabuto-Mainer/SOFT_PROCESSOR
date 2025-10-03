@@ -6,7 +6,7 @@ const char NAME_BIN_FILE[] = "CODE-FILE/bin-code.bin";
 const char NAME_TEXT_FILE[] = "CODE-FILE/text-code.txt";
 const char NAME_DISASMB_FILE[] = "CODE-FILE/disasmb-text.asm";
 
-const char STR_MASS_COMANDS[10][6] = {
+const char STR_MASS_COMANDS[20][6] = {
                         "PUSH",
                         "ADD",
                         "SUB",
@@ -16,7 +16,8 @@ const char STR_MASS_COMANDS[10][6] = {
                         "OUT",
                         "HLT",
                         "POPR",
-                        "PUSHR"
+                        "PUSHR",
+                        "IN"
 };
 
 enum INT_COMANDS{
@@ -29,7 +30,8 @@ enum INT_COMANDS{
     INT_OUT = 6,
     INT_HLT = 7,
     INT_POPR = 8,
-    INT_PUSHR = 9
+    INT_PUSHR = 9,
+    INT_IN = 10
 };
 
 enum INT_REG{

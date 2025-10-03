@@ -1,7 +1,41 @@
-PUSH 10
-PUSH 20
-POPR HX
-PUSHR HX
+IN
+POPR AX
+IN
+POPR BX
+IN
+POPR CX
+PUSHR BX ; b^2
+PUSHR BX
+MUL
+PUSH -4
+PUSHR AX
+PUSHR CX ;-4a*c
+MUL
+MUL
 ADD
+POPR DX ; Нашли D
+PUSH -1
+PUSHR BX
+MUL
+PUSHR DX
+ADD ; Нашли -a + sqrt(D)
+POPR EX
+PUSH 2
+PUSHR AX ; -2a
+MUL
+PUSHR EX
+DIV ; Нашли первый корень
 OUT
+PUSHR EX
+PUSHR DX ; -b + sqrt(D) - 2*sqrt(D)
+PUSH 2
+MUL
+SUB
+POPR EX
+PUSH 2
+PUSHR AX ; -2a
+MUL
+PUSHR EX
+DIV
+OUT ; Нашли второй корень
 HLT
