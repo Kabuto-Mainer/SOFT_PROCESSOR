@@ -24,22 +24,31 @@ enum asm_error_t{
     FEW_DIV = -6,
     FEW_MUL = -7,
     FEW_OUT = -8,
-    UNKNOWN_CMD = -9
+    FEW_SQRT = -9,
+    UNKNOWN_CMD = -10
 };
 
-const int AMOUNT_ERRORS = 9;
+const int AMOUNT_ERRORS = 10;
 
 char DESCRIPTION_ERRORS[AMOUNT_ERRORS][40] = {
-"syntax is not valid\n",
-"no argument to push\n",
-"too big or little argument to push\n",
-"too few argument to ADD\n",
-"too few argument to SUB\n",
-"too few argument to DIV\n",
-"too few argument to MUL\n",
-"too few argument to OUT\n",
-"unknown command\n"
+    "syntax is not valid\n",
+    "no argument to push\n",
+    "too big or little argument to push\n",
+    "too few argument to ADD\n",
+    "too few argument to SUB\n",
+    "too few argument to DIV\n",
+    "too few argument to MUL\n",
+    "too few argument to OUT\n",
+    "too few argument to SQRTn",
+    "unknown command\n"
 };
+
+struct variable{
+    const char* name_variable;
+    int mean_variable;
+};
+
+const int AMOUNT_VARIABLES = 3;
 
 
 #define EXIT_FUNCTION(name_file, amount_cmd, bin_code, text_str, return_error) \
@@ -49,7 +58,25 @@ free(text_str); \
 return return_error;
 
 
-int my_assembler(const char* name_input_file, const char* name_asm_file, const char* name_text_file);
+int my_assembler(const char* name_asm_file,
+                const char* name_byte_file,
+                const char* name_text_file,
+                variable* name_table);
+
+int find_mean_variable(const char* name_var, variable* name_table);
+int completion_name_table(variable* name_table);
+
+
+int check_realloc(int** bin_code, size_t* max_size, size_t current_size);
+size_t skip_comment(const char* asm_code, const char last_char);
+
+
+// Синтаксис KBC - язык
+const char DEC_VAR = '$';
+const char COMMENT_CHAR = '#';
+
+
+
 
 
 #endif // DISASSEMBLER_H

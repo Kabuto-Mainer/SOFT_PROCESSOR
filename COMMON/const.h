@@ -33,13 +33,14 @@ const char name_type[] = "int";
 
 // Множитель realloc
 const int MOD_REALLOC = 2;
+const int REALLOC_CONST = 5;
 
 // Множитель для увеличения точности
 // Работает не самым лучшим образом
 const int MODE_DECISION = 1;
 
 // Начальное количество команд
-const size_t START_AMOUNT_CMD = 10;
+const size_t START_AMOUNT_CMD = 40;
 
 // Минимальное и максимальное значение аргументов
 const stmn_t MAX_MEAN = 1e4;

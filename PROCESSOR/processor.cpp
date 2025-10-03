@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <cstdlib>
 #include <string.h>
+#include <math.h>
 
 #include "processor.h"
 #include "stack.h"
@@ -134,6 +135,14 @@ int my_processor(const char* name_bin_file) {
                 stack_pop(&stack, &arg_2);
 
                 stack_push(&stack, arg_1 * arg_2);
+                break;
+            }
+
+            case INT_SQRT: {
+                int arg = 0;
+
+                stack_pop(&stack, &arg);
+                stack_push(&stack, (int) sqrt(arg));
                 break;
             }
 
