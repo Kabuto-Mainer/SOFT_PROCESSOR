@@ -57,7 +57,7 @@ run-a:
 # Запуск processor
 run-p:
 	@echo -------------------------------------------------------------------------
-	./BIN/processor.exe
+	./BIN/processor.exe $(arg)
 
 # Запуск disassembler
 run-d:
