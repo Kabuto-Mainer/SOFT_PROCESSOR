@@ -102,6 +102,13 @@ asm_error_t my_assembler(const char* name_asm_file,
             push_counter++;
         }
 //---------------------------------------------------------------------------------
+        else if (strcmp(comand, STR_MASS_COMANDS[INT_IN]) == 0) {
+            bin_code[current_element++] = INT_IN;
+
+            PRINT_TEXT(text_stream, INT_DIV);
+            push_counter++;
+        }
+//-------------------------------------------------------------------------------------
         else if (strcmp(comand, STR_MASS_COMANDS[INT_POPR]) == 0) {
             char REG[10] = "";
             if (sscanf(asm_code + current_symbol + sscanf_amount, "%s", REG) != 1) {

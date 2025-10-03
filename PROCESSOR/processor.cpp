@@ -108,6 +108,16 @@ int my_processor(const char* name_bin_file) {
                 break;
             }
 
+            case INT_IN: {
+                int num = 0;
+
+                printf("Enter int num: ");
+                scanf("%d", &num);
+
+                stack_push(&(proc.stack), num);
+                break;
+            }
+
             case INT_ADD: {
                 int arg_1 = 0;
                 int arg_2 = 0;
