@@ -43,13 +43,14 @@ asm_error_t my_assembler(const char* name_asm_file,
     size_t max_elements = START_AMOUNT_CMD; // Only >= current_element
     size_t current_element = AMOUNT_SUP_NUM; // Only ++
 
+    int all_reg[AMOUNT_REGISTERS] = {0};
+
     // bin_code = <amount_cmd> <max_push> <bin_code[2]> ...
     int* bin_code = create_int_buffer(START_AMOUNT_CMD);
 
 
     while (current_symbol <= amount_symbols) {
         char comand[20] = "";
-        int argument = 0;
 
         size_t add_index = find_char(asm_code + current_symbol, ';');
 
@@ -85,6 +86,7 @@ asm_error_t my_assembler(const char* name_asm_file,
         }
 //--------------------------------------------------------------
         if (strcmp(comand, STR_MASS_COMANDS[INT_PUSH]) == 0) {
+            int argument = 0;
             if (sscanf(asm_code + current_symbol + sscanf_amount, "%d", &argument) != 1) {
                 EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, NO_ARG);
             }
@@ -97,6 +99,54 @@ asm_error_t my_assembler(const char* name_asm_file,
             bin_code[current_element++] = argument;
 
             fprintf(text_stream, "%d %d\n", INT_PUSH, argument);
+            push_counter++;
+        }
+//---------------------------------------------------------------------------------
+        else if (strcmp(comand, STR_MASS_COMANDS[INT_POPR]) == 0) {
+            char REG[10] = "";
+            if (sscanf(asm_code + current_symbol + sscanf_amount, "%s", REG) != 1) {
+                EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, FEW_REG);
+            }
+            REG[9] = '\0';
+
+            int buffer = 0;
+            buffer = char_reg_to_int(REG);
+
+            if (buffer == -1) {
+                EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, INVALID_REG);
+            }
+
+            all_reg[buffer] += 1;
+
+            bin_code[current_element++] = INT_POPR;
+            bin_code[current_element++] = buffer;
+
+            fprintf(text_stream, "%d %d\n", INT_POPR, buffer);
+            push_counter--;
+        }
+//-------------------------------------------------------------------------------------
+        else if (strcmp(comand, STR_MASS_COMANDS[INT_PUSHR]) == 0) {
+            char REG[10] = "";
+            if (sscanf(asm_code + current_symbol + sscanf_amount, "%s", REG) != 1) {
+                EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, FEW_REG);
+            }
+            REG[9] = '\0';
+
+            int buffer = 0;
+            buffer = char_reg_to_int(REG);
+
+            if (buffer == -1) {
+                EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, INVALID_REG);
+            }
+
+            if (all_reg[buffer] == 0) {
+                EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, NO_VARIABLE);
+            }
+
+            bin_code[current_element++] = INT_PUSHR;
+            bin_code[current_element++] = buffer;
+
+            fprintf(text_stream, "%d %d\n", INT_PUSHR, buffer);
             push_counter++;
         }
 //---------------------------------------------------------------------------------
@@ -236,3 +286,14 @@ int check_realloc(int** bin_code, size_t* max_elements, size_t current_element) 
 }
 
 
+int char_reg_to_int(const char* name_reg) {
+    assert(name_reg);
+
+    for (int i = 0; i < AMOUNT_REGISTERS; i++) {
+        if (strcmp(name_reg, CHAR_REG[i]) == 0) {
+            return i;
+        }
+    }
+
+    return -1;
+}

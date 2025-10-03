@@ -1,7 +1,8 @@
-#ifndef S_STACK_H
-#define S_STACK_H
+#ifndef STACK_H
+#define STACK_H
 
 #include "stack_define.h"
+#include "../COMMON/const.h"
 
 const long int SIZE_ADD_CAPACITY = BIRD_SECURE;
 
@@ -87,6 +88,6 @@ stack_error_t stack_realloc(stack_struct* stack_address);
 
 
 
-#endif // S_STACK_H
+#endif // STACK_H
 
 
