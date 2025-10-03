@@ -9,86 +9,75 @@
 #include "../COMMON/const.h"
 
 int main(void) {
-    variable massive_variable[AMOUNT_VARIABLES] = {};
-    completion_name_table(massive_variable);
 
-    my_assembler(NAME_ASM_FILE, NAME_BIN_FILE, NAME_TEXT_FILE, massive_variable);
+    my_assembler(NAME_ASM_FILE, NAME_BIN_FILE, NAME_TEXT_FILE);
 
     return 0;
 }
 
 
-int my_assembler(const char* name_asm_file,
+asm_error_t my_assembler(const char* name_asm_file,
                 const char* name_byte_file,
-                const char* name_text_file,
-                variable* name_table) {
+                const char* name_text_file) {
     assert(name_asm_file);
     assert(name_byte_file);
     assert(name_text_file);
 
-    // printf("Name input: %s\n", name_asm_file);
-    // printf("Name asm: %s\n", name_byte_file);
-    // printf("Name text: %s\n", name_text_file);
-
     FILE* asm_stream = fopen_file(name_asm_file, "rb");
 
-#if PRINT_TO_TEXT_FILE == ON
     FILE* text_stream = fopen_file(name_text_file, "w");
-#endif
 
     char* asm_code = create_char_buffer(file_size_check(name_asm_file) + 1);
     if (asm_code == NULL) {
-        return -1;
+        return NULL_ADR;
     }
 
     size_t amount_symbols = fread(asm_code, sizeof(char), file_size_check(name_asm_file), asm_stream);
     asm_code[amount_symbols] = '\0';
     size_t current_symbol = 0;
 
-
     int push_counter = 0; // Текущее количество элементов в стеке
     int max_push = 0; // Максимальное количество элементов в стеке
-
     int amount_cmd = 0;
-    int amount_div_result = 0;
 
     size_t max_elements = START_AMOUNT_CMD; // Only >= current_element
-
-    size_t current_element = 2; // Only ++
+    size_t current_element = AMOUNT_SUP_NUM; // Only ++
 
     // bin_code = <amount_cmd> <max_push> <bin_code[2]> ...
     int* bin_code = create_int_buffer(START_AMOUNT_CMD);
 
 
     while (current_symbol <= amount_symbols) {
-        size_t buffer_add = skip_comment(asm_code + current_symbol, '\n');
+        char comand[20] = "";
+        int argument = 0;
 
-        if (buffer_add != 0) {
-            current_symbol += buffer_add;
+        size_t add_index = find_char(asm_code + current_symbol, ';');
+
+        if (*(asm_code + current_symbol + add_index) == ';') {
+            *(asm_code + current_symbol + add_index) = '\0';
+
+            add_index += find_char(asm_code + current_symbol + add_index + 1, '\n') + 1;
+        }
+        else {
+            *(asm_code + current_symbol + add_index) = '\0';
+        }
+
+        int sscanf_amount = 0;
+        if (*(asm_code + current_symbol) == '\0' ||
+            sscanf(asm_code + current_symbol, "%s %n", comand, &sscanf_amount) == 0) {
+            current_symbol += add_index + 1;
             amount_cmd--;
             continue;
         }
+        comand[19] = '\0'; // На всякий случай
 
-        size_t add_index = find_char(asm_code + current_symbol, ' ');
-        if (add_index == 0) {
-            EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, SYNTAX);
-        }
-
-        asm_code[current_symbol + add_index] = '\0';
-
-        char* comand = asm_code + current_symbol;
-        current_symbol += add_index + 1;
-        // PUSH 30  ~~ ADD\nDIV
-        // -----^    -------^
-
-        int argument = 0;
 
 // Проверки размеров
 //-----------------------------------------------------------------
         if (check_realloc(&bin_code, &max_elements, current_element) == -1) {
             free(bin_code);
             free(asm_code);
-            return -1;
+            return NULL_ADR;
         }
 
         if (max_push < push_counter) {
@@ -96,22 +85,9 @@ int my_assembler(const char* name_asm_file,
         }
 //--------------------------------------------------------------
         if (strcmp(comand, STR_MASS_COMANDS[INT_PUSH]) == 0) {
-            add_index = find_char(asm_code + current_symbol, '\n');
-            if (add_index == 0) {
+            if (sscanf(asm_code + current_symbol + sscanf_amount, "%d", &argument) != 1) {
                 EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, NO_ARG);
             }
-
-            asm_code[current_symbol + add_index] = '\0';
-            if (*(asm_code + current_symbol) == DEC_VAR) {
-                argument = find_mean_variable(asm_code + current_symbol, name_table);
-            }
-
-            else {
-                argument = atoi(asm_code + current_symbol);
-            }
-            argument *= MODE_DECISION;
-
-            current_symbol += add_index + 1;
 
             if (argument < MIN_MEAN || argument > MAX_MEAN) {
                 EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, LIMIT);
@@ -120,9 +96,7 @@ int my_assembler(const char* name_asm_file,
             bin_code[current_element++] = INT_PUSH;
             bin_code[current_element++] = argument;
 
-#if PRINT_TO_TEXT_FILE == ON
             fprintf(text_stream, "%d %d\n", INT_PUSH, argument);
-#endif
             push_counter++;
         }
 //---------------------------------------------------------------------------------
@@ -157,7 +131,6 @@ int my_assembler(const char* name_asm_file,
 
             PRINT_TEXT(text_stream, INT_DIV);
             push_counter--;
-            amount_div_result--;
         }
 //-------------------------------------------------------------------------------------
         else if (strcmp(comand, STR_MASS_COMANDS[INT_MUL]) == 0) {
@@ -169,7 +142,6 @@ int my_assembler(const char* name_asm_file,
 
             PRINT_TEXT(text_stream, INT_MUL);
             push_counter--;
-            amount_div_result++;
         }
 //-------------------------------------------------------------------------------------
         else if (strcmp(comand, STR_MASS_COMANDS[INT_SQRT]) == 0) {
@@ -206,10 +178,13 @@ int my_assembler(const char* name_asm_file,
             EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, UNKNOWN_CMD);
         }
         amount_cmd++;
+        current_symbol += add_index + 1;
     }
     // В надежде на то, что current_element поместится в <int>
-    bin_code[0] = (int) current_element;
-    bin_code[1] = max_push;
+    bin_code[0] = OWN_SIGNATURE;
+    bin_code[1] = CURRENT_VERSION;
+    bin_code[2] = (int) current_element;
+    bin_code[3] = max_push;
 
     fclose_file(asm_stream);
 
@@ -217,51 +192,15 @@ int my_assembler(const char* name_asm_file,
     if (fwrite(bin_code, sizeof(int), current_element, bin_file) != current_element) {
         printf("ERROR: write bin_code to bin_file was failed\n");
         free(bin_code);
-        return -1;
+        return FILE_ERR;
     }
     fclose_file(bin_file);
 
     free(bin_code);
     free(asm_code);
     printf("Compilation was completed\n");
-    return 0;
+    return NOT_ERRORS;
 }
-
-
-int find_mean_variable(const char* name_var, variable* name_table) {
-    assert(name_var);
-    assert(name_table);
-
-    for (int i = 0; i < AMOUNT_VARIABLES; i++) {
-        if (strcmp(name_table[i].name_variable, name_var + 1) == 0) {
-            return name_table[i].mean_variable;
-        }
-    }
-
-//TODO Добавить передачу переменой по адресу
-    return 0;
-}
-
-
-
-int completion_name_table(variable* name_table) {
-    assert(name_table);
-
-// Первый коэффициент
-    name_table[0].mean_variable = 1;
-    name_table[0].name_variable = "A";
-
-// Второй коэффициент
-    name_table[1].mean_variable = 4;
-    name_table[1].name_variable = "B";
-
-// Третий коэффициент
-    name_table[2].mean_variable = 4;
-    name_table[2].name_variable = "C";
-
-    return 0;
-}
-
 
 
 size_t skip_comment(const char* asm_code, const char last_char) {
@@ -295,4 +234,5 @@ int check_realloc(int** bin_code, size_t* max_elements, size_t current_element) 
     }
     return 0;
 }
+
 

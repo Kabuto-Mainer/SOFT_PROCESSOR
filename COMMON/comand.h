@@ -28,5 +28,9 @@ enum INT_COMANDS{
     INT_HLT = 7
 };
 
+const int AMOUNT_SUP_NUM = 4;
+
+const int OWN_SIGNATURE = 1388;
+const int CURRENT_VERSION = 2;
 
 #endif // COMAND_H
