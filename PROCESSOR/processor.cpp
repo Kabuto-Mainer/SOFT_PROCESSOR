@@ -35,6 +35,30 @@ int* create_bin_buffer(const char* name_bin_file,
 
     FILE* bin_file = fopen_file(name_bin_file, "rb");
 
+    int signature = 0;
+    if (fread(&signature, sizeof(int), 1, bin_file) != 1) {
+        fclose_file(bin_file);
+        printf("ERROR: read signature not correct\n");
+        return NULL;
+    }
+
+    if (signature != OWN_SIGNATURE) {
+        printf("ERROR: signature is not coincidence\n");
+        return NULL;
+    }
+
+    int version = 0;
+    if (fread(&version, sizeof(int), 1, bin_file) != 1) {
+        fclose_file(bin_file);
+        printf("ERROR: read version not correct\n");
+        return NULL;
+    }
+
+    if (version != CURRENT_VERSION) {
+        printf("ERROR: invalid version\n");
+        return NULL;
+    }
+
     if (fread(amount_elements, sizeof(int), 1, bin_file) != 1) {
         fclose_file(bin_file);
         printf("ERROR: read amount_elements not correct\n");
@@ -48,8 +72,10 @@ int* create_bin_buffer(const char* name_bin_file,
     }
 
 //! Нам точно известно, что amount_elements > 2
-    int* bin_code = create_int_buffer(size_t (*amount_elements - 2));
-    if (fread(bin_code, sizeof(int), size_t(*amount_elements - 2), bin_file) != size_t(*amount_elements - 2)) {
+    int* bin_code = create_int_buffer(size_t (*amount_elements - AMOUNT_SUP_NUM));
+    if (fread(bin_code, sizeof(int), size_t(*amount_elements - AMOUNT_SUP_NUM), bin_file)
+        != size_t(*amount_elements - AMOUNT_SUP_NUM)) {
+
         free(bin_code);
         fclose_file(bin_file);
         printf("ERROR: with read bin_code\n");

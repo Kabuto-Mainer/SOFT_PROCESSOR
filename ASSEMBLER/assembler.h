@@ -25,10 +25,12 @@ enum asm_error_t{
     FEW_MUL = -7,
     FEW_OUT = -8,
     FEW_SQRT = -9,
-    UNKNOWN_CMD = -10
+    UNKNOWN_CMD = -10,
+    NULL_ADR = -11,
+    FILE_ERR = -12
 };
 
-const int AMOUNT_ERRORS = 10;
+const int AMOUNT_ERRORS = 12;
 
 char DESCRIPTION_ERRORS[AMOUNT_ERRORS][40] = {
     "syntax is not valid\n",
@@ -40,13 +42,11 @@ char DESCRIPTION_ERRORS[AMOUNT_ERRORS][40] = {
     "too few argument to MUL\n",
     "too few argument to OUT\n",
     "too few argument to SQRTn",
-    "unknown command\n"
+    "unknown command\n",
+    "null address\n",
+    "error with writing to file"
 };
 
-struct variable{
-    const char* name_variable;
-    int mean_variable;
-};
 
 const int AMOUNT_VARIABLES = 3;
 
@@ -58,13 +58,9 @@ free(text_str); \
 return return_error;
 
 
-int my_assembler(const char* name_asm_file,
+asm_error_t my_assembler(const char* name_asm_file,
                 const char* name_byte_file,
-                const char* name_text_file,
-                variable* name_table);
-
-int find_mean_variable(const char* name_var, variable* name_table);
-int completion_name_table(variable* name_table);
+                const char* name_text_file);
 
 
 int check_realloc(int** bin_code, size_t* max_size, size_t current_size);

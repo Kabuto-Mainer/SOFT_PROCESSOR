@@ -88,7 +88,7 @@ size_t find_char (const char* string, const char symbol) {
     assert(string);
 
     for (size_t i = 0; ; i++) {
-        if (*(string + i) == symbol || *(string + i) == '\n') {
+        if (*(string + i) == symbol || *(string + i) == '\n' || *(string + i) == '\0') {
             return i;
         }
     }
