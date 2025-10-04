@@ -11,17 +11,17 @@
 #define MOD_WORK DEBUG
 
 // Канареечная зашита
-#define BIRD_SECURE OFF
+#define BIRD_SECURE ON
 
 // Хеш зашиты
-#define HASH_SECURE OFF
+#define HASH_SECURE ON
 
 // Автоматическое увеличение стека
-#define AUTO_REALLOC OFF
+#define AUTO_REALLOC ON
 
 // Заполнение стека
 //* Необходимо для работы Канареечной и Хеш зашиты
-#define COMPLETION_DATA OFF
+#define COMPLETION_DATA ON
 
 
 // Тип данных стека. В режиме процессора должен быть <int>

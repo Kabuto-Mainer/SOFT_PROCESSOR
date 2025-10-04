@@ -10,7 +10,7 @@
 
 
 
-stack_error_t stack_stk(stack_struct* stack_address, const long int start_capacity,
+stack_error_t stack_creator(stack_struct* stack_address, const long int start_capacity,
                         const char* file_name, const int line, const char* stack_name) {
     // assert(stack_address);
     assert(file_name);
@@ -42,7 +42,6 @@ stack_error_t stack_stk(stack_struct* stack_address, const long int start_capaci
 
                                             // Мы точно знаем, что это значение > 0
     stmn_t* buffer_address = (stmn_t*) calloc(((size_t) start_capacity + 2 * SIZE_ADD_CAPACITY), sizeof(stmn_t));
-
 
     STACK_STR_ADDRESS_CHECK(stack_address, buffer_address);
     stack_address->data = buffer_address + SIZE_ADD_CAPACITY;
@@ -92,7 +91,6 @@ stack_error_t stack_push(stack_struct* stack_address, const stmn_t mean_to_push)
 REPLACE_HASH_CODE(stack_address);
 #endif
 //-----------------------------------
-
     DUMP_NOT_CORRECT_STACK(stack_address);
 
     return NOT_ERRORS;
@@ -106,6 +104,7 @@ stack_error_t stack_pop(stack_struct* stack_address, stmn_t* mean_pop_address) {
     DUMP_NOT_CORRECT_STACK(stack_address);
     STACK_POP_CHECK(stack_address);
 
+
     *mean_pop_address = stack_address->data[--(stack_address->size)];
 
 //--------------------------------
@@ -113,7 +112,6 @@ stack_error_t stack_pop(stack_struct* stack_address, stmn_t* mean_pop_address) {
 REPLACE_HASH_CODE(stack_address);
 #endif
 //---------------------------------
-
     DUMP_NOT_CORRECT_STACK(stack_address);
 
     return NOT_ERRORS;
@@ -235,8 +233,8 @@ int stack_dump(stack_struct* stack_address) {
 
     if ((error_with_stack & BAD_CREATE_CALLOC) == BAD_CREATE_CALLOC ||
         (error_with_stack & BAD_DATA_ADDRESS) == (BAD_DATA_ADDRESS) ||
-        (error_with_stack & BAD_REALLOC) == BAD_REALLOC ||
-        stack_address->size < 1) {
+        (error_with_stack & BAD_REALLOC) == BAD_REALLOC /*||
+        stack_address->size < 1*/) {
         printf("%s===============================================================================\n%s",_P_, _N_);
         return 0;
     }
@@ -361,32 +359,32 @@ void print_stack_for_dump(stack_struct* stack_address, const int error_with_stac
     assert(stack_address);
 
     if (SIZE_ADD_CAPACITY > 0) {
-        printf("    first bird = ");
+        printf(_M_ "    first bird = ");
         PRINT_ELEMENT((stack_address->data)[0 - SIZE_ADD_CAPACITY]);
         printf(" (BIRD_NUM) (MUST BE ");
         PRINT_ELEMENT(BIRD_NUM);
-        printf(")\n");
+        printf(")\n" _N_);
     }
-
-    for (int i = 0; i < MIN_INT(stack_address->size + SIZE_ADD_CAPACITY * 2, AMOUNT_PRINT_ELEMENT); i++) {
+/*MIN_INT(stack_address->size + SIZE_ADD_CAPACITY * 2, AMOUNT_PRINT_ELEMENT)*/
+    for (int i = 0; i < (stack_address->capacity); i++) {
         printf("   ");
 
-        if ((error_with_stack & BAD_SIZE) != BAD_SIZE && i <= stack_address->size && i != 0) {
+        if ((error_with_stack & BAD_SIZE) != BAD_SIZE && i < stack_address->size) {
             printf("*");
         }
         else {
             printf(" ");
         }
-        printf("%d = %s", i, _B_);
+        printf(_P_ "%d%s = " _B_, i, _N_);
         PRINT_ELEMENT((stack_address->data)[i]);
-        printf("%s\n", _P_);
+        printf("%s\n" _N_, _P_);
     }
     if (SIZE_ADD_CAPACITY > 0) {
-        printf("    second bird = ");
-        PRINT_ELEMENT((stack_address->data)[stack_address->capacity + SIZE_ADD_CAPACITY]);
+        printf(_M_ "    second bird = ");
+        PRINT_ELEMENT((stack_address->data)[stack_address->capacity]);
         printf(" (BIRD_NUM) (MUST BE ");
         PRINT_ELEMENT(BIRD_NUM);
-        printf(")\n");
+        printf(")\n" _N_);
     }
 }
 
