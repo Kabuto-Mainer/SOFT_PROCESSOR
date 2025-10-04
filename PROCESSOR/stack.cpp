@@ -48,7 +48,7 @@ stack_error_t stack_creator(stack_struct* stack_address, const long int start_ca
 
 //------------------------------------------------------------------
 #if COMPLETION_DATA == ON
-    for (long int i = SIZE_ADD_CAPACITY; i < start_capacity; i++) {
+    for (long int i = SIZE_ADD_CAPACITY; i <= start_capacity; i++) {
         buffer_address[i] = POISON_NUM;
     }
 
@@ -193,7 +193,7 @@ stack_error_t stack_realloc(stack_struct* stack_address) {
 
 //-------------------------------------------------------------------
 #if COMPLETION_DATA == ON
-    for (ssize_t i = SIZE_ADD_CAPACITY; i < stack_address->capacity; i++) {
+    for (ssize_t i = stack_address->size + 1; i <= stack_address->capacity; i++) {
         buffer_address[i] = POISON_NUM;
     }
 

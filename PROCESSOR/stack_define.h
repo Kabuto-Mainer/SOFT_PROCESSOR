@@ -207,7 +207,7 @@ struct stack_struct{
 // Если мы не хотим заниматься самостоятельным увеличением стека
 #if AUTO_REALLOC == AUTO_REALLOC
 #define STACK_PUSH_CHECK(stack_address) { \
-   if ((stack_address)->capacity <= stack_address->size + 2 * SIZE_ADD_CAPACITY) { \
+   if ((stack_address)->capacity <= stack_address->size) { \
       stack_realloc(stack_address); \
    }\
 }
