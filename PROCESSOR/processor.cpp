@@ -81,6 +81,8 @@ int my_proc(const char* name_bin_file) {
     }
 
     for ( ; size_t (proc.C_E) < size_t (amount_elements - AMOUNT_SUP_NUM); (proc.C_E)++) {
+        // proc_dump(&proc);
+        getchar();
         switch (proc.bin_code[proc.C_E]) {
             case INT_PUSH: {
                 proc.C_E++;
@@ -187,14 +189,19 @@ int my_proc(const char* name_bin_file) {
                 break;
             }
 
+            case INT_JMP: {
+                proc.C_E++;
+                proc.C_E = proc.bin_code[proc.C_E] - 2;
+
+                break;
+            }
+
             default: {
                 proc_destruct(&proc);
                 printf(_R_ "ERROR: unknown command\n" _N_);
                 return -1;
             }
         }
-        proc_dump(&proc);
-        getchar();
     }
     proc_destruct(&proc);
     return -1;
@@ -233,6 +240,7 @@ int proc_creator(cpu_t* proc,
     return 0;
 }
 
+
 int proc_destruct(cpu_t* proc) {
     assert(proc);
 
@@ -247,16 +255,22 @@ int proc_dump(cpu_t* proc) {
     assert(proc);
 
     // stack_dump(&(proc->stack)); // Выводит слишком много
+    printf(_R_ "\n=== STACK ===\n\n" _N_);
+
     printf(_P_"size = %s%zd%s\n", _B_, proc->stack.size, _P_);
     printf("capacity = %s%zd%s\n", _B_, proc->stack.capacity, _P_);
     printf("data %s[%p]%s\n" _N_ , _B_, proc->stack.data, _P_);
 
     print_stack_for_dump(&(proc->stack), NOT_ERRORS);
 
+    printf(_R_ "\n=== BIN_CODE ===\n\n" _N_);
+
     print_before_end(proc);
     print_end(proc);
 
-    print_reg(proc);
+//     printf(_R_ "\n=== Registers ===\n\n");
+//
+//     print_reg(proc);
 
     return 0;
 }
@@ -265,7 +279,7 @@ int proc_dump(cpu_t* proc) {
 int print_before_end(cpu_t* proc) {
     assert(proc);
 
-    if ((proc->amount_el - AMOUNT_SUP_NUM) / 8 == 0) {
+    if ((proc->amount_el - AMOUNT_SUP_NUM) % 8 == 0) {
         for (unsigned int i = 0; i < ((unsigned) (proc->amount_el - AMOUNT_SUP_NUM) / 8); i++) {
             print_line(proc, i);
         }
@@ -284,7 +298,6 @@ int print_end(cpu_t* proc) {
     assert(proc);
 
     for (unsigned i = 0; i < ((unsigned) (proc->amount_el - AMOUNT_SUP_NUM) % 8); i++) {
-        printf("%ud\n", i);
         print_line(proc, ((unsigned) (proc->amount_el - AMOUNT_SUP_NUM) / 8));
     }
 
@@ -298,7 +311,7 @@ int print_line(cpu_t* proc, unsigned int i) {
     printf(_G_ "[%p]: " _N_, proc->bin_code + i * 8);
 
     for (unsigned int buf = 0; buf < 8; buf++) {
-        if (i * 8 + buf == (unsigned) proc->C_E) {
+        if (i * 8 + buf == (unsigned) proc->C_E ) {
             printf(_G_ "%02X " _N_, *((unsigned char*) (proc->bin_code + i * 8 + buf) + 0));
             printf(_G_ "%02X " _N_, *((unsigned char*) (proc->bin_code + i * 8 + buf) + 1));
             printf(_G_ "%02X " _N_, *((unsigned char*) (proc->bin_code + i * 8 + buf) + 2));
@@ -327,7 +340,7 @@ int print_reg(cpu_t* proc) {
     assert(proc);
 
     for (int i = 0; i < AMOUNT_REGISTERS; i++) {
-        printf(_P_ "%s: %08X\n" _N_, CHAR_REG[i], proc->regs[i]);
+        printf(_P_ "%s: %s%08d\n" _N_, CHAR_REG[i], _B_, proc->regs[i]);
     }
 
     return 0;

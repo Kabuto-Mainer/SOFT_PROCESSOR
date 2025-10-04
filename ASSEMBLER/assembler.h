@@ -32,10 +32,12 @@ enum asm_error_t{
     FEW_REG = -13,
     ERR_PUSHR = -14,
     INVALID_REG = -15,
-    NO_VARIABLE = -16
+    NO_VARIABLE = -16,
+    FEW_LOC = -17,
+    INVALID_LOC = -18
 };
 
-const int AMOUNT_ERRORS = 17;
+const int AMOUNT_ERRORS = 18;
 
 char DESCRIPTION_ERRORS[AMOUNT_ERRORS][40] = {
     "syntax is not valid\n",
@@ -53,7 +55,9 @@ char DESCRIPTION_ERRORS[AMOUNT_ERRORS][40] = {
     "no register\n",
     "no variable ib register\n",
     "invalid register\n",
-    "no variable in register\n"
+    "no variable in register\n",
+    "no location to jump\n",
+    "invalid location to jump\n"
 };
 
 
