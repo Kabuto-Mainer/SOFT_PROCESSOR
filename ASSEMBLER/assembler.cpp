@@ -85,7 +85,7 @@ asm_error_t my_assembler(const char* name_asm_file,
             max_push = push_counter;
         }
 //--------------------------------------------------------------
-        if (strcmp(comand, STR_MASS_COMANDS[INT_PUSH]) == 0) {
+        if (strcmp(comand, CHAR_CMD[INT_PUSH]) == 0) {
             int argument = 0;
             if (sscanf(asm_code + current_symbol + sscanf_amount, "%d", &argument) != 1) {
                 EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, NO_ARG);
@@ -102,14 +102,14 @@ asm_error_t my_assembler(const char* name_asm_file,
             push_counter++;
         }
 //---------------------------------------------------------------------------------
-        else if (strcmp(comand, STR_MASS_COMANDS[INT_IN]) == 0) {
+        else if (strcmp(comand, CHAR_CMD[INT_IN]) == 0) {
             bin_code[current_element++] = INT_IN;
 
-            PRINT_TEXT(text_stream, INT_DIV);
+            PRINT_TEXT(text_stream, INT_IN);
             push_counter++;
         }
 //-------------------------------------------------------------------------------------
-        else if (strcmp(comand, STR_MASS_COMANDS[INT_POPR]) == 0) {
+        else if (strcmp(comand, CHAR_CMD[INT_POPR]) == 0) {
             char REG[10] = "";
             if (sscanf(asm_code + current_symbol + sscanf_amount, "%s", REG) != 1) {
                 EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, FEW_REG);
@@ -132,7 +132,7 @@ asm_error_t my_assembler(const char* name_asm_file,
             push_counter--;
         }
 //-------------------------------------------------------------------------------------
-        else if (strcmp(comand, STR_MASS_COMANDS[INT_PUSHR]) == 0) {
+        else if (strcmp(comand, CHAR_CMD[INT_PUSHR]) == 0) {
             char REG[10] = "";
             if (sscanf(asm_code + current_symbol + sscanf_amount, "%s", REG) != 1) {
                 EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, FEW_REG);
@@ -157,7 +157,7 @@ asm_error_t my_assembler(const char* name_asm_file,
             push_counter++;
         }
 //---------------------------------------------------------------------------------
-        else if (strcmp(comand, STR_MASS_COMANDS[INT_ADD]) == 0) {
+        else if (strcmp(comand, CHAR_CMD[INT_ADD]) == 0) {
             if (push_counter < 2) {
                 EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, FEW_ADD);
             }
@@ -168,7 +168,7 @@ asm_error_t my_assembler(const char* name_asm_file,
             push_counter--;
         }
 //-------------------------------------------------------------------------------------
-        else if (strcmp(comand, STR_MASS_COMANDS[INT_SUB]) == 0) {
+        else if (strcmp(comand, CHAR_CMD[INT_SUB]) == 0) {
             if (push_counter < 2) {
                 EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, FEW_SUB);
             }
@@ -179,7 +179,7 @@ asm_error_t my_assembler(const char* name_asm_file,
             push_counter--;
         }
 //-------------------------------------------------------------------------------------
-        else if (strcmp(comand, STR_MASS_COMANDS[INT_DIV]) == 0) {
+        else if (strcmp(comand, CHAR_CMD[INT_DIV]) == 0) {
             if (push_counter < 2) {
                 EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, FEW_DIV);
             }
@@ -190,7 +190,7 @@ asm_error_t my_assembler(const char* name_asm_file,
             push_counter--;
         }
 //-------------------------------------------------------------------------------------
-        else if (strcmp(comand, STR_MASS_COMANDS[INT_MUL]) == 0) {
+        else if (strcmp(comand, CHAR_CMD[INT_MUL]) == 0) {
             if (push_counter < 2) {
                 EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, FEW_MUL);
             }
@@ -201,7 +201,7 @@ asm_error_t my_assembler(const char* name_asm_file,
             push_counter--;
         }
 //-------------------------------------------------------------------------------------
-        else if (strcmp(comand, STR_MASS_COMANDS[INT_SQRT]) == 0) {
+        else if (strcmp(comand, CHAR_CMD[INT_SQRT]) == 0) {
             bin_code[current_element++] = INT_SQRT;
             if (push_counter < 1) {
                 EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, FEW_SQRT);
@@ -211,7 +211,7 @@ asm_error_t my_assembler(const char* name_asm_file,
             PRINT_TEXT(text_stream, INT_SQRT);
         }
 //-------------------------------------------------------------------------------------
-        else if (strcmp(comand, STR_MASS_COMANDS[INT_OUT]) == 0) {
+        else if (strcmp(comand, CHAR_CMD[INT_OUT]) == 0) {
             if (push_counter < 1) {
                 EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, FEW_OUT);
             }
@@ -222,7 +222,7 @@ asm_error_t my_assembler(const char* name_asm_file,
             push_counter--;
         }
 //-------------------------------------------------------------------------------------
-        else if (strcmp(comand, STR_MASS_COMANDS[INT_HLT]) == 0) {
+        else if (strcmp(comand, CHAR_CMD[INT_HLT]) == 0) {
             bin_code[current_element++] = INT_HLT;
 
             amount_cmd++;
@@ -247,7 +247,7 @@ asm_error_t my_assembler(const char* name_asm_file,
 
     FILE* bin_file = fopen_file(name_byte_file, "wb");
     if (fwrite(bin_code, sizeof(int), current_element, bin_file) != current_element) {
-        printf("ERROR: write bin_code to bin_file was failed\n");
+        printf(_R_ "ERROR: write bin_code to bin_file was failed\n" _N_);
         free(bin_code);
         return FILE_ERR;
     }
@@ -255,19 +255,8 @@ asm_error_t my_assembler(const char* name_asm_file,
 
     free(bin_code);
     free(asm_code);
-    printf("Compilation was completed\n");
+    printf(_G_ "Compilation was completed\n" _N_);
     return NOT_ERRORS;
-}
-
-
-size_t skip_comment(const char* asm_code, const char last_char) {
-    assert(asm_code);
-
-    if (*asm_code != COMMENT_CHAR) {
-        return 0;
-    }
-
-    return find_char(asm_code, last_char) + 1;
 }
 
 
@@ -279,7 +268,7 @@ int check_realloc(int** bin_code, size_t* max_elements, size_t current_element) 
         int* buffer_address = realloc_buffer(*bin_code, *max_elements);
 
         if (buffer_address == NULL) {
-            printf("ERROR in check_realloc: Null address\n");
+            printf(_R_ "ERROR in check_realloc: Null address\n" _N_);
             return -1;
         }
         // printf("BUFFER = [%p]\n", buffer_address);

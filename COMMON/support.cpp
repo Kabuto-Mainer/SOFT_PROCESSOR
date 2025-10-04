@@ -5,6 +5,8 @@
 
 #include "support.h"
 #include "const.h"
+#include "comand.h"
+#include "color.h"
 
 FILE* fopen_file(const char* name_file, const char* type_open) {
     assert(name_file);
@@ -73,7 +75,6 @@ int* realloc_buffer(int* address, const size_t max_size) {
 }
 
 
-
 size_t pass_space(const char* string_place, size_t index) {
     assert(string_place);
 
@@ -94,3 +95,34 @@ size_t find_char (const char* string, const char symbol) {
     }
     return 0;
 }
+
+
+int check_inf(FILE* bin_file) {
+    assert(bin_file);
+
+    int signature = 0;
+    if (fread(&signature, sizeof(int), 1, bin_file) != 1) {
+        fclose_file(bin_file);
+        printf(_R_ "ERROR: read signature not correct\n" _N_);
+        return -1;
+    }
+
+    if (signature != OWN_SIGNATURE) {
+        printf(_R_ "ERROR: signature is not coincidence\n" _N_);
+        return -1;
+    }
+
+    int version = 0;
+    if (fread(&version, sizeof(int), 1, bin_file) != 1) {
+        fclose_file(bin_file);
+        printf(_R_ "ERROR: read version not correct\n" _N_);
+        return -1;
+    }
+
+    if (version != CURRENT_VERSION) {
+        printf(_R_ "ERROR: invalid version\n" _N_);
+        return -1;
+    }
+    return 0;
+}
+

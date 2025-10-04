@@ -76,7 +76,7 @@ stack_error_t stack_push(stack_struct* stack_address,
 int stack_destruct(stack_struct* stack_address);
 
 
-stack_error_t stack_stk(stack_struct* stack_address,
+stack_error_t stack_creator(stack_struct* stack_address,
                         const long int start_capacity,
                         const char* file_name,
                         const int line_number,

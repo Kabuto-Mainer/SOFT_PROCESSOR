@@ -2,6 +2,7 @@
 #define DISASSEMBLER_H
 
 #include "../COMMON/const.h"
+#include "../COMMON/color.h"
 
 #define PRINT_TO_TEXT_FILE ON
 
@@ -57,10 +58,10 @@ char DESCRIPTION_ERRORS[AMOUNT_ERRORS][40] = {
 
 
 #define EXIT_FUNCTION(name_file, amount_cmd, bin_code, text_str, return_error) \
-printf("%s:%d: ERROR: %s\n", name_file, amount_cmd + 1, DESCRIPTION_ERRORS[-1 * return_error - 1]); \
-free(bin_code); \
-free(text_str); \
-return return_error;
+ printf(_R_ "%s:%d: ERROR: %s\n" _N_, name_file, amount_cmd + 1, DESCRIPTION_ERRORS[-1 * return_error - 1]); \
+ free(bin_code); \
+ free(text_str); \
+ return return_error;
 
 
 asm_error_t my_assembler(const char* name_asm_file,
@@ -69,13 +70,10 @@ asm_error_t my_assembler(const char* name_asm_file,
 
 
 int check_realloc(int** bin_code, size_t* max_size, size_t current_size);
-size_t skip_comment(const char* asm_code, const char last_char);
+
 
 int char_reg_to_int(const char* name_reg);
 
-// Синтаксис KBC - язык
-const char DEC_VAR = '$';
-const char COMMENT_CHAR = '#';
 
 
 
