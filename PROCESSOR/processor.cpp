@@ -256,6 +256,8 @@ int proc_dump(cpu_t* proc) {
     print_before_end(proc);
     print_end(proc);
 
+    print_reg(proc);
+
     return 0;
 }
 
@@ -290,72 +292,6 @@ int print_end(cpu_t* proc) {
 }
 
 
-int print_current(cpu_t* proc) {
-    assert(proc);
-
-    for (int i = 0; i < proc->C_E % 16; i++) {
-        printf("%02X ", (unsigned) proc->bin_code[i + (proc->C_E / 16) * 16]);
-    }
-
-    printf(_G_ "%0X " _N_ , (unsigned) proc->bin_code[proc->C_E]);
-
-    for (int i = 0; i < 16 - proc->C_E % 16; i++) {
-        printf("%02X ", (unsigned) proc->bin_code[i + proc->C_E]);
-    }
-
-    printf("         ");
-
-    for (int i = 0; i < proc->C_E % 16; i++) {
-        printf("---");
-    }
-
-    printf("^^-");
-
-    for (int i = 0; i < 16 - proc->C_E % 16; i++) {
-        printf("---");
-    }
-
-    putchar('\n');
-    return 0;
-}
-
-
-int print_after_current(cpu_t* proc) {
-    assert(proc);
-
-    for (unsigned int i = unsigned (proc->C_E / 16 + 1); i < unsigned(proc->amount_el / 16); i++) {
-        printf(_B_ "\nLINE %X: " _N_,  i * 16);
-
-        for (int buf = 0; buf < 16; buf++) {
-            printf("%02X ", (unsigned) proc->bin_code[i * 16 + unsigned (buf) ]);
-        }
-
-        putchar('\n');
-
-        printf("         ");
-
-        for (int buf = 0; buf < 16; buf++) {
-            printf("---");
-        }
-
-        putchar('\n');
-    }
-
-    printf(_B_ "\nLINE %X: " _N_,  unsigned (proc->amount_el / 16) * 16);
-
-    for (int i = (proc->amount_el / 16) * 16; i < proc->amount_el; i++) {
-        printf("%02X ", (unsigned) proc->bin_code[i]);
-    }
-
-    printf("         ");
-
-    for (int buf = 0; buf < proc->amount_el % 16; buf++) {
-        printf("---");
-    }
-    return 0;
-}
-
-
 int print_line(cpu_t* proc, unsigned int i) {
     assert(proc);
 
@@ -383,6 +319,17 @@ int print_line(cpu_t* proc, unsigned int i) {
 
     }
     putchar('\n');
+    return 0;
+}
+
+
+int print_reg(cpu_t* proc) {
+    assert(proc);
+
+    for (int i = 0; i < AMOUNT_REGISTERS; i++) {
+        printf(_P_ "%s: %08X\n" _N_, CHAR_REG[i], proc->regs[i]);
+    }
+
     return 0;
 }
 

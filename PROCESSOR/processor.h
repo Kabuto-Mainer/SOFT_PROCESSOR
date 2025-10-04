@@ -31,8 +31,7 @@ int proc_dump(cpu_t* proc);
 int print_before_end(cpu_t* proc);
 int print_end(cpu_t* proc);
 
-int print_current(cpu_t* proc);
-int print_after_current(cpu_t* proc);
+int print_reg(cpu_t* proc);
 int print_line(cpu_t* proc, unsigned int i);
 
 
