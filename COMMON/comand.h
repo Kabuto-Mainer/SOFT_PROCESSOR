@@ -1,7 +1,7 @@
 #ifndef COMAND_H
 #define COMAND_H
 
-const char NAME_ASM_FILE[] = "CODE-FILE/quad.asm";
+const char NAME_ASM_FILE[] = "CODE-FILE/asm-code.asm";
 const char NAME_BIN_FILE[] = "CODE-FILE/bin-code.bin";
 const char NAME_TEXT_FILE[] = "CODE-FILE/text-code.txt";
 const char NAME_DISASMB_FILE[] = "CODE-FILE/disasmb-text.asm";
@@ -17,7 +17,8 @@ const char CHAR_CMD[20][6] = {
                         "HLT",
                         "POPR",
                         "PUSHR",
-                        "IN"
+                        "IN",
+                        "JMP"
 };
 
 enum INT_CMD{
@@ -31,7 +32,8 @@ enum INT_CMD{
     INT_HLT = 7,
     INT_POPR = 8,
     INT_PUSHR = 9,
-    INT_IN = 10
+    INT_IN = 10,
+    INT_JMP = 11
 };
 
 enum INT_REG{
