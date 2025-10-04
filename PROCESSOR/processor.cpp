@@ -215,6 +215,9 @@ int proc_creator(cpu_t* proc,
     }
     proc->bin_code = bin_code;
 
+//TODO убрать это тест
+    // size_stack = 1;
+
     if (stack_creator(&(proc->stack), size_stack, __FILE__,  __LINE__, NAME_RETURN(stack)) != 0) {
         printf(_R_ "ERROR: creating stack was not completed\n" _N_);
         return -1;
