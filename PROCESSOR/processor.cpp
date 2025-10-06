@@ -13,6 +13,7 @@
 
 
 int main(int argv, char* args[]) {
+
     if (argv > 1) {
         FILE* buffer = fopen_file(args[1], "wb");
         fclose_file(buffer);
@@ -75,13 +76,13 @@ int my_proc(const char* name_bin_file) {
     int amount_elements = 0;
     cpu_t proc = {};
 
-    if (proc_creator(&proc, name_bin_file, &amount_elements) == -1) {
-        printf(_R_ "ERROR: proc_creator return -1\n" _N_);
+    if (cpu_ctor(&proc, name_bin_file, &amount_elements) == -1) {
+        printf(_R_ "ERROR: cpu_ctor return -1\n" _N_);
         return -1;
     }
 
     for ( ; size_t (proc.C_E) < size_t (amount_elements - AMOUNT_SUP_NUM); (proc.C_E)++) {
-        // proc_dump(&proc);
+        proc_dump(&proc);
         getchar();
         switch (proc.bin_code[proc.C_E]) {
             case INT_PUSH: {
@@ -90,7 +91,7 @@ int my_proc(const char* name_bin_file) {
                 stack_push(&(proc.stack), proc.bin_code[proc.C_E]);
                 break;
             }
-
+//------------------------------------------------------------------------------------------------
             case INT_IN: {
                 int num = 0;
 
@@ -100,7 +101,7 @@ int my_proc(const char* name_bin_file) {
                 stack_push(&(proc.stack), num);
                 break;
             }
-
+//------------------------------------------------------------------------------------------------
             case INT_ADD: {
                 int arg_1 = 0;
                 int arg_2 = 0;
@@ -111,7 +112,7 @@ int my_proc(const char* name_bin_file) {
                 stack_push(&(proc.stack), arg_1 + arg_2);
                 break;
             }
-
+//------------------------------------------------------------------------------------------------
             case INT_SUB: {
                 int arg_1 = 0;
                 int arg_2 = 0;
@@ -122,7 +123,7 @@ int my_proc(const char* name_bin_file) {
                 stack_push(&(proc.stack), arg_1 - arg_2);
                 break;
             }
-
+//------------------------------------------------------------------------------------------------
             case INT_DIV: {
                 int arg_1 = 0;
                 int arg_2 = 0;
@@ -132,14 +133,14 @@ int my_proc(const char* name_bin_file) {
 
                 if (arg_2 == 0) {
                     printf(_R_ "ERROR: division by zero is not correct\n" _N_);
-                    proc_destruct(&proc);
+                    cpu_dtor(&proc);
                     return -1;
                 }
 
                 stack_push(&(proc.stack), arg_1 / arg_2);
                 break;
             }
-
+//------------------------------------------------------------------------------------------------
             case INT_MUL: {
                 int arg_1 = 0;
                 int arg_2 = 0;
@@ -150,7 +151,7 @@ int my_proc(const char* name_bin_file) {
                 stack_push(&(proc.stack), arg_1 * arg_2);
                 break;
             }
-
+//------------------------------------------------------------------------------------------------
             case INT_SQRT: {
                 int arg = 0;
 
@@ -158,7 +159,7 @@ int my_proc(const char* name_bin_file) {
                 stack_push(&(proc.stack), (int) sqrt(arg));
                 break;
             }
-
+//------------------------------------------------------------------------------------------------
             case INT_OUT: {
                 int arg = 0;
 
@@ -166,12 +167,12 @@ int my_proc(const char* name_bin_file) {
                 printf("%d\n", arg);
                 break;
             }
-
+//------------------------------------------------------------------------------------------------
             case INT_HLT: {
-                proc_destruct(&proc);
+                cpu_dtor(&proc);
                 return 0;
             }
-
+//------------------------------------------------------------------------------------------------
             case INT_POPR: {
                 int reg = proc.bin_code[++proc.C_E];
                 int num = 0;
@@ -180,7 +181,7 @@ int my_proc(const char* name_bin_file) {
                 proc.regs[reg] = num;
                 break;
             }
-
+//------------------------------------------------------------------------------------------------
             case INT_PUSHR: {
                 int reg = proc.bin_code[++proc.C_E];
                 int num = proc.regs[reg];
@@ -188,7 +189,7 @@ int my_proc(const char* name_bin_file) {
                 stack_push(&(proc.stack), num);
                 break;
             }
-
+//------------------------------------------------------------------------------------------------
             case INT_JMP: {
                 proc.C_E++;
                 proc.C_E = proc.bin_code[proc.C_E] - 2;
@@ -196,19 +197,53 @@ int my_proc(const char* name_bin_file) {
                 break;
             }
 
+            case INT_HACK: {
+                // proc.stack.size = -1;
+                int arg_1 = 100;
+
+                proc.stack.data[2] = arg_1;
+
+                break;
+            }
+//------------------------------------------------------------------------------------------------
+            case INT_JB: {
+                J_COMAND(<);
+            }
+//---------------------------------------------------------------------------------------------------
+            case INT_JBE: {
+                J_COMAND(<=);
+            }
+//---------------------------------------------------------------------------------------------------
+            case INT_JA: {
+                J_COMAND(>);
+            }
+//---------------------------------------------------------------------------------------------------
+            case INT_JAE: {
+                J_COMAND(>=);
+            }
+//---------------------------------------------------------------------------------------------------
+            case INT_JE: {
+                J_COMAND(==);
+            }
+//---------------------------------------------------------------------------------------------------
+            case INT_JNE: {
+                J_COMAND(!=);
+            }
+//----------------------------------------------------------------------------------------------------
             default: {
-                proc_destruct(&proc);
+                cpu_dtor(&proc);
                 printf(_R_ "ERROR: unknown command\n" _N_);
                 return -1;
             }
         }
     }
-    proc_destruct(&proc);
+    printf(_R_ "Invalid go???\n" _N_);
+    cpu_dtor(&proc);
     return -1;
 }
 
 
-int proc_creator(cpu_t* proc,
+int cpu_ctor(cpu_t* proc,
                   const char* name_bin_file,
                   int* amount_elements) {
     assert(proc);
@@ -223,7 +258,7 @@ int proc_creator(cpu_t* proc,
     proc->bin_code = bin_code;
 
 //TODO убрать это тест
-    // size_stack = 1;
+    size_stack = START_SIZE_STACK;
 
     if (stack_creator(&(proc->stack), size_stack, __FILE__,  __LINE__, NAME_RETURN(stack)) != 0) {
         printf(_R_ "ERROR: creating stack was not completed\n" _N_);
@@ -241,7 +276,7 @@ int proc_creator(cpu_t* proc,
 }
 
 
-int proc_destruct(cpu_t* proc) {
+int cpu_dtor(cpu_t* proc) {
     assert(proc);
 
     stack_destruct(&(proc->stack));
@@ -255,19 +290,19 @@ int proc_dump(cpu_t* proc) {
     assert(proc);
 
     // stack_dump(&(proc->stack)); // Выводит слишком много
-    printf(_R_ "\n=== STACK ===\n\n" _N_);
+    // printf(_R_ "\n=== STACK ===\n\n" _N_);
 
     printf(_P_"size = %s%zd%s\n", _B_, proc->stack.size, _P_);
-    printf("capacity = %s%zd%s\n", _B_, proc->stack.capacity, _P_);
-    printf("data %s[%p]%s\n" _N_ , _B_, proc->stack.data, _P_);
+    // printf("capacity = %s%zd%s\n", _B_, proc->stack.capacity, _P_);
+    // printf("data %s[%p]%s\n" _N_ , _B_, proc->stack.data, _P_);
 
     print_stack_for_dump(&(proc->stack), NOT_ERRORS);
-
-    printf(_R_ "\n=== BIN_CODE ===\n\n" _N_);
-
-    print_before_end(proc);
-    print_end(proc);
-
+//
+//     printf(_R_ "\n=== BIN_CODE ===\n\n" _N_);
+//
+//     print_before_end(proc);
+//     print_end(proc);
+//
 //     printf(_R_ "\n=== Registers ===\n\n");
 //
 //     print_reg(proc);
@@ -279,16 +314,8 @@ int proc_dump(cpu_t* proc) {
 int print_before_end(cpu_t* proc) {
     assert(proc);
 
-    if ((proc->amount_el - AMOUNT_SUP_NUM) % 8 == 0) {
-        for (unsigned int i = 0; i < ((unsigned) (proc->amount_el - AMOUNT_SUP_NUM) / 8); i++) {
-            print_line(proc, i);
-        }
-    }
-
-    else {
-        for (unsigned int i = 0; i < ((unsigned) (proc->amount_el - AMOUNT_SUP_NUM) / 8) - 1; i++) {
-            print_line(proc, i);
-        }
+    for (unsigned int i = 0; i < ((unsigned) (proc->amount_el - AMOUNT_SUP_NUM) / 8); i++) {
+        print_line(proc, i);
     }
 
     return 0;
@@ -297,9 +324,33 @@ int print_before_end(cpu_t* proc) {
 int print_end(cpu_t* proc) {
     assert(proc);
 
-    for (unsigned i = 0; i < ((unsigned) (proc->amount_el - AMOUNT_SUP_NUM) % 8); i++) {
-        print_line(proc, ((unsigned) (proc->amount_el - AMOUNT_SUP_NUM) / 8));
+    // print_line(proc, ((unsigned) (proc->amount_el - AMOUNT_SUP_NUM) % 8 ));
+    printf(_G_ "[%p]: " _N_, proc->bin_code + (proc->amount_el - AMOUNT_SUP_NUM) / 8 * 8);
+
+    for (int i = 0; i < (proc->amount_el - AMOUNT_SUP_NUM) % 8; i++) {
+        if ((((proc->amount_el - AMOUNT_SUP_NUM) / 8 * 8) + i) == proc->C_E ) {
+            printf(_G_ "%02X " _N_, *((unsigned char*) (proc->bin_code + (proc->amount_el - AMOUNT_SUP_NUM) / 8 * 8 + i) + 0));
+            printf(_G_ "%02X " _N_, *((unsigned char*) (proc->bin_code + (proc->amount_el - AMOUNT_SUP_NUM) / 8 * 8 + i) + 1));
+            printf(_G_ "%02X " _N_, *((unsigned char*) (proc->bin_code + (proc->amount_el - AMOUNT_SUP_NUM) / 8 * 8 + i) + 2));
+            printf(_G_ "%02X " _N_, *((unsigned char*) (proc->bin_code + (proc->amount_el - AMOUNT_SUP_NUM) / 8 * 8 + i) + 3));
+        }
+
+        else if (i % 2 == 0) {
+            printf(_B_ "%02X " _N_, *((unsigned char*) (proc->bin_code + (proc->amount_el - AMOUNT_SUP_NUM) / 8 * 8 + i) + 0));
+            printf(_B_ "%02X " _N_, *((unsigned char*) (proc->bin_code + (proc->amount_el - AMOUNT_SUP_NUM) / 8 * 8 + i) + 1));
+            printf(_B_ "%02X " _N_, *((unsigned char*) (proc->bin_code + (proc->amount_el - AMOUNT_SUP_NUM) / 8 * 8 + i) + 2));
+            printf(_B_ "%02X " _N_, *((unsigned char*) (proc->bin_code + (proc->amount_el - AMOUNT_SUP_NUM) / 8 * 8 + i) + 3));
+        }
+        else {
+            printf(_P_ "%02X " _N_, *((unsigned char*) (proc->bin_code + (proc->amount_el - AMOUNT_SUP_NUM) / 8 * 8 + i) + 0));
+            printf(_P_ "%02X " _N_, *((unsigned char*) (proc->bin_code + (proc->amount_el - AMOUNT_SUP_NUM) / 8 * 8 + i) + 1));
+            printf(_P_ "%02X " _N_, *((unsigned char*) (proc->bin_code + (proc->amount_el - AMOUNT_SUP_NUM) / 8 * 8 + i) + 2));
+            printf(_P_ "%02X " _N_, *((unsigned char*) (proc->bin_code + (proc->amount_el - AMOUNT_SUP_NUM) / 8 * 8 + i) + 3));
+        }
     }
+    // for (unsigned i = 0; i < ((unsigned) (proc->amount_el - AMOUNT_SUP_NUM) % 8); i++) {
+    //     print_line(proc, ((unsigned) (proc->amount_el - AMOUNT_SUP_NUM) / 8 - 1));
+    // }
 
     return 0;
 }
@@ -317,12 +368,14 @@ int print_line(cpu_t* proc, unsigned int i) {
             printf(_G_ "%02X " _N_, *((unsigned char*) (proc->bin_code + i * 8 + buf) + 2));
             printf(_G_ "%02X " _N_, *((unsigned char*) (proc->bin_code + i * 8 + buf) + 3));
         }
+
         else if (buf % 2 == 0) {
             printf(_B_ "%02X " _N_, *((unsigned char*) (proc->bin_code + i * 8 + buf) + 0));
             printf(_B_ "%02X " _N_, *((unsigned char*) (proc->bin_code + i * 8 + buf) + 1));
             printf(_B_ "%02X " _N_, *((unsigned char*) (proc->bin_code + i * 8 + buf) + 2));
             printf(_B_ "%02X " _N_, *((unsigned char*) (proc->bin_code + i * 8 + buf) + 3));
         }
+
         else {
             printf(_P_ "%02X " _N_, *((unsigned char*) (proc->bin_code + i * 8 + buf) + 0));
             printf(_P_ "%02X " _N_, *((unsigned char*) (proc->bin_code + i * 8 + buf) + 1));

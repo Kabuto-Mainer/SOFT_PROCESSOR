@@ -39,6 +39,7 @@ asm_error_t my_assembler(const char* name_asm_file,
     int push_counter = 0; // Текущее количество элементов в стеке
     int max_push = 0; // Максимальное количество элементов в стеке
     int amount_cmd = 0;
+    int amount_line = 0;
 
     size_t max_elements = START_AMOUNT_CMD; // Only >= current_element
     size_t current_element = AMOUNT_SUP_NUM; // Only ++
@@ -67,11 +68,13 @@ asm_error_t my_assembler(const char* name_asm_file,
         if (*(asm_code + current_symbol) == '\0' ||
             sscanf(asm_code + current_symbol, "%s %n", comand, &sscanf_amount) == 0) {
             current_symbol += add_index + 1;
-            amount_cmd--;
+            amount_line++;
             continue;
         }
         comand[19] = '\0'; // На всякий случай
 
+        // printf("COMAND: %s\n", comand);
+// TODO struct
 
 // Проверки размеров
 //-----------------------------------------------------------------
@@ -87,12 +90,13 @@ asm_error_t my_assembler(const char* name_asm_file,
 //--------------------------------------------------------------
         if (strcmp(comand, CHAR_CMD[INT_PUSH]) == 0) {
             int argument = 0;
-            if (sscanf(asm_code + current_symbol + sscanf_amount, "%d", &argument) != 1) {
-                EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, NO_ARG);
+            if (sscanf(asm_code + current_symbol + sscanf_amount - 1, "%d", &argument) != 1) {
+                EXIT_FUNCTION(name_asm_file, amount_line, bin_code, asm_code, NO_ARG);
             }
 
+            // printf("ARGUMENT TO PUSH: %d\n", argument);
             if (argument < MIN_MEAN || argument > MAX_MEAN) {
-                EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, LIMIT);
+                EXIT_FUNCTION(name_asm_file, amount_line, bin_code, asm_code, LIMIT);
             }
 
             bin_code[current_element++] = INT_PUSH;
@@ -100,19 +104,23 @@ asm_error_t my_assembler(const char* name_asm_file,
 
             fprintf(text_stream, "%d %d\n", INT_PUSH, argument);
             push_counter++;
+
+            CONTINUE;
         }
 //---------------------------------------------------------------------------------
-        else if (strcmp(comand, CHAR_CMD[INT_IN]) == 0) {
+        if (strcmp(comand, CHAR_CMD[INT_IN]) == 0) {
             bin_code[current_element++] = INT_IN;
 
             PRINT_TEXT(text_stream, INT_IN);
             push_counter++;
+
+            CONTINUE;
         }
 //-------------------------------------------------------------------------------------
-        else if (strcmp(comand, CHAR_CMD[INT_POPR]) == 0) {
+        if (strcmp(comand, CHAR_CMD[INT_POPR]) == 0) {
             char REG[10] = "";
-            if (sscanf(asm_code + current_symbol + sscanf_amount, "%s", REG) != 1) {
-                EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, FEW_REG);
+            if (sscanf(asm_code + current_symbol + sscanf_amount, "%9s", REG) != 1) {
+                EXIT_FUNCTION(name_asm_file, amount_line, bin_code, asm_code, FEW_REG);
             }
             REG[9] = '\0';
 
@@ -120,34 +128,35 @@ asm_error_t my_assembler(const char* name_asm_file,
             buffer = char_reg_to_int(REG);
 
             if (buffer == -1) {
-                EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, INVALID_REG);
+                EXIT_FUNCTION(name_asm_file, amount_line, bin_code, asm_code, INVALID_REG);
             }
 
-            all_reg[buffer] += 1;
+            all_reg[buffer] = 1;
 
             bin_code[current_element++] = INT_POPR;
             bin_code[current_element++] = buffer;
 
             fprintf(text_stream, "%d %d\n", INT_POPR, buffer);
             push_counter--;
+
+            CONTINUE;
         }
 //-------------------------------------------------------------------------------------
-        else if (strcmp(comand, CHAR_CMD[INT_PUSHR]) == 0) {
+        if (strcmp(comand, CHAR_CMD[INT_PUSHR]) == 0) {
             char REG[10] = "";
-            if (sscanf(asm_code + current_symbol + sscanf_amount, "%s", REG) != 1) {
-                EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, FEW_REG);
+            if (sscanf(asm_code + current_symbol + sscanf_amount, "%9s", REG) != 1) {
+                EXIT_FUNCTION(name_asm_file, amount_line, bin_code, asm_code, FEW_REG);
             }
-            REG[9] = '\0';
 
             int buffer = 0;
             buffer = char_reg_to_int(REG);
 
             if (buffer == -1) {
-                EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, INVALID_REG);
+                EXIT_FUNCTION(name_asm_file, amount_line, bin_code, asm_code, INVALID_REG);
             }
 
             if (all_reg[buffer] == 0) {
-                EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, NO_VARIABLE);
+                EXIT_FUNCTION(name_asm_file, amount_line, bin_code, asm_code, NO_VARIABLE);
             }
 
             bin_code[current_element++] = INT_PUSHR;
@@ -155,102 +164,104 @@ asm_error_t my_assembler(const char* name_asm_file,
 
             fprintf(text_stream, "%d %d\n", INT_PUSHR, buffer);
             push_counter++;
+
+            CONTINUE;
         }
 //---------------------------------------------------------------------------------
-        else if (strcmp(comand, CHAR_CMD[INT_ADD]) == 0) {
+        if (strcmp(comand, CHAR_CMD[INT_ADD]) == 0) {
             if (push_counter < 2) {
-                EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, FEW_ADD);
+                EXIT_FUNCTION(name_asm_file, amount_line, bin_code, asm_code, FEW_ADD);
             }
 
             bin_code[current_element++] = INT_ADD;
+            push_counter--;
 
             PRINT_TEXT(text_stream, INT_ADD);
-            push_counter--;
+            CONTINUE;
         }
 //-------------------------------------------------------------------------------------
-        else if (strcmp(comand, CHAR_CMD[INT_SUB]) == 0) {
+        if (strcmp(comand, CHAR_CMD[INT_SUB]) == 0) {
             if (push_counter < 2) {
-                EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, FEW_SUB);
+                EXIT_FUNCTION(name_asm_file, amount_line, bin_code, asm_code, FEW_SUB);
             }
 
             bin_code[current_element++] = INT_SUB;
+            push_counter--;
 
             PRINT_TEXT(text_stream, INT_SUB);
-            push_counter--;
+            CONTINUE;
         }
 //-------------------------------------------------------------------------------------
-        else if (strcmp(comand, CHAR_CMD[INT_DIV]) == 0) {
+        if (strcmp(comand, CHAR_CMD[INT_DIV]) == 0) {
             if (push_counter < 2) {
-                EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, FEW_DIV);
+                EXIT_FUNCTION(name_asm_file, amount_line, bin_code, asm_code, FEW_DIV);
             }
 
             bin_code[current_element++] = INT_DIV;
+            push_counter--;
 
             PRINT_TEXT(text_stream, INT_DIV);
-            push_counter--;
+            CONTINUE;
         }
 //-------------------------------------------------------------------------------------
-        else if (strcmp(comand, CHAR_CMD[INT_MUL]) == 0) {
+        if (strcmp(comand, CHAR_CMD[INT_MUL]) == 0) {
             if (push_counter < 2) {
-                EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, FEW_MUL);
+                EXIT_FUNCTION(name_asm_file, amount_line, bin_code, asm_code, FEW_MUL);
             }
 
             bin_code[current_element++] = INT_MUL;
+            push_counter--;
 
             PRINT_TEXT(text_stream, INT_MUL);
-            push_counter--;
+            CONTINUE;
         }
 //-------------------------------------------------------------------------------------
-        else if (strcmp(comand, CHAR_CMD[INT_SQRT]) == 0) {
+        if (strcmp(comand, CHAR_CMD[INT_SQRT]) == 0) {
             bin_code[current_element++] = INT_SQRT;
             if (push_counter < 1) {
-                EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, FEW_SQRT);
+                EXIT_FUNCTION(name_asm_file, amount_line, bin_code, asm_code, FEW_SQRT);
             }
             bin_code[current_element++] = INT_SQRT;
 
             PRINT_TEXT(text_stream, INT_SQRT);
+            CONTINUE;
         }
 //-------------------------------------------------------------------------------------
-        else if (strcmp(comand, CHAR_CMD[INT_JMP]) == 0) {
-            int C_E = 0;
-            if (sscanf(asm_code + current_symbol + sscanf_amount, "%d", &C_E) != 1) {
-                EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, FEW_LOC);
-            }
-            if (C_E < 0 || (size_t) C_E >= current_element) {
-                EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, INVALID_LOC);
-            }
-
-            bin_code[current_element++] = INT_JMP;
-            bin_code[current_element++] = C_E;
-
-            fprintf(text_stream, "%d %d\n", INT_JMP, C_E);
-        }
+        ADD_J_CMD(INT_JMP);
+        ADD_J_CMD(INT_JB);
+        ADD_J_CMD(INT_JBE);
+        ADD_J_CMD(INT_JA);
+        ADD_J_CMD(INT_JAE);
+        ADD_J_CMD(INT_JE);
+        ADD_J_CMD(INT_JNE);
 //-------------------------------------------------------------------------------------
-        else if (strcmp(comand, CHAR_CMD[INT_OUT]) == 0) {
+        if (strcmp(comand, CHAR_CMD[INT_OUT]) == 0) {
             if (push_counter < 1) {
-                EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, FEW_OUT);
+                EXIT_FUNCTION(name_asm_file, amount_line, bin_code, asm_code, FEW_OUT);
             }
 
             bin_code[current_element++] = INT_OUT;
 
-            PRINT_TEXT(text_stream, INT_OUT);
             push_counter--;
+            PRINT_TEXT(text_stream, INT_OUT);
+            CONTINUE;
         }
 //-------------------------------------------------------------------------------------
-        else if (strcmp(comand, CHAR_CMD[INT_HLT]) == 0) {
+        if (strcmp(comand, CHAR_CMD[INT_HACK]) == 0) {
+            bin_code[current_element++] = INT_HACK;
+
+            PRINT_TEXT(text_stream, INT_HACK);
+            CONTINUE;
+        }
+//----------------------------------------------------------------------------------------
+        if (strcmp(comand, CHAR_CMD[INT_HLT]) == 0) {
             bin_code[current_element++] = INT_HLT;
 
-            amount_cmd++;
-
             PRINT_TEXT(text_stream, INT_HLT);
-            break;
+            CONTINUE;
         }
 //-------------------------------------------------------------------------------------
-        else {
-            EXIT_FUNCTION(name_asm_file, amount_cmd, bin_code, asm_code, UNKNOWN_CMD);
-        }
-        amount_cmd++;
-        current_symbol += add_index + 1;
+        EXIT_FUNCTION(name_asm_file, amount_line, bin_code, asm_code, UNKNOWN_CMD);
     }
     // В надежде на то, что current_element поместится в <int>
     bin_code[0] = OWN_SIGNATURE;

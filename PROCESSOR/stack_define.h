@@ -235,6 +235,7 @@ struct stack_struct{
 // Проверяет, есть ли в стеке элемент, который можно POPнуть
 #define STACK_POP_CHECK(stack_address) { \
    if ((stack_address)->size < 1) { \
+      printf("SIZE: %ld\n", (stack_address)->size); \
       (stack_address)->inf_adr_error.current_error = BAD_POP_SIZE; \
       ERROR_FUNC_RETURN(stack_address); \
    } \

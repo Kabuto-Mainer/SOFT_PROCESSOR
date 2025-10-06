@@ -66,7 +66,7 @@ run-d:
 
 # Git commit
 gitcom:
-	@(git add ASSEMBLER/ BIN/ COMMON/ DISASSEMBLER/ PROCESSOR/ CODE-FILE/ Makefile)
+	@(git add ASSEMBLER/ BIN/ COMMON/ DISASSEMBLER/ PROCESSOR/ CODE-FILE/ Makefile myasm/)
 	@echo -- Add file to git commit ---
 	@(git commit -m "$(m)")
 	@echo --- Git committing ---
