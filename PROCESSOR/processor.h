@@ -12,6 +12,19 @@ struct cpu_t{
     int amount_el;
 };
 
+#define J_COMAND(OP) \
+    int arg_1 = 0; \
+    int arg_2 = 0; \
+    \
+    stack_pop(&(proc.stack), &arg_1); \
+    stack_pop(&(proc.stack), &arg_2); \
+    \
+    proc.C_E++; \
+    if (arg_1 OP arg_2) { \
+        proc.C_E = proc.bin_code[proc.C_E] - 2; \
+    } \
+    break;
+
 int my_proc(const char* name_asm_file);
 
 
@@ -19,11 +32,11 @@ int* create_bin_buffer(const char* name_bin_file,
                 int* amount_elements,
                 int* size_stack);
 
-int proc_creator(cpu_t* proc_str,
+int cpu_ctor(cpu_t* proc_str,
                   const char* name_bin_file,
                   int* amount_elements);
 
-int proc_destruct(cpu_t* proc);
+int cpu_dtor(cpu_t* proc);
 
 
 int proc_dump(cpu_t* proc);

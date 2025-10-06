@@ -16,6 +16,7 @@
 // Хеш зашиты
 #define HASH_SECURE ON
 
+//todo config.h
 // Автоматическое увеличение стека
 #define AUTO_REALLOC ON
 
@@ -41,9 +42,11 @@ const int REALLOC_CONST = 5;
 // Начальное количество команд
 const size_t START_AMOUNT_CMD = 40;
 
+const int START_SIZE_STACK = 4;
+
 // Минимальное и максимальное значение аргументов
-const stmn_t MAX_MEAN = 1e4;
-const stmn_t MIN_MEAN = -1e4;
+const stmn_t MAX_MEAN = 1e5;
+const stmn_t MIN_MEAN = -1e5;
 
 // Сид для хеш-функции
 const size_t START_HASH_CODE = 5318;
@@ -58,6 +61,8 @@ const int MIN_ADDRESS = 8000;
 const int AMOUNT_PRINT_ELEMENT = 10;
 
 // Куропатка или Канарейка
-const stmn_t BIRD_NUM = 7777;
+const stmn_t BIRD_NUM = (stmn_t) 0xDEADFACE;
+
+const int HACK_NUM = 10;
 
 #endif // CONST_H

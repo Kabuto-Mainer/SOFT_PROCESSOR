@@ -1,0 +1,25 @@
+{
+  "name": "myasm",
+  "displayName": "myasm-syntax",
+  "description": "Syntax highlighting for MyASM assembler",
+  "version": "0.0.2",
+  "engines": {
+    "vscode": "^1.104.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "myasm",
+      "aliases": ["myasm", "myasm"],
+      "extensions": [".myasm", ".asm"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "myasm",
+      "scopeName": "source.myasm",
+      "path": "./syntaxes/myasm.tmLanguage.json"
+    }]
+  }
+}

@@ -18,7 +18,14 @@ const char CHAR_CMD[20][6] = {
                         "POPR",
                         "PUSHR",
                         "IN",
-                        "JMP"
+                        "JMP",
+                        "JB",
+                        "JBE",
+                        "JA",
+                        "JAE",
+                        "JE",
+                        "JNE",
+                        "HACK"
 };
 
 enum INT_CMD{
@@ -33,7 +40,14 @@ enum INT_CMD{
     INT_POPR = 8,
     INT_PUSHR = 9,
     INT_IN = 10,
-    INT_JMP = 11
+    INT_JMP = 11,
+    INT_JB = 12,
+    INT_JBE = 13,
+    INT_JA = 14,
+    INT_JAE = 15,
+    INT_JE = 16,
+    INT_JNE = 17,
+    INT_HACK = 18
 };
 
 enum INT_REG{

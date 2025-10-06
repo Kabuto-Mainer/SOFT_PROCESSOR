@@ -360,9 +360,10 @@ void print_stack_for_dump(stack_struct* stack_address, const int error_with_stac
 
     if (SIZE_ADD_CAPACITY > 0) {
         printf(_M_ "    first bird = ");
-        PRINT_ELEMENT((stack_address->data)[0 - SIZE_ADD_CAPACITY]);
+        printf("%08X", (unsigned) (stack_address->data)[0 - SIZE_ADD_CAPACITY]);
+        // PRINT_ELEMENT((stack_address->data)[0 - SIZE_ADD_CAPACITY]);
         printf(" (BIRD_NUM) (MUST BE ");
-        PRINT_ELEMENT(BIRD_NUM);
+        printf("%08X", (unsigned) BIRD_NUM);
         printf(")\n" _N_);
     }
 /*MIN_INT(stack_address->size + SIZE_ADD_CAPACITY * 2, AMOUNT_PRINT_ELEMENT)*/
@@ -381,9 +382,9 @@ void print_stack_for_dump(stack_struct* stack_address, const int error_with_stac
     }
     if (SIZE_ADD_CAPACITY > 0) {
         printf(_M_ "    second bird = ");
-        PRINT_ELEMENT((stack_address->data)[stack_address->capacity]);
+        printf("%08X", (unsigned) (stack_address->data)[stack_address->capacity]);
         printf(" (BIRD_NUM) (MUST BE ");
-        PRINT_ELEMENT(BIRD_NUM);
+        printf("%08X", (unsigned) BIRD_NUM);
         printf(")\n" _N_);
     }
 }
@@ -422,7 +423,7 @@ ssize_t make_hash_code(stack_struct* stack_address) {
     ssize_t current_hash = START_HASH_CODE;
 
     for (ssize_t i = 0; i < stack_address->capacity - 1; i++) {
-        current_hash += (current_hash << 5) + stack_address->data[i]; // Я знаю, компилятор сам подставит это вместо простого умножения на 33, а таким способом уменьшается масштабируемость, но хотелось так сделать + надо начинать использовать побитовые операции
+        current_hash += current_hash * 33 + stack_address->data[i];
     }
 
     return current_hash;

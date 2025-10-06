@@ -1,0 +1,47 @@
+{
+  "scopeName": "source.myasm",
+  "patterns": [
+    {
+      "name": "comment",
+      "match": ";.*$"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\b(PUSH|ADD|SUB|DIV|MUL|SQRT|OUT|HLT|POPR|PUSHR|IN|JMP|JB|JBE|JA|JAE|JE|JNE|HACK)\\b"
+    },
+    {
+      "begin": "\\b(PUSH|JMP|JB|JBE|JA|JAE|JE|JNE)\\b\\s+",
+      "beginCaptures": {
+        "1": { "name": "keyword.control" }
+      },
+      "end": "$",
+      "patterns": [
+        {
+          "name": "constant.numeric",
+          "match": "\\b\\d+\\b"
+        }
+      ]
+    },
+    {
+      "begin": "\\b(POPR|PUSHR)\\b\\s+",
+      "beginCaptures": {
+        "1": { "name": "keyword.control" }
+      },
+      "end": "$",
+      "patterns": [
+        {
+          "name": "support.type",
+          "match": "\\b(AX|BX|CX|DX|EX|FX|GX|HX)\\b"
+        }
+      ]
+    },
+    {
+      "name": "support.type",
+      "match": "\\b(AX|BX|CX|DX|EX|FX|GX|HX)\\b"
+    },
+    {
+      "name": "constant.numeric",
+      "match": "\\b\\d+\\b"
+    }
+  ]
+}
