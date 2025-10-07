@@ -51,7 +51,22 @@ asm_error_t my_assembler(const char* name_asm_file,
 
 
     while (current_symbol <= amount_symbols) {
+        size_t buf_index = find_char(asm_code + current_symbol, '\n');
+        *(asm_code + current_symbol + buf_index) = '\0';
+
+        char bufic[40] = "                                      \0";
+
+        if (sscanf(asm_code + current_symbol, "%39s", bufic) != 0 && bufic[0] != ';' && bufic[0] != ' ') {
+            fprintf(text_stream, "[%3zu] %s ", current_element - AMOUNT_SUP_NUM + 1, asm_code + current_symbol);
+
+            for (int i = 0; i < (40 - (int) strlen(asm_code + current_symbol) - 1); i++) {
+                fprintf(text_stream, " ");
+            }
+        }
+        // printf("%s\n", asm_code + current_symbol);
+
         char comand[20] = "";
+        // size_t sscanf_amount = 0;
 
         size_t add_index = find_char(asm_code + current_symbol, ';');
 
@@ -71,11 +86,9 @@ asm_error_t my_assembler(const char* name_asm_file,
             amount_line++;
             continue;
         }
+
         comand[19] = '\0'; // На всякий случай
-
         // printf("COMAND: %s\n", comand);
-// TODO struct
-
 // Проверки размеров
 //-----------------------------------------------------------------
         if (check_realloc(&bin_code, &max_elements, current_element) == -1) {
@@ -89,6 +102,8 @@ asm_error_t my_assembler(const char* name_asm_file,
         }
 //--------------------------------------------------------------
         if (strcmp(comand, CHAR_CMD[INT_PUSH]) == 0) {
+            // fprintf(text_stream, "[%d]", current_element + 1);
+
             int argument = 0;
             if (sscanf(asm_code + current_symbol + sscanf_amount - 1, "%d", &argument) != 1) {
                 EXIT_FUNCTION(name_asm_file, amount_line, bin_code, asm_code, NO_ARG);
@@ -253,29 +268,29 @@ asm_error_t my_assembler(const char* name_asm_file,
             CONTINUE;
         }
 //----------------------------------------------------------------------------------------
-        if (strcmp(comand, CHAR_CMD[INT_CODE]) == 0) {
-            int code = 0;
-            int point = 0;
-            if (sscanf(asm_code + current_symbol + sscanf_amount - 1, "%d", &code) != 1) {
-                EXIT_FUNCTION(name_asm_file, amount_line, bin_code, asm_code, NO_ARG);
-            }
-
-            bin_code[current_element++] = INT_CODE;
-
-            for (int i = 0; i < AMOUNT_CODS; i++) {
-                if (code == INT_CODS[i]) {
-                    bin_code[current_element++] = i;
-                    fprintf(text_stream, "%d %d\n", INT_CODE, i);
-
-                    point = 1;
-                    CONTINUE;
-                }
-            }
-            if (point == 1) {
-                continue;
-            }
-            EXIT_FUNCTION(name_asm_file, amount_line, bin_code, asm_code, INVALID_CODE);
-        }
+//         if (strcmp(comand, CHAR_CMD[INT_CODE]) == 0) {
+//             int code = 0;
+//             int point = 0;
+//             if (sscanf(asm_code + current_symbol + sscanf_amount - 1, "%d", &code) != 1) {
+//                 EXIT_FUNCTION(name_asm_file, amount_line, bin_code, asm_code, NO_ARG);
+//             }
+//
+//             bin_code[current_element++] = INT_CODE;
+//
+//             for (int i = 0; i < AMOUNT_CODS; i++) {
+//                 if (code == INT_CODS[i]) {
+//                     bin_code[current_element++] = i;
+//                     fprintf(text_stream, "%d %d\n", INT_CODE, i);
+//
+//                     point = 1;
+//                     CONTINUE;
+//                 }
+//             }
+//             if (point == 1) {
+//                 continue;
+//             }
+//             EXIT_FUNCTION(name_asm_file, amount_line, bin_code, asm_code, INVALID_CODE);
+//         }
 //-------------------------------------------------------------------------------------
         if (strcmp(comand, CHAR_CMD[INT_HLT]) == 0) {
             bin_code[current_element++] = INT_HLT;
