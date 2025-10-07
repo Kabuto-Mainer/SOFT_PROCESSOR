@@ -6,7 +6,7 @@
 #include "assembler.h"
 #include "../COMMON/support.h"
 #include "../COMMON/comand.h"
-#include "../COMMON/const.h"
+#include "../COMMON/config.h"
 
 int main(void) {
 
@@ -217,7 +217,6 @@ asm_error_t my_assembler(const char* name_asm_file,
         }
 //-------------------------------------------------------------------------------------
         if (strcmp(comand, CHAR_CMD[INT_SQRT]) == 0) {
-            bin_code[current_element++] = INT_SQRT;
             if (push_counter < 1) {
                 EXIT_FUNCTION(name_asm_file, amount_line, bin_code, asm_code, FEW_SQRT);
             }
@@ -254,6 +253,30 @@ asm_error_t my_assembler(const char* name_asm_file,
             CONTINUE;
         }
 //----------------------------------------------------------------------------------------
+        if (strcmp(comand, CHAR_CMD[INT_CODE]) == 0) {
+            int code = 0;
+            int point = 0;
+            if (sscanf(asm_code + current_symbol + sscanf_amount - 1, "%d", &code) != 1) {
+                EXIT_FUNCTION(name_asm_file, amount_line, bin_code, asm_code, NO_ARG);
+            }
+
+            bin_code[current_element++] = INT_CODE;
+
+            for (int i = 0; i < AMOUNT_CODS; i++) {
+                if (code == INT_CODS[i]) {
+                    bin_code[current_element++] = i;
+                    fprintf(text_stream, "%d %d\n", INT_CODE, i);
+
+                    point = 1;
+                    CONTINUE;
+                }
+            }
+            if (point == 1) {
+                continue;
+            }
+            EXIT_FUNCTION(name_asm_file, amount_line, bin_code, asm_code, INVALID_CODE);
+        }
+//-------------------------------------------------------------------------------------
         if (strcmp(comand, CHAR_CMD[INT_HLT]) == 0) {
             bin_code[current_element++] = INT_HLT;
 

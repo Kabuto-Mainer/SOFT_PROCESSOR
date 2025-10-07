@@ -1,7 +1,7 @@
 #ifndef DISASSEMBLER_H
 #define DISASSEMBLER_H
 
-#include "../COMMON/const.h"
+#include "../COMMON/config.h"
 #include "../COMMON/color.h"
 
 #define PRINT_TO_TEXT_FILE ON
@@ -34,10 +34,11 @@ enum asm_error_t{
     INVALID_REG = -15,
     NO_VARIABLE = -16,
     FEW_LOC = -17,
-    INVALID_LOC = -18
+    INVALID_LOC = -18,
+    INVALID_CODE = -19
 };
 
-const int AMOUNT_ERRORS = 18;
+const int AMOUNT_ERRORS = 19;
 
 char DESCRIPTION_ERRORS[AMOUNT_ERRORS][40] = {
     "syntax is not valid\n",
@@ -57,7 +58,8 @@ char DESCRIPTION_ERRORS[AMOUNT_ERRORS][40] = {
     "invalid register\n",
     "no variable in register\n",
     "no location to jump\n",
-    "invalid location to jump\n"
+    "invalid location to jump\n",
+    "invalid code to print\n"
 };
 
 

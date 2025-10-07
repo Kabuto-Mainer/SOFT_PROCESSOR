@@ -4,7 +4,7 @@
 #include <sys/stat.h>
 
 #include "support.h"
-#include "const.h"
+#include "config.h"
 #include "comand.h"
 #include "color.h"
 

@@ -1,7 +1,7 @@
 #ifndef DISASSEMBLER_H
 #define DISASSEMBLER_H
 
-#include "../COMMON/const.h"
+#include "../COMMON/config.h"
 
 
 // int my_textbin_to_asm(const char* name_asm_file, const char* name_text_file);

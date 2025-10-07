@@ -6,7 +6,7 @@ const char NAME_BIN_FILE[] = "CODE-FILE/bin-code.bin";
 const char NAME_TEXT_FILE[] = "CODE-FILE/text-code.txt";
 const char NAME_DISASMB_FILE[] = "CODE-FILE/disasmb-text.asm";
 
-const char CHAR_CMD[20][6] = {
+const char CHAR_CMD[30][6] = {
                         "PUSH",
                         "ADD",
                         "SUB",
@@ -25,7 +25,8 @@ const char CHAR_CMD[20][6] = {
                         "JAE",
                         "JE",
                         "JNE",
-                        "HACK"
+                        "HACK",
+                        "CODE"
 };
 
 enum INT_CMD{
@@ -47,7 +48,8 @@ enum INT_CMD{
     INT_JAE = 15,
     INT_JE = 16,
     INT_JNE = 17,
-    INT_HACK = 18
+    INT_HACK = 18,
+    INT_CODE = 19
 };
 
 enum INT_REG{
@@ -73,9 +75,36 @@ const char CHAR_REG[][4] = {
 };
 
 
+const int AMOUNT_CODS = 4;
 const int AMOUNT_SUP_NUM = 4;
 
 const int OWN_SIGNATURE = 1388;
 const int CURRENT_VERSION = 3;
+
+
+const int INT_CODS[AMOUNT_CODS] = {
+    -13,
+    999,
+    41,
+    333
+};
+
+const char STR_CODS[AMOUNT_CODS][100] = {
+    "DEADFACE\n",
+    "Infinite amount roots\n",
+    "No reality roots\n",
+    _P_ "  /\\_/\\\n ( o.o )\n  > ^ <\n" _N_
+};
+//
+// ONE_CODE CODE_STR[AMOUNT_CODS] = {
+//     {-13, "DEADFACE\n"},
+//     {999, "Infinite amount roots\n"},
+//     {41, "No reality roots\n"},
+//     {333, _P_ "  /\\_/\\\n ( o.o )\n  > ^ <\n" _N_}
+// };
+
+
+
+
 
 #endif // COMAND_H

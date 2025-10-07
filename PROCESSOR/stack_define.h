@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-#include "../COMMON/const.h"
+#include "../COMMON/config.h"
 // #include "stack.h"
 
 
