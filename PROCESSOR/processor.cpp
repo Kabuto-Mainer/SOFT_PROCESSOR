@@ -82,8 +82,10 @@ int my_proc(const char* name_bin_file) {
     }
 
     for ( ; size_t (proc.C_E) < size_t (amount_elements - AMOUNT_SUP_NUM); (proc.C_E)++) {
-        proc_dump(&proc);
-        getchar();
+        if (getchar() == 'd') {
+            proc_dump(&proc);
+        }
+
         switch (proc.bin_code[proc.C_E]) {
             case INT_PUSH: {
                 proc.C_E++;
@@ -168,6 +170,11 @@ int my_proc(const char* name_bin_file) {
                 break;
             }
 //------------------------------------------------------------------------------------------------
+            case INT_CODE: {
+                printf("%s\n", STR_CODS[proc.bin_code[++proc.C_E]]);
+
+                break;
+            }
             case INT_HLT: {
                 cpu_dtor(&proc);
                 return 0;
@@ -297,15 +304,15 @@ int proc_dump(cpu_t* proc) {
     // printf("data %s[%p]%s\n" _N_ , _B_, proc->stack.data, _P_);
 
     print_stack_for_dump(&(proc->stack), NOT_ERRORS);
-//
-//     printf(_R_ "\n=== BIN_CODE ===\n\n" _N_);
-//
-//     print_before_end(proc);
-//     print_end(proc);
-//
-//     printf(_R_ "\n=== Registers ===\n\n");
-//
-//     print_reg(proc);
+
+    printf(_R_ "\n=== BIN_CODE ===\n\n" _N_);
+
+    print_before_end(proc);
+    print_end(proc);
+
+    printf(_R_ "\n=== Registers ===\n\n");
+
+    print_reg(proc);
 
     return 0;
 }

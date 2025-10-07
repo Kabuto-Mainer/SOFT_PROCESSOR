@@ -3,7 +3,7 @@
 
 #include "../COMMON/support.h"
 #include "../COMMON/comand.h"
-#include "../COMMON/const.h"
+#include "../COMMON/config.h"
 
 #include "disassembler.h"
 

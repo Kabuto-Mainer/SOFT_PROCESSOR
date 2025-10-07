@@ -2,7 +2,7 @@
 #define STACK_H
 
 #include "stack_define.h"
-#include "../COMMON/const.h"
+#include "../COMMON/config.h"
 
 const long int SIZE_ADD_CAPACITY = BIRD_SECURE;
 
