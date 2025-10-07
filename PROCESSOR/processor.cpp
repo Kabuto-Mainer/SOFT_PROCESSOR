@@ -82,9 +82,9 @@ int my_proc(const char* name_bin_file) {
     }
 
     for ( ; size_t (proc.C_E) < size_t (amount_elements - AMOUNT_SUP_NUM); (proc.C_E)++) {
-        if (getchar() == 'd') {
-            proc_dump(&proc);
-        }
+        // if (getchar() == 'd') {
+        //     proc_dump(&proc);
+        // }
 
         switch (proc.bin_code[proc.C_E]) {
             case INT_PUSH: {
@@ -170,11 +170,11 @@ int my_proc(const char* name_bin_file) {
                 break;
             }
 //------------------------------------------------------------------------------------------------
-            case INT_CODE: {
-                printf("%s\n", STR_CODS[proc.bin_code[++proc.C_E]]);
-
-                break;
-            }
+//             case INT_CODE: {
+//                 printf("%s\n", STR_CODS[proc.bin_code[++proc.C_E]]);
+//
+//                 break;
+//             }
             case INT_HLT: {
                 cpu_dtor(&proc);
                 return 0;

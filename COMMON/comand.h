@@ -3,7 +3,7 @@
 
 const char NAME_ASM_FILE[] = "CODE-FILE/asm-code.asm";
 const char NAME_BIN_FILE[] = "CODE-FILE/bin-code.bin";
-const char NAME_TEXT_FILE[] = "CODE-FILE/text-code.txt";
+const char NAME_TEXT_FILE[] = "CODE-FILE/text-code.asm";
 const char NAME_DISASMB_FILE[] = "CODE-FILE/disasmb-text.asm";
 
 const char CHAR_CMD[30][6] = {
@@ -81,20 +81,24 @@ const int AMOUNT_SUP_NUM = 4;
 const int OWN_SIGNATURE = 1388;
 const int CURRENT_VERSION = 3;
 
-
-const int INT_CODS[AMOUNT_CODS] = {
-    -13,
-    999,
-    41,
-    333
-};
-
-const char STR_CODS[AMOUNT_CODS][100] = {
-    "DEADFACE\n",
-    "Infinite amount roots\n",
-    "No reality roots\n",
-    _P_ "  /\\_/\\\n ( o.o )\n  > ^ <\n" _N_
-};
+//
+// const int INT_CODS[AMOUNT_CODS] = {
+//     -13,
+//     999,
+//     41,
+//     333,
+//     2001,
+//     1001
+// };
+//
+// const char STR_CODS[AMOUNT_CODS][100] = {
+//     "DEADFACE\n",
+//     "Infinite amount roots\n",
+//     "No reality root\n",
+//     _P_ "  /\\_/\\\n ( o.o )\n  > ^ <\n" _N_,
+//     "2 roots",
+//     "1 roots"
+// };
 //
 // ONE_CODE CODE_STR[AMOUNT_CODS] = {
 //     {-13, "DEADFACE\n"},
