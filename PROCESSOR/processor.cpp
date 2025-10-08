@@ -85,7 +85,7 @@ int my_proc(const char* name_bin_file) {
         // if (getchar() == 'd') {
         //     proc_dump(&proc);
         // }
-
+        // printf("CMD: %d\n", proc.bin_code[proc.C_E]);
         switch (proc.bin_code[proc.C_E]) {
             case INT_PUSH: {
                 proc.C_E++;
@@ -264,7 +264,6 @@ int cpu_ctor(cpu_t* proc,
     }
     proc->bin_code = bin_code;
 
-//TODO убрать это тест
     size_stack = START_SIZE_STACK;
 
     if (stack_creator(&(proc->stack), size_stack, __FILE__,  __LINE__, NAME_RETURN(stack)) != 0) {

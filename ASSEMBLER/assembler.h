@@ -72,7 +72,8 @@ char DESCRIPTION_ERRORS[AMOUNT_ERRORS][40] = {
 
 asm_error_t my_assembler(const char* name_asm_file,
                 const char* name_byte_file,
-                const char* name_text_file);
+                const char* name_text_file,
+                int* table_point);
 
 
 int check_realloc(int** bin_code, size_t* max_size, size_t current_size);
@@ -92,8 +93,19 @@ int char_reg_to_int(const char* name_reg);
 #define ADD_J_CMD(INT_COMAND) \
  if (strcmp(comand, CHAR_CMD[INT_COMAND]) == 0) { \
     int C_E = 0; \
-    if (sscanf(asm_code + current_symbol + sscanf_amount, "%d", &C_E) != 1) { \
+    char buffer[10] = {}; \
+    if (sscanf(asm_code + current_symbol + sscanf_amount, "%s", buffer) != 1) { \
         EXIT_FUNCTION(name_asm_file, amount_line, bin_code, asm_code, FEW_LOC); \
+    } \
+    if (buffer[0] == ':') { \
+        C_E = atoi(buffer + 1); \
+        if (C_E >= AMOUNT_POINTS || C_E < 0) { \
+            EXIT_FUNCTION(name_asm_file, amount_line, bin_code, asm_code, FEW_LOC); \
+        } \
+        C_E = table_point[C_E]; \
+    } \
+    else { \
+        C_E = atoi(buffer); \
     } \
  \
     bin_code[current_element++] = INT_COMAND; \
