@@ -73,7 +73,7 @@ const char CHAR_REG[][4] = {
     "GX",
     "HX"
 };
-
+const int AMOUNT_POINTS = 8;
 
 const int AMOUNT_CODS = 4;
 const int AMOUNT_SUP_NUM = 4;

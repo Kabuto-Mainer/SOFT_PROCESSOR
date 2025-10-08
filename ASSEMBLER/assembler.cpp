@@ -8,9 +8,12 @@
 #include "../COMMON/comand.h"
 #include "../COMMON/config.h"
 
-int main(void) {
 
-    my_assembler(NAME_ASM_FILE, NAME_BIN_FILE, NAME_TEXT_FILE);
+int main(void) {
+    int table_point[AMOUNT_POINTS] = {-1, -1, -1, -1, -1, -1, -1, -1};
+
+    my_assembler(NAME_ASM_FILE, NAME_BIN_FILE, NAME_TEXT_FILE, table_point);
+    my_assembler(NAME_ASM_FILE, NAME_BIN_FILE, NAME_TEXT_FILE, table_point);
 
     return 0;
 }
@@ -18,7 +21,8 @@ int main(void) {
 
 asm_error_t my_assembler(const char* name_asm_file,
                 const char* name_byte_file,
-                const char* name_text_file) {
+                const char* name_text_file,
+                int* table_point) {
     assert(name_asm_file);
     assert(name_byte_file);
     assert(name_text_file);
@@ -81,14 +85,15 @@ asm_error_t my_assembler(const char* name_asm_file,
 
         int sscanf_amount = 0;
         if (*(asm_code + current_symbol) == '\0' ||
-            sscanf(asm_code + current_symbol, "%s %n", comand, &sscanf_amount) == 0) {
+            sscanf(asm_code + current_symbol, "%s %n", comand, &sscanf_amount) == 0 ||
+            comand[0] == '\0') {
             current_symbol += add_index + 1;
             amount_line++;
             continue;
         }
 
-        comand[19] = '\0'; // На всякий случай
-        // printf("COMAND: %s\n", comand);
+        // comand[19] = '\0'; // На всякий случай
+        // printf("COMAND: -%s-\n", comand);
 // Проверки размеров
 //-----------------------------------------------------------------
         if (check_realloc(&bin_code, &max_elements, current_element) == -1) {
@@ -268,29 +273,15 @@ asm_error_t my_assembler(const char* name_asm_file,
             CONTINUE;
         }
 //----------------------------------------------------------------------------------------
-//         if (strcmp(comand, CHAR_CMD[INT_CODE]) == 0) {
-//             int code = 0;
-//             int point = 0;
-//             if (sscanf(asm_code + current_symbol + sscanf_amount - 1, "%d", &code) != 1) {
-//                 EXIT_FUNCTION(name_asm_file, amount_line, bin_code, asm_code, NO_ARG);
-//             }
-//
-//             bin_code[current_element++] = INT_CODE;
-//
-//             for (int i = 0; i < AMOUNT_CODS; i++) {
-//                 if (code == INT_CODS[i]) {
-//                     bin_code[current_element++] = i;
-//                     fprintf(text_stream, "%d %d\n", INT_CODE, i);
-//
-//                     point = 1;
-//                     CONTINUE;
-//                 }
-//             }
-//             if (point == 1) {
-//                 continue;
-//             }
-//             EXIT_FUNCTION(name_asm_file, amount_line, bin_code, asm_code, INVALID_CODE);
-//         }
+        if (comand[0] == ':') {
+            int point = atoi(comand + 1);
+            table_point[point] = (int) current_element - 3;
+
+            amount_line++;
+            current_symbol += add_index + 1;
+
+            continue;
+        }
 //-------------------------------------------------------------------------------------
         if (strcmp(comand, CHAR_CMD[INT_HLT]) == 0) {
             bin_code[current_element++] = INT_HLT;
