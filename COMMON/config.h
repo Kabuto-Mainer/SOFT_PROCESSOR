@@ -14,7 +14,7 @@
 #define BIRD_SECURE ON
 
 // Хеш зашиты
-#define HASH_SECURE ON
+#define HASH_SECURE OFF
 
 //todo config.h
 // Автоматическое увеличение стека

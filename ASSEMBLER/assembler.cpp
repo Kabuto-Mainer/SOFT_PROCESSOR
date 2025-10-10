@@ -13,11 +13,11 @@
 int main(void) {
     int table_point[AMOUNT_POINTS] = {-1, -1, -1, -1, -1, -1, -1, -1};
 
-//     table_point[0] = -2;
-    // for (int i = 0; i < 19; i++) {
+    table_point[0] = -2;
+    // for (int i = 0; i < 22; i++) {
     //     printf("%s: %d\n", CHAR_CMD[i], cmd_to_hash(CHAR_CMD[i]));
     // }
-//
+
     my_assembler(NAME_ASM_FILE, NAME_BIN_FILE, NAME_TEXT_FILE, table_point);
 
     // printf("%d\n", table_point[0]);
@@ -382,6 +382,21 @@ asm_error_t check_comand(asm_struct* asm_data)
             break;
         }
 //-----------------------------------------------------------------------------------------------------
+        case (HASH_CALL): {
+            if (check_J_cmd(asm_data, INT_CALL) != NOT_ERRORS) {
+                return ERROR;
+            }
+
+            break;
+        }
+//-----------------------------------------------------------------------------------------------------
+        case (HASH_RET): {
+            asm_data->bin_code[asm_data->cur_element++] = INT_RET;
+
+            fprintf(asm_data->text_stream, "%d\n", INT_RET);
+            break;
+        }
+//-----------------------------------------------------------------------------------------------------
         default: {
             EXIT_FUNCTION(asm_data, UNKNOWN_CMD);
         }
@@ -414,6 +429,16 @@ asm_error_t check_J_cmd(asm_struct* asm_data, int cmd)
         }
 
         new_C_E = asm_data->table_point[point] - AMOUNT_SUP_NUM + 1;
+        // printf("new_C_E: %d\n", new_C_E);
+    }
+
+    else if (char_adr[0] == '$') {
+        int add_num = atoi(char_adr + 1);
+        if (add_num < 0) {
+            EXIT_FUNCTION(asm_data, INVALID_POINT);
+        }
+
+        new_C_E = asm_data->cur_element + add_num - 2;
         // printf("new_C_E: %d\n", new_C_E);
     }
 
