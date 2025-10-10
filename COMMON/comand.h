@@ -25,11 +25,32 @@ const char CHAR_CMD[30][6] = {
                         "JAE",
                         "JE",
                         "JNE",
-                        "HACK",
-                        "CODE"
+                        "HACK"
 };
 
-enum INT_CMD{
+enum INT_HASH {
+    HASH_PUSH = 15795,
+    HASH_ADD = 11855,
+    HASH_SUB = 12944,
+    HASH_DIV = 12713,
+    HASH_MUL = 13076,
+    HASH_SQRT = 16125,
+    HASH_OUT = 13406,
+    HASH_HLT = 12878,
+    HASH_POPR = 15828,
+    HASH_PUSHR = 18514,
+    HASH_IN = 10192,
+    HASH_JMP = 12845,
+    HASH_JB = 9829,
+    HASH_JBE = 12119,
+    HASH_JA = 9796,
+    HASH_JAE = 12086,
+    HASH_JE = 9928,
+    HASH_JNE = 12515,
+    HASH_HACK = 14442
+};
+
+enum INT_CMD {
     INT_PUSH = 0,
     INT_ADD = 1,
     INT_SUB = 2,
@@ -48,8 +69,7 @@ enum INT_CMD{
     INT_JAE = 15,
     INT_JE = 16,
     INT_JNE = 17,
-    INT_HACK = 18,
-    INT_CODE = 19
+    INT_HACK = 18
 };
 
 enum INT_REG{
