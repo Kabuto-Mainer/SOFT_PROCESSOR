@@ -13,68 +13,65 @@
 #define PRINT_TEXT(text_stream, INT_CMD) (void(0))
 #endif
 
-// Пока не вижу смысла записывать ошибки в биты
-// Т.к. при ошибке на данный момент компилятор прекращает дальнейшие проверки
-enum asm_error_t{
-    NOT_ERRORS = 0,
-    SYNTAX = -1,
-    NO_ARG = -2,
-    LIMIT = -3,
-    FEW_ADD = -4,
-    FEW_SUB = -5,
-    FEW_DIV = -6,
-    FEW_MUL = -7,
-    FEW_OUT = -8,
-    FEW_SQRT = -9,
-    UNKNOWN_CMD = -10,
-    NULL_ADR = -11,
-    FILE_ERR = -12,
-    FEW_REG = -13,
-    ERR_PUSHR = -14,
-    INVALID_REG = -15,
-    NO_VARIABLE = -16,
-    FEW_LOC = -17,
-    INVALID_LOC = -18,
-    INVALID_CODE = -19
+struct asm_struct {
+    const char* name_file;
+    FILE* text_stream;
+    int* bin_code;
+    char* asm_code;
+    int* table_point;
+
+    int amount_line;
+    int cur_char;
+    int cur_element;
+    int hash_cmd;
 };
 
-const int AMOUNT_ERRORS = 19;
-
-char DESCRIPTION_ERRORS[AMOUNT_ERRORS][40] = {
-    "syntax is not valid\n",
-    "no argument to push\n",
-    "too big or little argument to push\n",
-    "too few argument to ADD\n",
-    "too few argument to SUB\n",
-    "too few argument to DIV\n",
-    "too few argument to MUL\n",
-    "too few argument to OUT\n",
-    "too few argument to SQRTn",
-    "unknown command\n",
-    "null address\n",
-    "error with writing to file",
-    "no register\n",
-    "no variable ib register\n",
-    "invalid register\n",
-    "no variable in register\n",
-    "no location to jump\n",
-    "invalid location to jump\n",
-    "invalid code to print\n"
-};
-
-
-#define EXIT_FUNCTION(name_file, amount_cmd, bin_code, text_str, return_error) \
- printf(_R_ "%s:%d: ERROR: %s\n" _N_, name_file, amount_cmd + 1, DESCRIPTION_ERRORS[-1 * return_error - 1]); \
- free(bin_code); \
- free(text_str); \
+#define EXIT_FUNCTION(data, return_error) \
+ printf(_R_ "%s:%d: ERROR: %s\n" _N_, data->name_file, data->amount_line + 1, DESCRIPTION_ERRORS[return_error]); \
  return return_error;
 
 
-asm_error_t my_assembler(const char* name_asm_file,
-                const char* name_byte_file,
-                const char* name_text_file,
-                int* table_point);
+enum asm_error_t{
+    NOT_ERRORS = 0,
+    FEW_PUSH = 1,
+    NO_ARG = 2,
+    UNKNOWN_REG = 3,
+    NO_ADR = 4,
+    NULL_ADR = 5,
+    INVALID_POINT = 6,
+    FILE_ERROR = 7,
+    NO_REG = 8,
+    LIMIT = 9,
+    UNKNOWN_CMD = 10,
+    ERROR = 11
+};
 
+char DESCRIPTION_ERRORS[][40] = {
+    "no errors in code\n",
+    "too few argument to push\n",
+    "no register to use\n",
+    "unknown register\n",
+    "no address for jump\n",
+    "null address in file\n",
+    "not correct use point\n",
+    "error with file\n",
+    "no register to use\n",
+    "too big or small argument\n",
+    "unknown comand\n",
+    "ERROR\n"
+};
+
+
+asm_error_t my_assembler (const char* name_asm_file,
+                          const char* name_byte_file,
+                          const char* name_text_file,
+                          int* table_point);
+
+asm_error_t check_J_cmd(asm_struct* asm_data, int cmd);
+
+int cmd_to_hash(const char* comand);
+
+asm_error_t check_comand(asm_struct* asm_data);
 
 int check_realloc(int** bin_code, size_t* max_size, size_t current_size);
 

@@ -83,8 +83,9 @@ int my_proc(const char* name_bin_file) {
 
     for ( ; size_t (proc.C_E) < size_t (amount_elements - AMOUNT_SUP_NUM); (proc.C_E)++) {
         // if (getchar() == 'd') {
-        //     proc_dump(&proc);
+            // proc_dump(&proc);
         // }
+        // printf("CMD: %d\n", proc.bin_code[proc.C_E]);
         // printf("CMD: %d\n", proc.bin_code[proc.C_E]);
         switch (proc.bin_code[proc.C_E]) {
             case INT_PUSH: {
@@ -170,11 +171,6 @@ int my_proc(const char* name_bin_file) {
                 break;
             }
 //------------------------------------------------------------------------------------------------
-//             case INT_CODE: {
-//                 printf("%s\n", STR_CODS[proc.bin_code[++proc.C_E]]);
-//
-//                 break;
-//             }
             case INT_HLT: {
                 cpu_dtor(&proc);
                 return 0;
@@ -203,7 +199,7 @@ int my_proc(const char* name_bin_file) {
 
                 break;
             }
-
+//------------------------------------------------------------------------------------------------
             case INT_HACK: {
                 // proc.stack.size = -1;
                 int arg_1 = 100;
@@ -361,7 +357,6 @@ int print_end(cpu_t* proc) {
     return 0;
 }
 
-
 int print_line(cpu_t* proc, unsigned int i) {
     assert(proc);
 
@@ -393,7 +388,6 @@ int print_line(cpu_t* proc, unsigned int i) {
     putchar('\n');
     return 0;
 }
-
 
 int print_reg(cpu_t* proc) {
     assert(proc);
