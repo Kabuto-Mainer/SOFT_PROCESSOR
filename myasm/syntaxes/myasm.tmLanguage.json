@@ -2,15 +2,46 @@
   "scopeName": "source.myasm",
   "patterns": [
     {
-      "name": "comment",
+      "name": "comment.line.semicolon",
       "match": ";.*$"
     },
+
+    {
+      "name": "entity.name.label",
+      "match": "^(?::[A-Za-z0-9_]+|[A-Za-z_][A-Za-z0-9_]*:)"
+    },
+
+    {
+      "begin": "\\$",
+      "beginCaptures": {
+        "0": { "name": "keyword.operator.relative" }
+      },
+      "end": "(?=\\s|$)",
+      "patterns": [
+        {
+          "name": "variable.parameter.relative",
+          "match": "([A-Za-z_][A-Za-z0-9_]*|[+\\-]?\\d+)"
+        }
+      ]
+    },
+
+    {
+      "name": "string.quoted.double",
+      "match": "\".*?\""
+    },
+
+    {
+      "name": "constant.numeric",
+      "match": "-?\\b\\d+\\b"
+    },
+
     {
       "name": "keyword.control",
-      "match": "\\b(PUSH|ADD|SUB|DIV|MUL|SQRT|OUT|HLT|POPR|PUSHR|IN|JMP|JB|JBE|JA|JAE|JE|JNE|HACK)\\b"
+      "match": "\\b(PUSH|ADD|SUB|DIV|MUL|SQRT|OUT|HLT|POPR|PUSHR|IN|JMP|JB|JBE|JA|JAE|JE|JNE|HACK|CALL|RET)\\b"
     },
+
     {
-      "begin": "\\b(PUSH|JMP|JB|JBE|JA|JAE|JE|JNE)\\b\\s+",
+      "begin": "\\b(PUSH|JMP|JB|JBE|JA|JAE|JE|JNE|CALL)\\b\\s+",
       "beginCaptures": {
         "1": { "name": "keyword.control" }
       },
@@ -18,10 +49,11 @@
       "patterns": [
         {
           "name": "constant.numeric",
-          "match": "\\b\\d+\\b"
+          "match": "-?\\b\\d+\\b"
         }
       ]
     },
+
     {
       "begin": "\\b(POPR|PUSHR)\\b\\s+",
       "beginCaptures": {
@@ -30,18 +62,15 @@
       "end": "$",
       "patterns": [
         {
-          "name": "support.type",
-          "match": "\\b(AX|BX|CX|DX|EX|FX|GX|HX)\\b"
+          "name": "support.type.register",
+          "match": "\\b(AX|BX|CX|DX|EX|FX|GX|HX|IX|JX)\\b"
         }
       ]
     },
+
     {
-      "name": "support.type",
-      "match": "\\b(AX|BX|CX|DX|EX|FX|GX|HX)\\b"
-    },
-    {
-      "name": "constant.numeric",
-      "match": "\\b\\d+\\b"
+      "name": "support.type.register",
+      "match": "\\b(AX|BX|CX|DX|EX|FX|GX|HX|IX|JX)\\b"
     }
   ]
 }

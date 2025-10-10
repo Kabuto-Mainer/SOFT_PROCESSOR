@@ -233,6 +233,22 @@ int my_proc(const char* name_bin_file) {
                 J_COMAND(!=);
             }
 //----------------------------------------------------------------------------------------------------
+            case INT_CALL: {
+                proc.C_E++;
+                stack_push(&(proc.address), proc.C_E + 1);
+                proc.C_E = proc.bin_code[proc.C_E] - 2;
+
+                break;
+            }
+//----------------------------------------------------------------------------------------------------
+            case INT_RET: {
+                int adr = 0;
+                stack_pop(&(proc.address), &adr);
+
+                proc.C_E = adr - 1;
+                break;
+            }
+//----------------------------------------------------------------------------------------------------
             default: {
                 cpu_dtor(&proc);
                 printf(_R_ "ERROR: unknown command\n" _N_);
@@ -247,8 +263,8 @@ int my_proc(const char* name_bin_file) {
 
 
 int cpu_ctor(cpu_t* proc,
-                  const char* name_bin_file,
-                  int* amount_elements) {
+             const char* name_bin_file,
+             int* amount_elements) {
     assert(proc);
     assert(name_bin_file);
 
@@ -263,6 +279,11 @@ int cpu_ctor(cpu_t* proc,
     size_stack = START_SIZE_STACK;
 
     if (stack_creator(&(proc->stack), size_stack, __FILE__,  __LINE__, NAME_RETURN(stack)) != 0) {
+        printf(_R_ "ERROR: creating stack was not completed\n" _N_);
+        return -1;
+    }
+
+    if (stack_creator(&(proc->address), 4, __FILE__,  __LINE__, NAME_RETURN(labels)) != 0) {
         printf(_R_ "ERROR: creating stack was not completed\n" _N_);
         return -1;
     }
@@ -282,6 +303,8 @@ int cpu_dtor(cpu_t* proc) {
     assert(proc);
 
     stack_destruct(&(proc->stack));
+    stack_destruct(&(proc->address));
+
     free(proc->bin_code);
 
     return 0;

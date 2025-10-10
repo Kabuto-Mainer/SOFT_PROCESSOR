@@ -6,6 +6,7 @@
 
 struct cpu_t{
     stack_struct stack;
+    stack_struct address;
     int* bin_code;
     int C_E;
     int regs[AMOUNT_REGISTERS];
