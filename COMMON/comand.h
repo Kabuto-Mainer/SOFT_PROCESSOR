@@ -3,7 +3,7 @@
 
 const char NAME_ASM_FILE[] = "CODE-FILE/asm-code.asm";
 const char NAME_BIN_FILE[] = "CODE-FILE/bin-code.bin";
-const char NAME_TEXT_FILE[] = "CODE-FILE/text-code.asm";
+const char NAME_TEXT_FILE[] = "CODE-FILE/listing.asm";
 const char NAME_DISASMB_FILE[] = "CODE-FILE/disasmb-text.asm";
 
 const char CHAR_CMD[30][6] = {
@@ -27,31 +27,37 @@ const char CHAR_CMD[30][6] = {
                         "JNE",
                         "HACK",
                         "CALL",
-                        "RET"
+                        "RET",
+                        "if",
+                        "else",
+                        "end"
 };
 
 enum INT_HASH {
-    HASH_PUSH = 15795,
-    HASH_ADD = 11855,
-    HASH_SUB = 12944,
-    HASH_DIV = 12713,
-    HASH_MUL = 13076,
-    HASH_SQRT = 16125,
-    HASH_OUT = 13406,
-    HASH_HLT = 12878,
-    HASH_POPR = 15828,
-    HASH_PUSHR = 18514,
-    HASH_IN = 10192,
-    HASH_JMP = 12845,
-    HASH_JB = 9829,
-    HASH_JBE = 12119,
-    HASH_JA = 9796,
-    HASH_JAE = 12086,
-    HASH_JE = 9928,
-    HASH_JNE = 12515,
-    HASH_HACK = 14442,
-    HASH_CALL = 14607,
-    HASH_RET = 12977
+    HASH_PUSH = 15743,
+    HASH_ADD = 11816,
+    HASH_SUB = 12905,
+    HASH_DIV = 12674,
+    HASH_MUL = 13037,
+    HASH_SQRT = 16073,
+    HASH_OUT = 13367,
+    HASH_HLT = 12839,
+    HASH_POPR = 15776,
+    HASH_PUSHR = 18449,
+    HASH_IN = 10166,
+    HASH_JMP = 12806,
+    HASH_JB = 9803,
+    HASH_JBE = 12080,
+    HASH_JA = 9770,
+    HASH_JAE = 12047,
+    HASH_JE = 9902,
+    HASH_JNE = 12476,
+    HASH_HACK = 14390,
+    HASH_CALL = 14555,
+    HASH_RET = 12938,
+    HASH_if = 12014,
+    HASH_else = 19208,
+    HASH_end = 15446
 };
 
 enum INT_CMD {
