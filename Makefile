@@ -12,11 +12,17 @@ common_cpp = COMMON/support.cpp
 # Общие файлы
 common_all = COMMON/color.h COMMON/comand.h COMMON/const.h COMMON/Makefile COMMON/support.h $(common_cpp)
 
+# Файлы .cpp stack
+stack_cpp = PROCESSOR/stack.cpp
+
+# Файлы stack
+stack_all = PROCESSOR/stack_define.h PROCESSOR/stack.h $(stack_cpp)
+
 # Файлы .cpp для сборки processor
-proc_cpp = PROCESSOR/processor.cpp PROCESSOR/stack.cpp
+proc_cpp = PROCESSOR/processor.cpp $(stack_cpp)
 
 # Файлы processor
-proc_all = PROCESSOR/processor.h PROCESSOR/stack_define.h PROCESSOR/stack.h $(proc_cpp)
+proc_all = PROCESSOR/processor.h $(stack_all) $(proc_cpp)
 
 # Файлы .cpp assembler
 asmb_cpp = ASSEMBLER/assembler.cpp
@@ -31,7 +37,7 @@ disasmb_cpp = DISASSEMBLER/disassembler.cpp
 disasmb_all = DISASSEMBLER/disassembler.h $(disasmb_cpp)
 
 # Текстовые файлы
-text_file = TEXT_FILE/bin_code.bin TEXT_FILE/asm_code.asm TEXT_FILE/text_code.txt TEXT_FILE/disasmb_text.asm
+text_file = TEXT_FILE/bin_code.bin TEXT_FILE/asm_code.asm TEXT_FILE/listing.asm TEXT_FILE/disasmb-text.asm
 
 
 # Компиляция processor
@@ -42,12 +48,12 @@ processor:
 # Компиляция assembler
 assembler:
 	@echo -------------------------------------------------------------------------
-	g++ $(asmb_cpp) $(common_cpp) $(flags) -o BIN/assembler.exe
+	g++ $(asmb_cpp) $(stack_cpp) $(common_cpp)  $(flags) -o BIN/assembler.exe
 
 # Запуск disassembler
 disassembler:
 	@echo -------------------------------------------------------------------------
-	g++ $(disasmb_cpp) $(common_cpp) $(flags) -o BIN/disassembler.exe
+	g++ $(disasmb_cpp) $(common_cpp)  $(flags) -o BIN/disassembler.exe
 
 # Запуск assembler
 run-a:

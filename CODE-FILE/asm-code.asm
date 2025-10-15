@@ -1,12 +1,11 @@
 IN
 POPR AX
 
-CALL :4
+CALL :FACT
 OUT
 HLT
 
-
-:4
+:FACT
 
 PUSHR AX
 
@@ -19,7 +18,7 @@ JE $+19
     ADD
     POPR AX
 
-    CALL :4
+    CALL :FACT
 
     PUSHR AX
     PUSH 1

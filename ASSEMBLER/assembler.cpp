@@ -9,20 +9,26 @@
 #include "../COMMON/comand.h"
 #include "../COMMON/config.h"
 
+#include "../PROCESSOR/stack.h"
+#include "../PROCESSOR/stack_define.h"
+
 
 int main(void) {
-    int table_point[AMOUNT_POINTS] = {-1, -1, -1, -1, -1, -1, -1, -1};
+//     int table_point[AMOUNT_POINTS] = {-1, -1, -1, -1, -1, -1, -1, -1};
+//
+//     table_point[0] = -2;
 
-    table_point[0] = -2;
-    // for (int i = 0; i < 22; i++) {
+    label_t table_label[AMOUNT_POINTS] = {0};
+
+    // for (int i = 0; i < 24; i++) {
     //     printf("%s: %d\n", CHAR_CMD[i], cmd_to_hash(CHAR_CMD[i]));
     // }
 
-    my_assembler(NAME_ASM_FILE, NAME_BIN_FILE, NAME_TEXT_FILE, table_point);
+    my_assembler(NAME_ASM_FILE, NAME_BIN_FILE, NAME_TEXT_FILE, table_label);
 
     // printf("%d\n", table_point[0]);
 
-    my_assembler(NAME_ASM_FILE, NAME_BIN_FILE, NAME_TEXT_FILE, table_point);
+    my_assembler(NAME_ASM_FILE, NAME_BIN_FILE, NAME_TEXT_FILE, table_label);
 
     return 0;
 }
@@ -66,19 +72,23 @@ int char_reg_to_int(const char* name_reg) {
 asm_error_t my_assembler (const char* name_asm_file,
                           const char* name_byte_file,
                           const char* name_text_file,
-                          int* table_point)
+                          label_t* table_label)
 {
     assert(name_asm_file);
     assert(name_byte_file);
     assert(name_text_file);
-    assert(table_point);
+    assert(table_label);
 
     asm_struct asm_data = {};
     asm_data.name_file = name_asm_file;
-    asm_data.table_point = table_point;
+    asm_data.table_label = table_label;
     asm_data.amount_line = 0;
     asm_data.cur_char = 0;
     asm_data.cur_element = AMOUNT_SUP_NUM;
+    if (stack_creator(&(asm_data.stack_if), 10, __FILE__, __LINE__, NAME_RETURN(stack_if)) != NOT_ERRORS) {
+        printf("ERROR with creating stack in assembler\n");
+        return ERROR;
+    }
 
     size_t max_elements = START_AMOUNT_CMD;
 
@@ -113,6 +123,8 @@ asm_error_t my_assembler (const char* name_asm_file,
         int add_index = (int) find_char(asm_code + asm_data.cur_char, '\n');
         *(asm_code + asm_data.cur_char + add_index) = '\0';
 
+        // printf("ALL: -%s-\n", asm_code + asm_data.cur_char);
+
         char comand[40] = "";
 
         if (sscanf(asm_code + asm_data.cur_char, "%39s", comand) == 0) {
@@ -132,44 +144,36 @@ asm_error_t my_assembler (const char* name_asm_file,
 
         // printf("CMD: -%s-\n", comand);
 
-        fprintf(text_stream, "[%3d] %s ", asm_data.cur_element - AMOUNT_SUP_NUM + 1, asm_data.asm_code + asm_data.cur_char);
-        for (int i = add_index; i < 60; i++) {
-            fputc(' ', text_stream);
-        }
+        fprintf(text_stream, "[%3d] ", asm_data.cur_element - AMOUNT_SUP_NUM + 1);
 
         if (comand[0] == ':') {
-            int point = 0;
+            int hash_label = cmd_to_hash(comand);
 
-            if (sscanf(asm_code + asm_data.cur_char + 1, "%d", &point) == 0) {
-                printf(_R_ "%s:%d: ERROR: %s\n" _N_, name_asm_file, asm_data.amount_line + 1, DESCRIPTION_ERRORS[INVALID_POINT]);
-                free(asm_data.bin_code);
-                free(asm_data.asm_code);
-                fclose(text_stream);
-                return INVALID_POINT;
+            for (int i = 0; i < AMOUNT_POINTS; i++) {
+                if ((table_label[i]).hash_name == 0) {
+                    (table_label[i]).hash_name = hash_label;
+                    (table_label[i]).address = asm_data.cur_element;
+                }
             }
 
-            if (point < 0 || point >= AMOUNT_POINTS) {
-                printf(_R_ "%s:%d: ERROR: %s\n" _N_, name_asm_file, asm_data.amount_line + 1, DESCRIPTION_ERRORS[INVALID_POINT]);
-                free(asm_data.bin_code);
-                free(asm_data.asm_code);
-                fclose(text_stream);
-                return INVALID_POINT;
-            }
-            // printf("POINT: %d\n", point);
-            // printf("LINE: %d\n", asm_data.amount_line);
-            table_point[point] = asm_data.cur_element;
             fputc('\n', text_stream);
         }
 
         else {
             asm_data.hash_cmd = cmd_to_hash(comand);
 
-            if (check_comand(&asm_data) != NOT_ERRORS) {
+            if (check_comand(&asm_data) != A_NOT_ERRORS) {
                 free(bin_code);
                 free(asm_code);
+                stack_destruct(&(asm_data.stack_if));
                 return ERROR;
             }
         }
+
+        fprintf(text_stream, "%s\n", asm_data.asm_code + asm_data.cur_char);
+        // for (int i = add_index; i < 60; i++) {
+        //     fputc(' ', text_stream);
+        // }
 
         asm_data.cur_char += add_index + 1;
         asm_data.amount_line++;
@@ -185,6 +189,7 @@ asm_error_t my_assembler (const char* name_asm_file,
         printf(_R_ "ERROR: write bin_code to bin_file was failed\n" _N_);
         free(bin_code);
         free(asm_code);
+        stack_destruct(&(asm_data.stack_if));
         return FILE_ERROR;
     }
     fclose_file(bin_file);
@@ -192,9 +197,10 @@ asm_error_t my_assembler (const char* name_asm_file,
 
     free(bin_code);
     free(asm_code);
+    stack_destruct(&(asm_data.stack_if));
     printf(_G_ "Compilation was completed\n" _N_);
 
-    return NOT_ERRORS;
+    return A_NOT_ERRORS;
 }
 
 
@@ -219,7 +225,7 @@ asm_error_t check_comand(asm_struct* asm_data)
             asm_data->bin_code[asm_data->cur_element++] = INT_PUSH;
             asm_data->bin_code[asm_data->cur_element++] = arg;
 
-            fprintf(asm_data->text_stream, "%d %d\n", INT_PUSH, arg);
+            fprintf(asm_data->text_stream, "%08X %08X ", (unsigned int) INT_PUSH, (unsigned int) arg);
             break;
         }
 //-----------------------------------------------------------------------------------------------------
@@ -239,7 +245,7 @@ asm_error_t check_comand(asm_struct* asm_data)
             asm_data->bin_code[asm_data->cur_element++] = INT_POPR;
             asm_data->bin_code[asm_data->cur_element++] = reg;
 
-            fprintf(asm_data->text_stream, "%d %d\n", INT_POPR, reg);
+            fprintf(asm_data->text_stream, "%08X %08X ", (unsigned int) INT_POPR, (unsigned int) reg);
             break;
         }
 //-----------------------------------------------------------------------------------------------------
@@ -259,61 +265,61 @@ asm_error_t check_comand(asm_struct* asm_data)
             asm_data->bin_code[asm_data->cur_element++] = INT_PUSHR;
             asm_data->bin_code[asm_data->cur_element++] = reg;
 
-            fprintf(asm_data->text_stream, "%d %d\n", INT_PUSHR, reg);
+            fprintf(asm_data->text_stream, "%08X %08X ", (unsigned int) INT_PUSHR, (unsigned int) reg);
             break;
         }
 //-----------------------------------------------------------------------------------------------------
         case (HASH_ADD): {
             asm_data->bin_code[asm_data->cur_element++] = INT_ADD;
 
-            fprintf(asm_data->text_stream, "%d\n", INT_ADD);
+            fprintf(asm_data->text_stream, "%08X          ", (unsigned int) INT_ADD);
             break;
         }
 //-----------------------------------------------------------------------------------------------------
         case (HASH_SUB): {
             asm_data->bin_code[asm_data->cur_element++] = INT_SUB;
 
-            fprintf(asm_data->text_stream, "%d\n", INT_SUB);
+            fprintf(asm_data->text_stream, "%08X          ", (unsigned int) INT_SUB);
             break;
         }
 //-----------------------------------------------------------------------------------------------------
         case (HASH_MUL): {
             asm_data->bin_code[asm_data->cur_element++] = INT_MUL;
 
-            fprintf(asm_data->text_stream, "%d\n", INT_MUL);
+            fprintf(asm_data->text_stream, "%08X          ", (unsigned int) INT_MUL);
             break;
         }
 //-----------------------------------------------------------------------------------------------------
         case (HASH_DIV): {
             asm_data->bin_code[asm_data->cur_element++] = INT_DIV;
 
-            fprintf(asm_data->text_stream, "%d\n", INT_DIV);
+            fprintf(asm_data->text_stream, "%08X          ", (unsigned int) INT_DIV);
             break;
         }
 //-----------------------------------------------------------------------------------------------------
         case (HASH_SQRT): {
             asm_data->bin_code[asm_data->cur_element++] = INT_SQRT;
 
-            fprintf(asm_data->text_stream, "%d\n", INT_SQRT);
+            fprintf(asm_data->text_stream, "%08X          ", (unsigned int) INT_SQRT);
             break;
         }
 //-----------------------------------------------------------------------------------------------------
         case (HASH_OUT): {
             asm_data->bin_code[asm_data->cur_element++] = INT_OUT;
 
-            fprintf(asm_data->text_stream, "%d\n", INT_OUT);
+            fprintf(asm_data->text_stream, "%08X          ", (unsigned int) INT_OUT);
             break;
         }
 //-----------------------------------------------------------------------------------------------------
         case (HASH_IN): {
             asm_data->bin_code[asm_data->cur_element++] = INT_IN;
 
-            fprintf(asm_data->text_stream, "%d\n", INT_IN);
+            fprintf(asm_data->text_stream, "%08X          ", (unsigned int) INT_IN);
             break;
         }
 //-----------------------------------------------------------------------------------------------------
         case (HASH_JMP): {
-            if (check_J_cmd(asm_data, INT_JMP) != NOT_ERRORS) {
+            if (check_J_cmd(asm_data, INT_JMP) != A_NOT_ERRORS) {
                 return ERROR;
             }
 
@@ -321,7 +327,7 @@ asm_error_t check_comand(asm_struct* asm_data)
         }
 //-----------------------------------------------------------------------------------------------------
         case (HASH_JB): {
-            if (check_J_cmd(asm_data, INT_JB) != NOT_ERRORS) {
+            if (check_J_cmd(asm_data, INT_JB) != A_NOT_ERRORS) {
                 return ERROR;
             }
 
@@ -329,7 +335,7 @@ asm_error_t check_comand(asm_struct* asm_data)
         }
 //-----------------------------------------------------------------------------------------------------
         case (HASH_JBE): {
-            if (check_J_cmd(asm_data, INT_JBE) != NOT_ERRORS) {
+            if (check_J_cmd(asm_data, INT_JBE) != A_NOT_ERRORS) {
                 return ERROR;
             }
 
@@ -337,7 +343,7 @@ asm_error_t check_comand(asm_struct* asm_data)
         }
 //-----------------------------------------------------------------------------------------------------
         case (HASH_JA): {
-            if (check_J_cmd(asm_data, INT_JA) != NOT_ERRORS) {
+            if (check_J_cmd(asm_data, INT_JA) != A_NOT_ERRORS) {
                 return ERROR;
             }
 
@@ -345,7 +351,7 @@ asm_error_t check_comand(asm_struct* asm_data)
         }
 //-----------------------------------------------------------------------------------------------------
         case (HASH_JAE): {
-            if (check_J_cmd(asm_data, INT_JAE) != NOT_ERRORS) {
+            if (check_J_cmd(asm_data, INT_JAE) != A_NOT_ERRORS) {
                 return ERROR;
             }
 
@@ -353,7 +359,7 @@ asm_error_t check_comand(asm_struct* asm_data)
         }
 //-----------------------------------------------------------------------------------------------------
         case (HASH_JE): {
-            if (check_J_cmd(asm_data, INT_JE) != NOT_ERRORS) {
+            if (check_J_cmd(asm_data, INT_JE) != A_NOT_ERRORS) {
                 return ERROR;
             }
 
@@ -361,7 +367,7 @@ asm_error_t check_comand(asm_struct* asm_data)
         }
 //-----------------------------------------------------------------------------------------------------
         case (HASH_JNE): {
-            if (check_J_cmd(asm_data, INT_JNE) != NOT_ERRORS) {
+            if (check_J_cmd(asm_data, INT_JNE) != A_NOT_ERRORS) {
                 return ERROR;
             }
 
@@ -371,19 +377,19 @@ asm_error_t check_comand(asm_struct* asm_data)
         case (HASH_HACK): {
             asm_data->bin_code[asm_data->cur_element++] = INT_HACK;
 
-            fprintf(asm_data->text_stream, "%d\n", INT_HACK);
+            fprintf(asm_data->text_stream, "%08X          ", (unsigned int) INT_HACK);
             break;
         }
 //-----------------------------------------------------------------------------------------------------
         case (HASH_HLT): {
             asm_data->bin_code[asm_data->cur_element++] = INT_HLT;
 
-            fprintf(asm_data->text_stream, "%d\n", INT_HLT);
+            fprintf(asm_data->text_stream, "%08X          ", (unsigned int) INT_HLT);
             break;
         }
 //-----------------------------------------------------------------------------------------------------
         case (HASH_CALL): {
-            if (check_J_cmd(asm_data, INT_CALL) != NOT_ERRORS) {
+            if (check_J_cmd(asm_data, INT_CALL) != A_NOT_ERRORS) {
                 return ERROR;
             }
 
@@ -393,7 +399,126 @@ asm_error_t check_comand(asm_struct* asm_data)
         case (HASH_RET): {
             asm_data->bin_code[asm_data->cur_element++] = INT_RET;
 
-            fprintf(asm_data->text_stream, "%d\n", INT_RET);
+            fprintf(asm_data->text_stream, "%08X          ", (unsigned int) INT_RET);
+            break;
+        }
+//-----------------------------------------------------------------------------------------------------
+        case (HASH_if): {
+            char trash[10] = "";
+            char arg_1[10] = "";
+            char arg_2[10] = "";
+            char sign[5] = "";
+            const char place[40] = "                   ";
+
+            if (sscanf(asm_data->asm_code + asm_data->cur_char, "%s %s %s %s", trash, arg_1, sign, arg_2) != 4) {
+                EXIT_FUNCTION(asm_data, FEW_IF);
+            }
+
+            if (isalpha(arg_1[0]) != 0) {
+                int reg = char_reg_to_int(arg_1);
+
+                if (reg == -1) {
+                    EXIT_FUNCTION(asm_data, UNKNOWN_REG);
+                }
+
+                asm_data->bin_code[asm_data->cur_element++] = INT_PUSHR;
+                asm_data->bin_code[asm_data->cur_element++] = reg;
+
+                fprintf(asm_data->text_stream, "%08X %08X %s %s", (unsigned int) INT_PUSHR, (unsigned int) reg, CHAR_CMD[INT_PUSHR], arg_1);
+
+                // fprintf(asm_data->text_stream, "\n %s %s %s", place, CHAR_CMD[INT_PUSHR], arg_1);
+            }
+
+            else if (arg_1[0] == '-' || isdigit(arg_1[0]) != 0) {
+                asm_data->bin_code[asm_data->cur_element++] = INT_PUSH;
+                asm_data->bin_code[asm_data->cur_element++] = atoi(arg_1);
+
+                fprintf(asm_data->text_stream, "%08X %08X %s %s", (unsigned int) INT_PUSHR, (unsigned int) atoi(arg_1), CHAR_CMD[INT_PUSHR], arg_1);
+                // fprintf(asm_data->text_stream, "\n %s %s %d", place, CHAR_CMD[INT_PUSH], atoi(arg_1));
+            }
+
+            else {
+                EXIT_FUNCTION(asm_data, UNCORRECT_IF);
+            }
+
+            fprintf(asm_data->text_stream, "\n[%3d] ", asm_data->cur_element - AMOUNT_SUP_NUM + 1);
+
+            if (isalpha(arg_2[0]) != 0) {
+                int reg = char_reg_to_int(arg_2);
+
+                if (reg == -1) {
+                    EXIT_FUNCTION(asm_data, UNKNOWN_REG);
+                }
+
+                asm_data->bin_code[asm_data->cur_element++] = INT_PUSHR;
+                asm_data->bin_code[asm_data->cur_element++] = reg;
+
+                fprintf(asm_data->text_stream, "%08X %08X %s %s", (unsigned int) INT_PUSHR, (unsigned int) reg, CHAR_CMD[INT_PUSHR], arg_1);
+                // fprintf(asm_data->text_stream, "\n %s %s %s", place, CHAR_CMD[INT_PUSHR], arg_2);
+            }
+
+            else if (arg_2[0] == '-' || isdigit(arg_2[0]) != 0) {
+                asm_data->bin_code[asm_data->cur_element++] = INT_PUSH;
+                asm_data->bin_code[asm_data->cur_element++] = atoi(arg_2);
+
+                fprintf(asm_data->text_stream, "%08X %08X %s %s", (unsigned int) INT_PUSHR, (unsigned int) atoi(arg_2), CHAR_CMD[INT_PUSHR], arg_1);
+                // fprintf(asm_data->text_stream, "\n %s %s %d", place, CHAR_CMD[INT_PUSH], atoi(arg_2));
+            }
+
+            else {
+                EXIT_FUNCTION(asm_data, UNCORRECT_IF);
+            }
+
+            int sign_comand = sign_to_j_cmd(sign);
+
+            if (sign_comand == -1) {
+                EXIT_FUNCTION(asm_data, UNCORRECT_IF);
+            }
+
+            asm_data->bin_code[asm_data->cur_element++] = sign_comand;
+            stack_push(&(asm_data->stack_if), asm_data->cur_element);
+            asm_data->cur_element++;
+
+            fprintf(asm_data->text_stream, "\n[%3d] ", asm_data->cur_element - AMOUNT_SUP_NUM + 1);
+            fprintf(asm_data->text_stream, "%08X %s %s %s", (unsigned int) sign_comand, ",CHAR_CMD[INT_PUSHR], arg_1);;
+
+            fprintf(asm_data->text_stream, "\n %s %s [else] \n", place, CHAR_CMD[sign_comand]);
+
+            // fprintf(asm_data->text_stream, "%d %d\n", INT_PUSH, arg);
+            break;
+        }
+//-----------------------------------------------------------------------------------------------------
+        case (HASH_else): {
+            int place_to_else = 0;
+            int place_to_end = 0;
+            const char place[40] = "                   ";
+
+            if (asm_data->stack_if.size == 0) {
+                EXIT_FUNCTION(asm_data, FEW_ELSE);
+            }
+
+            asm_data->bin_code[asm_data->cur_element++] = INT_JMP;
+            place_to_end = asm_data->cur_element;
+            asm_data->cur_element++;
+
+            stack_pop(&(asm_data->stack_if), &place_to_else);
+            asm_data->bin_code[place_to_else] = asm_data->cur_element;
+
+            stack_push(&(asm_data->stack_if), place_to_end);
+
+            fprintf(asm_data->text_stream, "\n %s %s [end]", place, CHAR_CMD[INT_JMP]);
+
+            fprintf(asm_data->text_stream, "[%d]\n", place_to_else - AMOUNT_SUP_NUM + 1);
+            break;
+        }
+//-----------------------------------------------------------------------------------------------------
+        case (HASH_end): {
+            int place_to_end = 0;
+
+            stack_pop(&(asm_data->stack_if), &place_to_end);
+            asm_data->bin_code[place_to_end] = asm_data->cur_element;
+
+            fprintf(asm_data->text_stream, "[%d]\n", place_to_end - AMOUNT_SUP_NUM + 1);
             break;
         }
 //-----------------------------------------------------------------------------------------------------
@@ -402,14 +527,14 @@ asm_error_t check_comand(asm_struct* asm_data)
         }
     }
 
-    return NOT_ERRORS;
+    return A_NOT_ERRORS;
 }
 
 
 asm_error_t check_J_cmd(asm_struct* asm_data, int cmd)
 {
     assert(asm_data);
-    assert(asm_data->table_point);
+    assert(asm_data->table_label);
 
     char char_adr[8] = "";
     char trash[100] = "";
@@ -423,13 +548,13 @@ asm_error_t check_J_cmd(asm_struct* asm_data, int cmd)
     char_adr[7] = '\0'; // На всякий
 
     if (char_adr[0] == ':') {
-        int point = atoi(char_adr + 1);
-        if (point < 0 || point >= AMOUNT_POINTS) {
-            EXIT_FUNCTION(asm_data, INVALID_POINT);
-        }
+        int hash_name = cmd_to_hash(char_adr);
 
-        new_C_E = asm_data->table_point[point] - AMOUNT_SUP_NUM + 1;
-        // printf("new_C_E: %d\n", new_C_E);
+        for (int i = 0; i < AMOUNT_POINTS; i++) {
+            if ((asm_data->table_label[i]).hash_name == hash_name) {
+                new_C_E = (asm_data->table_label[i]).address - AMOUNT_SUP_NUM + 1;
+            }
+        }
     }
 
     else if (char_adr[0] == '$') {
@@ -453,8 +578,8 @@ asm_error_t check_J_cmd(asm_struct* asm_data, int cmd)
     asm_data->bin_code[asm_data->cur_element++] = cmd;
     asm_data->bin_code[asm_data->cur_element++] = new_C_E;
 
-    fprintf(asm_data->text_stream, "%d %d\n", cmd, new_C_E);
-    return NOT_ERRORS;
+    fprintf(asm_data->text_stream, "%08X %08X ", (unsigned int) cmd, (unsigned int) new_C_E);
+    return A_NOT_ERRORS;
 }
 
 
@@ -469,10 +594,51 @@ int cmd_to_hash(const char* comand)
             break;
         }
 
-        hash_cmd += comand[i] * 33 + 13;
+        hash_cmd += comand[i] * 33;
     }
 
     return hash_cmd;
+}
+
+
+int sign_to_j_cmd(const char* string) {
+    assert(string);
+
+    if (string[0] == '<') {
+        if (string[1] == '=') {
+            return INT_JBE;
+        }
+
+        else {
+            return INT_JB;
+        }
+    }
+
+    if (string[0] == '>') {
+        if (string[1] == '=') {
+            return INT_JAE;
+        }
+
+        else {
+            return INT_JA;
+        }
+    }
+
+    if (string[1] == '=') {
+        if (string[0] == '=') {
+            return INT_JE;
+        }
+
+        else if (string[0] == '!') {
+            return INT_JNE;
+        }
+
+        else {
+            return -1;
+        }
+    }
+
+    return -1;
 }
 
 
