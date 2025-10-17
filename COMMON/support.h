@@ -34,5 +34,6 @@ int check_inf(FILE* bin_file);
 
 int* realloc_buffer(int* address, const size_t max_size);
 
+int cmd_to_hash(const char* comand);
 
 #endif // O_SUPPORT_H

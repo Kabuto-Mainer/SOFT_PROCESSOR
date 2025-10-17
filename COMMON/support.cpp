@@ -126,3 +126,24 @@ int check_inf(FILE* bin_file) {
     return 0;
 }
 
+
+
+int cmd_to_hash(const char* comand)
+{
+    assert(comand);
+
+    int hash_cmd = 5183;
+
+    for (int i = 0; i < 20; i++) {
+        if (comand[i] == ' ' || comand[i] == '\0') {
+            break;
+        }
+
+        hash_cmd += comand[i] * 33;
+    }
+
+    return hash_cmd;
+}
+
+
+

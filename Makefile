@@ -10,7 +10,7 @@ flags = -D_DEBUG -Werror -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Waggressi
 common_cpp = COMMON/support.cpp
 
 # Общие файлы
-common_all = COMMON/color.h COMMON/comand.h COMMON/const.h COMMON/Makefile COMMON/support.h $(common_cpp)
+common_all = COMMON/color.h COMMON/comand.h COMMON/const.h COMMON/Makefile COMMON/support.h COMMON/cmd-hash.h $(common_cpp)
 
 # Файлы .cpp stack
 stack_cpp = PROCESSOR/stack.cpp
@@ -19,7 +19,7 @@ stack_cpp = PROCESSOR/stack.cpp
 stack_all = PROCESSOR/stack_define.h PROCESSOR/stack.h $(stack_cpp)
 
 # Файлы .cpp для сборки processor
-proc_cpp = PROCESSOR/processor.cpp $(stack_cpp)
+proc_cpp = PROCESSOR/processor.cpp $(stack_cpp) PROCESSOR/OS.cpp
 
 # Файлы processor
 proc_all = PROCESSOR/processor.h $(stack_all) $(proc_cpp)
@@ -43,12 +43,18 @@ text_file = TEXT_FILE/bin_code.bin TEXT_FILE/asm_code.asm TEXT_FILE/listing.asm 
 # Компиляция processor
 processor:
 	@echo -------------------------------------------------------------------------
-	g++ $(proc_cpp) $(common_cpp) $(flags) -o BIN/processor.exe
+	g++ $(proc_cpp) $(common_cpp) $(flags) -lX11 -o BIN/processor.exe
 
 # Компиляция assembler
 assembler:
 	@echo -------------------------------------------------------------------------
 	g++ $(asmb_cpp) $(stack_cpp) $(common_cpp)  $(flags) -o BIN/assembler.exe
+
+# Компиляция hash-cmd
+hash-cmd:
+	@echo -------------------------------------------------------------------------
+	g++ ASSEMBLER/cmd-hash-create.cpp $(common_cpp)  $(flags) -o BIN/hash-cmd.exe
+
 
 # Запуск disassembler
 disassembler:
@@ -69,6 +75,13 @@ run-p:
 run-d:
 	@echo -------------------------------------------------------------------------
 	./BIN/disassembler.exe
+
+
+# Запуск hash-cmd-create
+run-h:
+	@echo -------------------------------------------------------------------------
+	./BIN/hash-cmd.exe
+
 
 # Git commit
 gitcom:
