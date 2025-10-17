@@ -97,20 +97,27 @@ int my_bincode_to_asm(const char* name_bin_file, const char* name_text_file) {
 
 
     for (unsigned int cur_el = 0; cur_el < amount_elements - 2; cur_el++) {
-        if (bin_code[cur_el] == INT_PUSH) {
+        if (bin_code[cur_el] == INT_PUSH ||
+            bin_code[cur_el] == INT_JMP ||
+            bin_code[cur_el] == INT_JB ||
+            bin_code[cur_el] == INT_JBE ||
+            bin_code[cur_el] == INT_JA ||
+            bin_code[cur_el] == INT_JAE ||
+            bin_code[cur_el] == INT_JE ||
+            bin_code[cur_el] == INT_JNE ||
+            bin_code[cur_el] == INT_CALL) {
             fprintf(text_stream, "%s %d\n", CHAR_CMD[bin_code[cur_el]], bin_code[cur_el + 1]);
             cur_el++;
         }
 
-        else if (bin_code[cur_el] == INT_POPR || bin_code[cur_el] == INT_PUSHR) {
+        else if (bin_code[cur_el] == INT_POPR ||
+                 bin_code[cur_el] == INT_PUSHR ||
+                 bin_code[cur_el] == INT_PUSHM ||
+                 bin_code[cur_el] == INT_POPM) {
             fprintf(text_stream, "%s %s\n", CHAR_CMD[bin_code[cur_el]], CHAR_REG[bin_code[cur_el + 1]]);
             cur_el++;
         }
 
-        else if (bin_code[cur_el] == INT_HLT) {
-            fprintf(text_stream, "%s\n", CHAR_CMD[INT_HLT]);
-            break;
-        }
 
         else {
             fprintf(text_stream, "%s\n", CHAR_CMD[bin_code[cur_el]]);

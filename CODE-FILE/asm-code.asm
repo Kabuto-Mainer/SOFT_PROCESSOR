@@ -1,37 +1,21 @@
-IN
+PUSH 20
+PUSH 0
 POPR AX
+POPM AX
 
-CALL :FACT
+#max_num 10
+
+PUSH #max_num
+
 OUT
+
+PUSH 40
+OUT
+
+PUSHM AX
+OUT
+
 HLT
-
-:FACT
-
-PUSHR AX
-
-PUSH 1
-PUSHR AX
-JE $+19
-
-    PUSHR AX
-    PUSH -1
-    ADD
-    POPR AX
-
-    CALL :FACT
-
-    PUSHR AX
-    PUSH 1
-    ADD
-    POPR AX
-
-    MUL
-    RET
-
-RET
-
-
-
 
 
 

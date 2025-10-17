@@ -35,6 +35,9 @@ const char name_type[] = "int";
 // Количество регистров
 const int AMOUNT_REGISTERS = 8;
 
+const int AMOUNT_POINTS = 20;
+const int AMOUNT_VARS = 20;
+
 // Множитель realloc
 const int MOD_REALLOC = 2;
 const int REALLOC_CONST = 5;
@@ -64,5 +67,20 @@ const int AMOUNT_PRINT_ELEMENT = 10;
 const stmn_t BIRD_NUM = (stmn_t) 0xDEADFACE;
 
 const int HACK_NUM = 10;
+
+// Размер выделяемой оперативки
+const int RAM_SIZE = 100 * sizeof(int);
+
+
+// Размер одного пикселя
+const int PIXEL_SIZE = 5;
+
+const int LEN_DISPLAY = 100;
+const int HIGH_DISPLAY = 100;
+const int SCALE = 4;
+
+
+// Размер
+const int VRAM_SIZE = HIGH_DISPLAY * LEN_DISPLAY;
 
 #endif // CONST_H

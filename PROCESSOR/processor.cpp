@@ -12,23 +12,6 @@
 #include "../COMMON/color.h"
 
 
-int main(int argv, char* args[]) {
-
-    if (argv > 1) {
-        FILE* buffer = fopen_file(args[1], "wb");
-        fclose_file(buffer);
-
-        printf(_G_ "Using %s file\n" _N_, args[1]);
-        my_proc(args[1]);
-    }
-
-    else {
-        my_proc(NAME_BIN_FILE);
-    }
-
-    return 0;
-}
-
 int* create_bin_buffer(const char* name_bin_file,
                 int* amount_elements,
                 int* size_stack) {
@@ -85,8 +68,6 @@ int my_proc(const char* name_bin_file) {
         // if (getchar() == 'd') {
             // proc_dump(&proc);
         // }
-        // printf("CMD: %d\n", proc.bin_code[proc.C_E]);
-        // printf("CMD: %d\n", proc.bin_code[proc.C_E]);
         switch (proc.bin_code[proc.C_E]) {
             case INT_PUSH: {
                 proc.C_E++;
@@ -249,6 +230,21 @@ int my_proc(const char* name_bin_file) {
                 break;
             }
 //----------------------------------------------------------------------------------------------------
+            case INT_PUSHM: {
+                int arg = proc.RAM[proc.regs[proc.bin_code[++(proc.C_E)]]];
+
+                stack_push(&(proc.stack), arg);
+                break;
+            }
+//----------------------------------------------------------------------------------------------------
+            case INT_POPM: {
+                int arg = 0;
+                stack_pop(&(proc.stack), &arg);
+
+                proc.RAM[proc.regs[proc.bin_code[++proc.C_E]]] = arg;
+                break;
+            }
+//----------------------------------------------------------------------------------------------------
             default: {
                 cpu_dtor(&proc);
                 printf(_R_ "ERROR: unknown command\n" _N_);
@@ -275,6 +271,22 @@ int cpu_ctor(cpu_t* proc,
         return -1;
     }
     proc->bin_code = bin_code;
+
+    int* RAM_address = create_int_buffer(RAM_SIZE);
+    if (RAM_address == NULL) {
+        return -1;
+    }
+    proc->RAM = RAM_address;
+
+    int* VRAM_address = create_int_buffer(VRAM_SIZE);
+    if (VRAM_address == NULL) {
+        return -1;
+    }
+    proc->VRAM = VRAM_address;
+
+    for (int i = 0; i < VRAM_SIZE; i++) {
+        VRAM_address[i] = 0;
+    }
 
     size_stack = START_SIZE_STACK;
 
@@ -305,6 +317,8 @@ int cpu_dtor(cpu_t* proc) {
     stack_destruct(&(proc->stack));
     stack_destruct(&(proc->address));
 
+    free(proc->RAM);
+    free(proc->VRAM);
     free(proc->bin_code);
 
     return 0;
