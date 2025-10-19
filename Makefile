@@ -64,7 +64,7 @@ disassembler:
 # Запуск assembler
 run-a:
 	@echo -------------------------------------------------------------------------
-	./BIN/assembler.exe
+	./BIN/assembler.exe $(arg)
 
 # Запуск processor
 run-p:

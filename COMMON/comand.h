@@ -7,7 +7,7 @@ const char NAME_BIN_FILE[] = "CODE-FILE/bin-code.bin";
 const char NAME_TEXT_FILE[] = "CODE-FILE/listing.asm";
 const char NAME_DISASMB_FILE[] = "CODE-FILE/disasmb-text.asm";
 
-const char CHAR_CMD[][6] = {
+const char CHAR_CMD[][7] = {
                         "PUSH",
                         "ADD",
                         "SUB",
@@ -33,7 +33,8 @@ const char CHAR_CMD[][6] = {
                         "POPM",
                         "PAINT",
                         "COLOR",
-                        "DRAW"
+                        "DRAW",
+                        "CTIME"
 };
 // -------------------------------------------------------------------------------------------------------
 enum INT_CMD {
@@ -62,7 +63,8 @@ enum INT_CMD {
     INT_POPM = 22,
     INT_PAINT = 23,
     INT_COLOR = 24,
-    INT_DRAW = 25
+    INT_DRAW = 25,
+    INT_CTIME = 26
 };
 // -------------------------------------------------------------------------------------------------------
 enum INT_REG{
@@ -95,11 +97,6 @@ const char CHAR_REG[][4] = {
     "R4"
 };
 // -------------------------------------------------------------------------------------------------------
-
-const int AMOUNT_SUP_NUM = 4;
-
-const int OWN_SIGNATURE = 1388;
-const int CURRENT_VERSION = 3;
 
 
 

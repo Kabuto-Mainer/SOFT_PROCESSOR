@@ -6,10 +6,10 @@
 #include"../COMMON/config.h"
 
 
-int color_pixel(int frame, int x, int y, int color) {
+int color_pixel(int* frame, int x, int y, int color) {
     int address = (y - 1) * LEN_DISPLAY + x;
 
-
+    frame[address] = color;
 
 
 }
