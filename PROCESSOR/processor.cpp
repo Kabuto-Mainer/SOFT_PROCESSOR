@@ -3,6 +3,8 @@
 #include <cstdlib>
 #include <string.h>
 #include <math.h>
+#include <time.h>
+#include <sys/time.h>
 
 #include "stack_define.h"
 #include "processor.h"
@@ -14,33 +16,47 @@
 
 int* create_bin_buffer(const char* name_bin_file,
                 int* amount_elements,
-                int* size_stack) {
+                display_t* disp_set) {
     assert(name_bin_file);
-    assert(size_stack);
+    assert(disp_set);
     assert(amount_elements);
 
     FILE* bin_file = fopen_file(name_bin_file, "rb");
 
-    if (check_inf(bin_file) != 0) {
+    if (check_inf(bin_file) != 0)
+    {
         return NULL;
     }
 
-    if (fread(amount_elements, sizeof(int), 1, bin_file) != 1) {
+    if (fread(amount_elements, sizeof(int), 1, bin_file) != 1)
+    {
         fclose_file(bin_file);
         printf(_R_ "ERROR: read amount_elements not correct\n" _N_);
         return NULL;
     }
 
-    if (fread(size_stack, sizeof(int), 1, bin_file) != 1) {
+    if (fread(&(disp_set->len), sizeof(int), 1, bin_file) != 1)
+    {
         fclose_file(bin_file);
-        printf(_R_ "ERROR: read size_check not correct\n" _N_);
+        printf(_R_ "ERROR: read LEN_DISPLAY not correct\n" _N_);
         return NULL;
     }
+
+    if (fread(&(disp_set->high), sizeof(int), 1, bin_file) != 1)
+    {
+        fclose_file(bin_file);
+        printf(_R_ "ERROR: read HIGH_DISPLAY not correct\n" _N_);
+        return NULL;
+    }
+    disp_set->size = disp_set->len * disp_set->high;
+
+    printf("LEN: %d\nHIGH: %d\n", disp_set->len, disp_set->high);
 
 //! Нам точно известно, что amount_elements > 2
     int* bin_code = create_int_buffer(size_t (*amount_elements - AMOUNT_SUP_NUM));
     if (fread(bin_code, sizeof(int), size_t(*amount_elements - AMOUNT_SUP_NUM), bin_file)
-        != size_t(*amount_elements - AMOUNT_SUP_NUM)) {
+        != size_t(*amount_elements - AMOUNT_SUP_NUM))
+    {
 
         free(bin_code);
         fclose_file(bin_file);
@@ -53,13 +69,15 @@ int* create_bin_buffer(const char* name_bin_file,
 }
 
 
-int my_proc(const char* name_bin_file) {
+int my_proc(const char* name_bin_file)
+{
     assert(name_bin_file);
 
     int amount_elements = 0;
     cpu_t proc = {};
+    display_t disp_set = {LEN_DISPLAY, HIGH_DISPLAY, VRAM_SIZE};
 
-    if (cpu_ctor(&proc, name_bin_file, &amount_elements) == -1) {
+    if (cpu_ctor(&proc, name_bin_file, &amount_elements, &disp_set) == -1) {
         printf(_R_ "ERROR: cpu_ctor return -1\n" _N_);
         return -1;
     }
@@ -68,15 +86,18 @@ int my_proc(const char* name_bin_file) {
         // if (getchar() == 'd') {
             // proc_dump(&proc);
         // }
-        switch (proc.bin_code[proc.C_E]) {
-            case INT_PUSH: {
+        switch (proc.bin_code[proc.C_E])
+        {
+            case INT_PUSH:
+            {
                 proc.C_E++;
 
                 stack_push(&(proc.stack), proc.bin_code[proc.C_E]);
                 break;
             }
 //------------------------------------------------------------------------------------------------
-            case INT_IN: {
+            case INT_IN:
+            {
                 int num = 0;
 
                 printf(_G_ "Enter int num: " _N_);
@@ -86,29 +107,18 @@ int my_proc(const char* name_bin_file) {
                 break;
             }
 //------------------------------------------------------------------------------------------------
-            case INT_ADD: {
-                int arg_1 = 0;
-                int arg_2 = 0;
-
-                stack_pop(&(proc.stack), &arg_1);
-                stack_pop(&(proc.stack), &arg_2);
-
-                stack_push(&(proc.stack), arg_1 + arg_2);
-                break;
+            case INT_ADD:
+            {
+                ARF_COMAND(+);
             }
 //------------------------------------------------------------------------------------------------
-            case INT_SUB: {
-                int arg_1 = 0;
-                int arg_2 = 0;
-
-                stack_pop(&(proc.stack), &arg_1);
-                stack_pop(&(proc.stack), &arg_2);
-
-                stack_push(&(proc.stack), arg_1 - arg_2);
-                break;
+            case INT_SUB:
+            {
+                ARF_COMAND(-);
             }
 //------------------------------------------------------------------------------------------------
-            case INT_DIV: {
+            case INT_DIV:
+            {
                 int arg_1 = 0;
                 int arg_2 = 0;
 
@@ -125,26 +135,28 @@ int my_proc(const char* name_bin_file) {
                 break;
             }
 //------------------------------------------------------------------------------------------------
-            case INT_MUL: {
-                int arg_1 = 0;
-                int arg_2 = 0;
-
-                stack_pop(&(proc.stack), &arg_1);
-                stack_pop(&(proc.stack), &arg_2);
-
-                stack_push(&(proc.stack), arg_1 * arg_2);
-                break;
+            case INT_MUL:
+            {
+                ARF_COMAND(*);
             }
 //------------------------------------------------------------------------------------------------
-            case INT_SQRT: {
+            case INT_SQRT:
+            {
                 int arg = 0;
-
                 stack_pop(&(proc.stack), &arg);
+
+                if (arg < 0)
+                {
+                    printf(_R_ "ERROR: sqrt in negative num is not correct\n" _N_);
+                    cpu_dtor(&proc);
+                    return -1;
+                }
                 stack_push(&(proc.stack), (int) sqrt(arg));
                 break;
             }
 //------------------------------------------------------------------------------------------------
-            case INT_OUT: {
+            case INT_OUT:
+            {
                 int arg = 0;
 
                 stack_pop(&(proc.stack), &arg);
@@ -152,12 +164,14 @@ int my_proc(const char* name_bin_file) {
                 break;
             }
 //------------------------------------------------------------------------------------------------
-            case INT_HLT: {
+            case INT_HLT:
+            {
                 cpu_dtor(&proc);
                 return 0;
             }
 //------------------------------------------------------------------------------------------------
-            case INT_POPR: {
+            case INT_POPR:
+            {
                 int reg = proc.bin_code[++proc.C_E];
                 int num = 0;
 
@@ -166,7 +180,8 @@ int my_proc(const char* name_bin_file) {
                 break;
             }
 //------------------------------------------------------------------------------------------------
-            case INT_PUSHR: {
+            case INT_PUSHR:
+            {
                 int reg = proc.bin_code[++proc.C_E];
                 int num = proc.regs[reg];
 
@@ -174,47 +189,52 @@ int my_proc(const char* name_bin_file) {
                 break;
             }
 //------------------------------------------------------------------------------------------------
-            case INT_JMP: {
+            case INT_JMP:
+            {
                 proc.C_E++;
                 proc.C_E = proc.bin_code[proc.C_E] - 2;
 
                 break;
             }
 //------------------------------------------------------------------------------------------------
-            case INT_HACK: {
-                // proc.stack.size = -1;
-                int arg_1 = 100;
-
-                proc.stack.data[2] = arg_1;
-
+            case INT_HACK:
+            {
+                proc.stack.size = -1;
                 break;
             }
 //------------------------------------------------------------------------------------------------
-            case INT_JB: {
+            case INT_JB:
+            {
                 J_COMAND(<);
             }
 //---------------------------------------------------------------------------------------------------
-            case INT_JBE: {
+            case INT_JBE:
+            {
                 J_COMAND(<=);
             }
 //---------------------------------------------------------------------------------------------------
-            case INT_JA: {
+            case INT_JA:
+            {
                 J_COMAND(>);
             }
 //---------------------------------------------------------------------------------------------------
-            case INT_JAE: {
+            case INT_JAE:
+            {
                 J_COMAND(>=);
             }
 //---------------------------------------------------------------------------------------------------
-            case INT_JE: {
+            case INT_JE:
+            {
                 J_COMAND(==);
             }
 //---------------------------------------------------------------------------------------------------
-            case INT_JNE: {
+            case INT_JNE:
+            {
                 J_COMAND(!=);
             }
 //----------------------------------------------------------------------------------------------------
-            case INT_CALL: {
+            case INT_CALL:
+            {
                 proc.C_E++;
                 stack_push(&(proc.address), proc.C_E + 1);
                 proc.C_E = proc.bin_code[proc.C_E] - 2;
@@ -222,7 +242,8 @@ int my_proc(const char* name_bin_file) {
                 break;
             }
 //----------------------------------------------------------------------------------------------------
-            case INT_RET: {
+            case INT_RET:
+            {
                 int adr = 0;
                 stack_pop(&(proc.address), &adr);
 
@@ -230,14 +251,16 @@ int my_proc(const char* name_bin_file) {
                 break;
             }
 //----------------------------------------------------------------------------------------------------
-            case INT_PUSHM: {
+            case INT_PUSHM:
+            {
                 int arg = proc.RAM[proc.regs[proc.bin_code[++(proc.C_E)]]];
 
                 stack_push(&(proc.stack), arg);
                 break;
             }
 //----------------------------------------------------------------------------------------------------
-            case INT_POPM: {
+            case INT_POPM:
+            {
                 int arg = 0;
                 stack_pop(&(proc.stack), &arg);
 
@@ -245,7 +268,62 @@ int my_proc(const char* name_bin_file) {
                 break;
             }
 //----------------------------------------------------------------------------------------------------
-            default: {
+            case INT_PAINT:
+            {
+                int x = 0;
+                int y = 0;
+
+                stack_pop(&(proc.stack), &y);
+                stack_pop(&(proc.stack), &x);
+
+                int address = y * disp_set.len + x;
+                int color = proc.bin_code[++proc.C_E];
+
+                (proc.VRAM)[address] = color;
+                break;
+            }
+//----------------------------------------------------------------------------------------------------
+            case INT_COLOR:
+            {
+                int x = 0;
+                int y = 0;
+
+                stack_pop(&(proc.stack), &y);
+                stack_pop(&(proc.stack), &x);
+
+                int address = y * disp_set.len + x;
+                int color = (proc.VRAM)[address];
+
+                stack_push(&(proc.stack), color);
+
+                break;
+            }
+//----------------------------------------------------------------------------------------------------
+            case INT_DRAW:
+            {
+                system("clear");
+                for (int i = 0; i < disp_set.size; i++) {
+                    putchar(proc.VRAM[i]);
+
+                    if (i % disp_set.len == 0) {
+                        putchar('\n');
+                    }
+                }
+                break;
+            }
+//----------------------------------------------------------------------------------------------------
+            case INT_CTIME:
+            {
+                struct timeval tv;
+                gettimeofday(&tv, NULL);
+
+                long long milisec = ((long long)tv.tv_sec * 1000 + tv.tv_usec / 1000) % TIME_DIV;
+                stack_push(&(proc.stack), (int) milisec);
+                break;
+            }
+//----------------------------------------------------------------------------------------------------
+            default:
+            {
                 cpu_dtor(&proc);
                 printf(_R_ "ERROR: unknown command\n" _N_);
                 return -1;
@@ -260,13 +338,12 @@ int my_proc(const char* name_bin_file) {
 
 int cpu_ctor(cpu_t* proc,
              const char* name_bin_file,
-             int* amount_elements) {
+             int* amount_elements,
+             display_t* disp_set) {
     assert(proc);
     assert(name_bin_file);
 
-    int size_stack = 0;
-
-    int* bin_code = create_bin_buffer(name_bin_file, amount_elements, &size_stack);
+    int* bin_code = create_bin_buffer(name_bin_file, amount_elements, disp_set);
     if (bin_code == NULL) {
         return -1;
     }
@@ -278,17 +355,17 @@ int cpu_ctor(cpu_t* proc,
     }
     proc->RAM = RAM_address;
 
-    int* VRAM_address = create_int_buffer(VRAM_SIZE);
+    int* VRAM_address = create_int_buffer((size_t) disp_set->size);
     if (VRAM_address == NULL) {
         return -1;
     }
     proc->VRAM = VRAM_address;
 
-    for (int i = 0; i < VRAM_SIZE; i++) {
+    for (int i = 0; i < disp_set->size; i++) {
         VRAM_address[i] = 0;
     }
 
-    size_stack = START_SIZE_STACK;
+    int size_stack = START_SIZE_STACK;
 
     if (stack_creator(&(proc->stack), size_stack, __FILE__,  __LINE__, NAME_RETURN(stack)) != 0) {
         printf(_R_ "ERROR: creating stack was not completed\n" _N_);

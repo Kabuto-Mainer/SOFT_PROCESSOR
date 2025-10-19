@@ -9,63 +9,15 @@
 
 
 
-int main() {
+int main()
+{
     // my_textbin_to_asm(NAME_TEXT_FILE, NAME_DISASMB_FILE);
     my_bincode_to_asm(NAME_BIN_FILE, NAME_DISASMB_FILE);
     return 0;
 }
-//
-// int my_textbin_to_asm(const char* name_byte_file, const char* name_text_file) {
-//     assert(name_byte_file);
-//     assert(name_text_file);
-//
-//     FILE* asm_stream = fopen_file(name_byte_file, "rb");
-//     FILE* text_stream = fopen_file(name_text_file, "w");
-//
-//     char* byte_code = create_char_buffer(file_size_check(name_byte_file) + 1);
-//     if (byte_code == NULL) {
-//         return -1;
-//     }
-//
-//     size_t amount_symbols = fread(byte_code, sizeof(char), file_size_check(name_byte_file), asm_stream);
-//     byte_code[amount_symbols] = '\0';
-//     // printf("ALL: \n%s", byte_code);
-//     size_t current_symbol = 0;
-//
-//     fclose_file(asm_stream);
-//
-//     while (current_symbol < amount_symbols) {
-//         size_t add_index = find_char(byte_code + current_symbol, ' ');
-//
-//         byte_code[current_symbol + add_index] = '\0';
-//
-//         char* comand = byte_code + current_symbol;
-//         current_symbol += add_index + 1;
-//
-//         int int_comand = atoi(comand);
-//
-//         switch (int_comand) {
-//             case INT_PUSH: {
-//                 add_index = find_char(byte_code + current_symbol, '\n');
-//                 byte_code[current_symbol + add_index] = '\0';
-//
-//                 fprintf(text_stream, "%s %d\n", CHAR_CMD[int_comand], atoi(byte_code + current_symbol));
-//                 current_symbol += add_index + 1;
-//                 break;
-//             }
-//
-//             default: {
-//                 fprintf(text_stream, "%s\n", CHAR_CMD[int_comand]);
-//             }
-//         }
-//     }
-//     fclose_file(text_stream);
-//     free(byte_code);
-//
-//     return 0;
-// }
-//
-int my_bincode_to_asm(const char* name_bin_file, const char* name_text_file) {
+
+int my_bincode_to_asm(const char* name_bin_file, const char* name_text_file)
+{
     assert(name_bin_file);
     assert(name_text_file);
 
@@ -90,7 +42,6 @@ int my_bincode_to_asm(const char* name_bin_file, const char* name_text_file) {
         return -1;
     }
 
-//TODO Check
     fread(bin_code, sizeof(int), amount_elements, bin_stream);
 
     fclose_file(bin_stream);
@@ -105,7 +56,8 @@ int my_bincode_to_asm(const char* name_bin_file, const char* name_text_file) {
             bin_code[cur_el] == INT_JAE ||
             bin_code[cur_el] == INT_JE ||
             bin_code[cur_el] == INT_JNE ||
-            bin_code[cur_el] == INT_CALL) {
+            bin_code[cur_el] == INT_CALL ||
+            bin_code[cur_el] == INT_PAINT) {
             fprintf(text_stream, "%s %d\n", CHAR_CMD[bin_code[cur_el]], bin_code[cur_el + 1]);
             cur_el++;
         }
@@ -117,7 +69,6 @@ int my_bincode_to_asm(const char* name_bin_file, const char* name_text_file) {
             fprintf(text_stream, "%s %s\n", CHAR_CMD[bin_code[cur_el]], CHAR_REG[bin_code[cur_el + 1]]);
             cur_el++;
         }
-
 
         else {
             fprintf(text_stream, "%s\n", CHAR_CMD[bin_code[cur_el]]);

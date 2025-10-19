@@ -25,4 +25,5 @@ enum INT_HASH {
     HASH_PAINT = 17723,
     HASH_COLOR = 17822,
     HASH_DRAW = 15149,
+    HASH_CTIME = 17393,
 };

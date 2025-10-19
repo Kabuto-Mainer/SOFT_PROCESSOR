@@ -32,9 +32,16 @@ const char name_type[] = "int";
    printf("%d", num); \
 }
 
-// Количество регистров
-const int AMOUNT_REGISTERS = 8;
+struct display_t {
+    int len;
+    int high;
+    int size;
+};
 
+// Количество регистров
+const int AMOUNT_REGISTERS = 12;
+
+// Количество меток и переменных
 const int AMOUNT_POINTS = 20;
 const int AMOUNT_VARS = 20;
 
@@ -43,13 +50,13 @@ const int MOD_REALLOC = 2;
 const int REALLOC_CONST = 5;
 
 // Начальное количество команд
-const size_t START_AMOUNT_CMD = 40;
+const size_t START_AMOUNT_CMD = 1e5;
 
 const int START_SIZE_STACK = 4;
 
 // Минимальное и максимальное значение аргументов
-const stmn_t MAX_MEAN = 1e5;
-const stmn_t MIN_MEAN = -1e5;
+const stmn_t MAX_MEAN = 2 * 1e8;
+const stmn_t MIN_MEAN = -2 * 1e8;
 
 // Сид для хеш-функции
 const size_t START_HASH_CODE = 5318;
@@ -66,21 +73,27 @@ const int AMOUNT_PRINT_ELEMENT = 10;
 // Куропатка или Канарейка
 const stmn_t BIRD_NUM = (stmn_t) 0xDEADFACE;
 
-const int HACK_NUM = 10;
-
 // Размер выделяемой оперативки
 const int RAM_SIZE = 100 * sizeof(int);
+
+// Константа уменьшения времени
+const long long int TIME_DIV = 1e7;
+
+// Количество доп. элементов в bin-code
+const int AMOUNT_SUP_NUM = 5;
+
+// Сингнатура и текущая версия
+const int OWN_SIGNATURE = 1388;
+const int CURRENT_VERSION = 3;
+
 
 
 // Размер одного пикселя
 const int PIXEL_SIZE = 5;
 
-const int LEN_DISPLAY = 100;
-const int HIGH_DISPLAY = 100;
-const int SCALE = 4;
-
-
-// Размер
-const int VRAM_SIZE = HIGH_DISPLAY * LEN_DISPLAY;
+// Стандартные настройки графики
+const int LEN_DISPLAY = 160;
+const int HIGH_DISPLAY = 120;
+const int VRAM_SIZE = LEN_DISPLAY * HIGH_DISPLAY;
 
 #endif // CONST_H

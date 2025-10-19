@@ -1,28 +1,20 @@
 PUSH 20
-PUSH 0
-POPR AX
-POPM AX
 
-#max_num 10
+; Это просто тестик
 
-PUSH #max_num
+#ARD 15
+
+PUSH #ARD
+
+CALL :GH
+
 
 OUT
-
-PUSH 40
-OUT
-
-PUSHM AX
-OUT
-
 HLT
 
+:GH
 
+PUSH 30
+OUT
 
-
-
-
-
-
-
-
+RET
