@@ -1,3 +1,33 @@
-PUSH 20
+IN
+POPR AX
+
+CALL :FACT
 OUT
 HLT
+
+:FACT
+
+PUSHR AX
+
+PUSH 1
+PUSHR AX
+JE $+19
+
+    PUSHR AX
+    PUSH -1
+    ADD
+    POPR AX
+
+    CALL :FACT
+
+    PUSHR AX
+    PUSH 1
+    ADD
+    POPR AX
+
+    MUL
+    RET
+
+RET
+
+
