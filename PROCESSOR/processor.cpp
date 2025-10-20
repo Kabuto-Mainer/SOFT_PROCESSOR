@@ -88,248 +88,262 @@ int my_proc(const char* name_bin_file)
     for ( ; size_t (proc.C_E) < size_t (amount_elements - AMOUNT_SUP_NUM); (proc.C_E)++) {
         // if (getchar() == 'd') {
             // proc_dump(&proc);
-        // }
-        switch (proc.bin_code[proc.C_E])
+//         // }
+//         switch (proc.bin_code[proc.C_E])
+//         {
+//             case INT_PUSH:
+//             {
+//                 proc.C_E++;
+//
+//                 stack_push(&(proc.stack), proc.bin_code[proc.C_E]);
+//                 break;
+//             }
+// //------------------------------------------------------------------------------------------------
+//             case INT_IN:
+//             {
+//                 int num = 0;
+//
+//                 printf(_G_ "Enter int num: " _N_);
+//                 scanf("%d", &num);
+//
+//                 stack_push(&(proc.stack), num);
+//                 break;
+//             }
+// //------------------------------------------------------------------------------------------------
+//             case INT_ADD:
+//             {
+//                 ARF_COMAND(+);
+//             }
+// //------------------------------------------------------------------------------------------------
+//             case INT_SUB:
+//             {
+//                 ARF_COMAND(-);
+//             }
+// //------------------------------------------------------------------------------------------------
+//             case INT_DIV:
+//             {
+//                 int arg_1 = 0;
+//                 int arg_2 = 0;
+//
+//                 stack_pop(&(proc.stack), &arg_1);
+//                 stack_pop(&(proc.stack), &arg_2);
+//
+//                 if (arg_2 == 0) {
+//                     printf(_R_ "ERROR: division by zero is not correct\n" _N_);
+//                     cpu_dtor(&proc);
+//                     return -1;
+//                 }
+//
+//                 stack_push(&(proc.stack), arg_1 / arg_2);
+//                 break;
+//             }
+// //------------------------------------------------------------------------------------------------
+//             case INT_MUL:
+//             {
+//                 ARF_COMAND(*);
+//             }
+// //------------------------------------------------------------------------------------------------
+//             case INT_SQRT:
+//             {
+//                 int arg = 0;
+//                 stack_pop(&(proc.stack), &arg);
+//
+//                 if (arg < 0)
+//                 {
+//                     printf(_R_ "ERROR: sqrt in negative num is not correct\n" _N_);
+//                     cpu_dtor(&proc);
+//                     return -1;
+//                 }
+//                 stack_push(&(proc.stack), (int) sqrt(arg));
+//                 break;
+//             }
+// //------------------------------------------------------------------------------------------------
+//             case INT_OUT:
+//             {
+//                 int arg = 0;
+//
+//                 stack_pop(&(proc.stack), &arg);
+//                 printf("%d\n", arg);
+//                 break;
+//             }
+// //------------------------------------------------------------------------------------------------
+//             case INT_HLT:
+//             {
+//                 cpu_dtor(&proc);
+//                 return 0;
+//             }
+// //------------------------------------------------------------------------------------------------
+//             case INT_POPR:
+//             {
+//                 int reg = proc.bin_code[++proc.C_E];
+//                 int num = 0;
+//
+//                 stack_pop(&(proc.stack), &num);
+//                 proc.regs[reg] = num;
+//                 break;
+//             }
+// //------------------------------------------------------------------------------------------------
+//             case INT_PUSHR:
+//             {
+//                 int reg = proc.bin_code[++proc.C_E];
+//                 int num = proc.regs[reg];
+//
+//                 stack_push(&(proc.stack), num);
+//                 break;
+//             }
+// //------------------------------------------------------------------------------------------------
+//             case INT_JMP:
+//             {
+//                 proc.C_E++;
+//                 proc.C_E = proc.bin_code[proc.C_E] - 2;
+//
+//                 break;
+//             }
+// //------------------------------------------------------------------------------------------------
+//             case INT_HACK:
+//             {
+//                 proc.stack.size = -1;
+//                 break;
+//             }
+// //------------------------------------------------------------------------------------------------
+//             case INT_JB:
+//             {
+//                 J_COMAND(<);
+//             }
+// //---------------------------------------------------------------------------------------------------
+//             case INT_JBE:
+//             {
+//                 J_COMAND(<=);
+//             }
+// //---------------------------------------------------------------------------------------------------
+//             case INT_JA:
+//             {
+//                 J_COMAND(>);
+//             }
+// //---------------------------------------------------------------------------------------------------
+//             case INT_JAE:
+//             {
+//                 J_COMAND(>=);
+//             }
+// //---------------------------------------------------------------------------------------------------
+//             case INT_JE:
+//             {
+//                 J_COMAND(==);
+//             }
+// //---------------------------------------------------------------------------------------------------
+//             case INT_JNE:
+//             {
+//                 J_COMAND(!=);
+//             }
+// //----------------------------------------------------------------------------------------------------
+//             case INT_CALL:
+//             {
+//                 proc.C_E++;
+//                 stack_push(&(proc.address), proc.C_E + 1);
+//                 proc.C_E = proc.bin_code[proc.C_E] - 2;
+//
+//                 break;
+//             }
+// //----------------------------------------------------------------------------------------------------
+//             case INT_RET:
+//             {
+//                 int adr = 0;
+//                 stack_pop(&(proc.address), &adr);
+//
+//                 proc.C_E = adr - 1;
+//                 break;
+//             }
+// //----------------------------------------------------------------------------------------------------
+//             case INT_PUSHM:
+//             {
+//                 int arg = proc.RAM[proc.regs[proc.bin_code[++(proc.C_E)]]];
+//
+//                 stack_push(&(proc.stack), arg);
+//                 break;
+//             }
+// //----------------------------------------------------------------------------------------------------
+//             case INT_POPM:
+//             {
+//                 int arg = 0;
+//                 stack_pop(&(proc.stack), &arg);
+//
+//                 proc.RAM[proc.regs[proc.bin_code[++proc.C_E]]] = arg;
+//                 break;
+//             }
+// //----------------------------------------------------------------------------------------------------
+//             case INT_PAINT:
+//             {
+//                 int x = 0;
+//                 int y = 0;
+//
+//                 stack_pop(&(proc.stack), &y);
+//                 stack_pop(&(proc.stack), &x);
+//
+//                 int address = y * disp_set.len + x;
+//                 int color = proc.bin_code[++proc.C_E];
+//
+//                 (proc.VRAM)[address] = color;
+//                 break;
+//             }
+// //----------------------------------------------------------------------------------------------------
+//             case INT_COLOR:
+//             {
+//                 int x = 0;
+//                 int y = 0;
+//
+//                 stack_pop(&(proc.stack), &y);
+//                 stack_pop(&(proc.stack), &x);
+//
+//                 int address = y * disp_set.len + x;
+//                 int color = (proc.VRAM)[address];
+//
+//                 stack_push(&(proc.stack), color);
+//
+//                 break;
+//             }
+// //----------------------------------------------------------------------------------------------------
+//             case INT_DRAW:
+//             {
+//                 system("clear");
+//                 for (int i = 0; i < disp_set.size; i++) {
+//                     putchar(proc.VRAM[i]);
+//
+//                     if (i % disp_set.len == 0) {
+//                         putchar('\n');
+//                     }
+//                 }
+//                 break;
+//             }
+// //----------------------------------------------------------------------------------------------------
+//             case INT_CTIME:
+//             {
+//                 struct timeval tv;
+//                 gettimeofday(&tv, NULL);
+//
+//                 long long milisec = ((long long)tv.tv_sec * 1000 + tv.tv_usec / 1000) % TIME_DIV;
+//                 stack_push(&(proc.stack), (int) milisec);
+//                 break;
+//             }
+// //----------------------------------------------------------------------------------------------------
+//             default:
+//             {
+//                 cpu_dtor(&proc);
+//                 printf(_R_ "ERROR: unknown command\n" _N_);
+//                 return -1;
+//             }
+//         }
+//
+        for (int i = 0; i < AMOUNT_CMD; i++)
         {
-            case INT_PUSH:
+            if (proc.bin_code[proc.C_E] == CMD_INF[i].number)
             {
-                proc.C_E++;
-
-                stack_push(&(proc.stack), proc.bin_code[proc.C_E]);
-                break;
-            }
-//------------------------------------------------------------------------------------------------
-            case INT_IN:
-            {
-                int num = 0;
-
-                printf(_G_ "Enter int num: " _N_);
-                scanf("%d", &num);
-
-                stack_push(&(proc.stack), num);
-                break;
-            }
-//------------------------------------------------------------------------------------------------
-            case INT_ADD:
-            {
-                ARF_COMAND(+);
-            }
-//------------------------------------------------------------------------------------------------
-            case INT_SUB:
-            {
-                ARF_COMAND(-);
-            }
-//------------------------------------------------------------------------------------------------
-            case INT_DIV:
-            {
-                int arg_1 = 0;
-                int arg_2 = 0;
-
-                stack_pop(&(proc.stack), &arg_1);
-                stack_pop(&(proc.stack), &arg_2);
-
-                if (arg_2 == 0) {
-                    printf(_R_ "ERROR: division by zero is not correct\n" _N_);
-                    cpu_dtor(&proc);
-                    return -1;
-                }
-
-                stack_push(&(proc.stack), arg_1 / arg_2);
-                break;
-            }
-//------------------------------------------------------------------------------------------------
-            case INT_MUL:
-            {
-                ARF_COMAND(*);
-            }
-//------------------------------------------------------------------------------------------------
-            case INT_SQRT:
-            {
-                int arg = 0;
-                stack_pop(&(proc.stack), &arg);
-
-                if (arg < 0)
+                // printf("CMD_INF: %d\n", CMD_INF[i].number);
+                if ((CMD_INF[i].func(&proc, CMD_INF[i].num_1, CMD_INF[i].num_2)) != P_OK)
                 {
-                    printf(_R_ "ERROR: sqrt in negative num is not correct\n" _N_);
                     cpu_dtor(&proc);
-                    return -1;
-                }
-                stack_push(&(proc.stack), (int) sqrt(arg));
-                break;
-            }
-//------------------------------------------------------------------------------------------------
-            case INT_OUT:
-            {
-                int arg = 0;
-
-                stack_pop(&(proc.stack), &arg);
-                printf("%d\n", arg);
-                break;
-            }
-//------------------------------------------------------------------------------------------------
-            case INT_HLT:
-            {
-                cpu_dtor(&proc);
-                return 0;
-            }
-//------------------------------------------------------------------------------------------------
-            case INT_POPR:
-            {
-                int reg = proc.bin_code[++proc.C_E];
-                int num = 0;
-
-                stack_pop(&(proc.stack), &num);
-                proc.regs[reg] = num;
-                break;
-            }
-//------------------------------------------------------------------------------------------------
-            case INT_PUSHR:
-            {
-                int reg = proc.bin_code[++proc.C_E];
-                int num = proc.regs[reg];
-
-                stack_push(&(proc.stack), num);
-                break;
-            }
-//------------------------------------------------------------------------------------------------
-            case INT_JMP:
-            {
-                proc.C_E++;
-                proc.C_E = proc.bin_code[proc.C_E] - 2;
-
-                break;
-            }
-//------------------------------------------------------------------------------------------------
-            case INT_HACK:
-            {
-                proc.stack.size = -1;
-                break;
-            }
-//------------------------------------------------------------------------------------------------
-            case INT_JB:
-            {
-                J_COMAND(<);
-            }
-//---------------------------------------------------------------------------------------------------
-            case INT_JBE:
-            {
-                J_COMAND(<=);
-            }
-//---------------------------------------------------------------------------------------------------
-            case INT_JA:
-            {
-                J_COMAND(>);
-            }
-//---------------------------------------------------------------------------------------------------
-            case INT_JAE:
-            {
-                J_COMAND(>=);
-            }
-//---------------------------------------------------------------------------------------------------
-            case INT_JE:
-            {
-                J_COMAND(==);
-            }
-//---------------------------------------------------------------------------------------------------
-            case INT_JNE:
-            {
-                J_COMAND(!=);
-            }
-//----------------------------------------------------------------------------------------------------
-            case INT_CALL:
-            {
-                proc.C_E++;
-                stack_push(&(proc.address), proc.C_E + 1);
-                proc.C_E = proc.bin_code[proc.C_E] - 2;
-
-                break;
-            }
-//----------------------------------------------------------------------------------------------------
-            case INT_RET:
-            {
-                int adr = 0;
-                stack_pop(&(proc.address), &adr);
-
-                proc.C_E = adr - 1;
-                break;
-            }
-//----------------------------------------------------------------------------------------------------
-            case INT_PUSHM:
-            {
-                int arg = proc.RAM[proc.regs[proc.bin_code[++(proc.C_E)]]];
-
-                stack_push(&(proc.stack), arg);
-                break;
-            }
-//----------------------------------------------------------------------------------------------------
-            case INT_POPM:
-            {
-                int arg = 0;
-                stack_pop(&(proc.stack), &arg);
-
-                proc.RAM[proc.regs[proc.bin_code[++proc.C_E]]] = arg;
-                break;
-            }
-//----------------------------------------------------------------------------------------------------
-            case INT_PAINT:
-            {
-                int x = 0;
-                int y = 0;
-
-                stack_pop(&(proc.stack), &y);
-                stack_pop(&(proc.stack), &x);
-
-                int address = y * disp_set.len + x;
-                int color = proc.bin_code[++proc.C_E];
-
-                (proc.VRAM)[address] = color;
-                break;
-            }
-//----------------------------------------------------------------------------------------------------
-            case INT_COLOR:
-            {
-                int x = 0;
-                int y = 0;
-
-                stack_pop(&(proc.stack), &y);
-                stack_pop(&(proc.stack), &x);
-
-                int address = y * disp_set.len + x;
-                int color = (proc.VRAM)[address];
-
-                stack_push(&(proc.stack), color);
-
-                break;
-            }
-//----------------------------------------------------------------------------------------------------
-            case INT_DRAW:
-            {
-                system("clear");
-                for (int i = 0; i < disp_set.size; i++) {
-                    putchar(proc.VRAM[i]);
-
-                    if (i % disp_set.len == 0) {
-                        putchar('\n');
-                    }
+                    return 0;
                 }
                 break;
-            }
-//----------------------------------------------------------------------------------------------------
-            case INT_CTIME:
-            {
-                struct timeval tv;
-                gettimeofday(&tv, NULL);
-
-                long long milisec = ((long long)tv.tv_sec * 1000 + tv.tv_usec / 1000) % TIME_DIV;
-                stack_push(&(proc.stack), (int) milisec);
-                break;
-            }
-//----------------------------------------------------------------------------------------------------
-            default:
-            {
-                cpu_dtor(&proc);
-                printf(_R_ "ERROR: unknown command\n" _N_);
-                return -1;
             }
         }
     }
