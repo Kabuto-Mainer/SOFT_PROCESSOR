@@ -8,13 +8,6 @@
 #include "../PROCESSOR/stack.h"
 #include "../PROCESSOR/stack_define.h"
 
-enum type_arg_t
-{
-    NO = 0,
-    NUM = 1,
-    REG = 2,
-    ADR = 3
-};
 //------------------------------------------------------------------------------------------------
 struct label_t
 {
@@ -26,14 +19,6 @@ struct variable_t
 {
     char name[20];
     int value;
-};
-//------------------------------------------------------------------------------------------------
-struct asm_func_t
-{
-    INT_HASH hash_cmd;
-    int amount_arg;
-    type_arg_t type_arg;
-    INT_CMD number;
 };
 //------------------------------------------------------------------------------------------------
 struct asm_struct
@@ -60,56 +45,25 @@ struct asm_struct
 //------------------------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------------------------
-const asm_func_t CMD_INF[] =
-{
-    {HASH_PUSH, 1, NUM, INT_PUSH},
-    {HASH_ADD, 0, NO, INT_ADD},
-    {HASH_SUB, 0, NO, INT_SUB},
-    {HASH_DIV, 0, NO, INT_DIV},
-    {HASH_MUL, 0, NO, INT_MUL},
-    {HASH_SQRT, 0, NO, INT_SQRT},
-    {HASH_OUT, 0, NO, INT_OUT},
-    {HASH_HLT, 0, NO, INT_HLT},
-    {HASH_POPR, 1, REG, INT_POPR},
-    {HASH_PUSHR, 1, REG, INT_PUSHR},
-    {HASH_IN, 0, NO, INT_IN},
-    {HASH_JMP, 1, ADR, INT_JMP},
-    {HASH_JB, 1, ADR, INT_JB},
-    {HASH_JBE, 1, ADR, INT_JBE},
-    {HASH_JA, 1, ADR, INT_JA},
-    {HASH_JAE, 1, ADR, INT_JAE},
-    {HASH_JE, 1, ADR, INT_JE},
-    {HASH_JNE, 1, ADR, INT_JNE},
-    {HASH_HACK, 0, NO, INT_HACK},
-    {HASH_CALL, 1, ADR, INT_CALL},
-    {HASH_RET, 0, NO, INT_RET},
-    {HASH_POPM, 1, REG, INT_POPM},
-    {HASH_PUSHM, 1, REG, INT_PUSHM},
-    {HASH_PAINT, 1, NUM, INT_PAINT},
-    {HASH_COLOR, 0, NO, INT_COLOR},
-    {HASH_DRAW, 0, NO, INT_DRAW},
-    {HASH_CTIME, 0, NO, INT_CTIME}
-};
-//------------------------------------------------------------------------------------------------
 enum asm_error_t{
-    A_NOT_ERRORS = 0,
-    FEW_PUSH = 1,
-    NO_ARG = 2,
-    UNKNOWN_REG = 3,
-    NO_ADR = 4,
-    NULL_ADR = 5,
+    A_NOT_ERRORS  = 0,
+    FEW_PUSH      = 1,
+    NO_ARG        = 2,
+    UNKNOWN_REG   = 3,
+    NO_ADR        = 4,
+    NULL_ADR      = 5,
     INVALID_POINT = 6,
-    FILE_ERROR = 7,
-    NO_REG = 8,
-    LIMIT = 9,
-    UNKNOWN_CMD = 10,
-    ERROR = 11,
-    FEW_IF = 12,
-    UNCORRECT_IF = 13,
-    UNKNOWN_SIGN = 14,
-    FEW_ELSE = 15,
-    NO_VAR = 16,
-    NO_INT = 17
+    FILE_ERROR    = 7,
+    NO_REG        = 8,
+    LIMIT         = 9,
+    UNKNOWN_CMD   = 10,
+    ERROR         = 11,
+    FEW_IF        = 12,
+    UNCORRECT_IF  = 13,
+    UNKNOWN_SIGN  = 14,
+    FEW_ELSE      = 15,
+    NO_VAR        = 16,
+    NO_INT        = 17
 };
 //------------------------------------------------------------------------------------------------
 const char DESCRIPTION_ERRORS[][40] =
@@ -134,20 +88,6 @@ const char DESCRIPTION_ERRORS[][40] =
     "argument is not int\n"
 };
 //------------------------------------------------------------------------------------------------
-enum flags_t
-{
-    F_INP_FILE = 0,
-    F_OUT_FILE = 1,
-    F_SIZE_DISP = 2
-};
-//------------------------------------------------------------------------------------------------
-const char FLAGS[][20] =
-{
-    "-InpFile=",
-    "-OutFile=",
-    "-SizeDisp="
-};
-//------------------------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------------------------
 asm_error_t my_assembler (const char* name_asm_file,
@@ -169,24 +109,27 @@ int check_arg(display_t* disp_set,
               int argv,
               char* args[]);
 //------------------------------------------------------------------------------------------------
-int check_flag(const char* input_arg,
-               const char* flag);
-//------------------------------------------------------------------------------------------------
 asm_error_t check_J_cmd(asm_struct* asm_data,
                         int cmd);
 //------------------------------------------------------------------------------------------------
+asm_error_t check_NUM_cmd(asm_struct* asm_data,
+                          size_t cur_el_struct);
+//------------------------------------------------------------------------------------------------
+asm_error_t check_REG_cmd(asm_struct* asm_data,
+                          size_t cur_el_struct);
+//------------------------------------------------------------------------------------------------
 asm_error_t asm_check_cmd(asm_struct* asm_data);
 //------------------------------------------------------------------------------------------------
-int asm_skip_comment(asm_struct* asm_data,
+int skip_comment(asm_struct* asm_data,
                      char* comand,
                      int add_index);
 //------------------------------------------------------------------------------------------------
-int asm_check_label(asm_struct* asm_data,
+int check_label(asm_struct* asm_data,
                   char* comand,
                   int number_start,
                   int add_index);
 //------------------------------------------------------------------------------------------------
-int asm_check_var(asm_struct* asm_data);
+int check_var(asm_struct* asm_data);
 //------------------------------------------------------------------------------------------------
 int check_realloc(int** bin_code,
                   size_t* max_size,
@@ -195,6 +138,12 @@ int check_realloc(int** bin_code,
 int char_reg_to_int(const char* name_reg);
 //------------------------------------------------------------------------------------------------
 int sign_to_j_cmd(const char* string);
+//------------------------------------------------------------------------------------------------
+int bin_find(const int hash_cmd);
+//------------------------------------------------------------------------------------------------
+int bubble_sort(const int* mass_num, const int amount_el);
+//------------------------------------------------------------------------------------------------
+
 
 
 

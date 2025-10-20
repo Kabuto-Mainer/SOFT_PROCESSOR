@@ -9,39 +9,8 @@
 #include "../COMMON/comand.h"
 #include "../COMMON/config.h"
 
-#include "../PROCESSOR/stack.h"
-#include "../PROCESSOR/stack_define.h"
 
-
-int main(int argv, char* args[])
-{
-    label_t table_label[AMOUNT_POINTS] = {};
-
-    for (int i = 0; i < AMOUNT_POINTS; i++) {
-        table_label[i] = {"\0", -1};
-    }
-
-    display_t disp_set = {-1, -1};
-    disp_set.len = LEN_DISPLAY;
-    disp_set.high = HIGH_DISPLAY;
-    disp_set.size = LEN_DISPLAY * HIGH_DISPLAY;
-
-    const char* name_input_file = NAME_ASM_FILE;
-    const char* name_output_file = NAME_BIN_FILE;
-
-    printf("ARG: %d\n", argv);
-    check_arg(&disp_set,
-              &name_input_file,
-              &name_output_file,
-              argv,
-              args);
-
-    my_assembler(name_input_file, name_output_file, NAME_TEXT_FILE, table_label, 0, &disp_set);
-    my_assembler(name_input_file, name_output_file, NAME_TEXT_FILE, table_label, 1, &disp_set);
-
-    return 0;
-}
-
+//------------------------------------------------------------------------------------------------
 int check_arg(display_t* disp_set,
               const char** name_if,
               const char** name_of,
@@ -52,30 +21,37 @@ int check_arg(display_t* disp_set,
     assert(name_if);
     assert(name_of);
 
-    if (argv > 1) {
-        for (int i = 1; i < argv; i++) {
+    if (argv > 1)
+    {
+        for (int i = 1; i < argv; i++)
+        {
             int len_flag = 0;
 
-            if ((len_flag = check_flag(args[i], FLAGS[F_INP_FILE])) != -1) {
+            if ((len_flag = check_flag(args[i], FLAGS[F_INP_FILE])) != -1)
+            {
                 *name_if = &(args[i][len_flag]);
                 printf("NAME_INPUT_FILE: %s\n", *name_if);
             }
 
-            else if ((len_flag = check_flag(args[i], FLAGS[F_OUT_FILE])) != -1) {
+            else if ((len_flag = check_flag(args[i], FLAGS[F_OUT_FILE])) != -1)
+            {
                 *name_of = &(args[i][len_flag]);
                 printf("NAME_INPUT_FILE: %s\n", *name_if);
             }
 
-            else if ((len_flag = check_flag(args[i], FLAGS[F_SIZE_DISP])) != -1) {
+            else if ((len_flag = check_flag(args[i], FLAGS[F_SIZE_DISP])) != -1)
+            {
                 int buffer_len = -1;
                 int buffer_high = -1;
 
                 if (sscanf(args[i] + len_flag, "%d:%d", &buffer_len, &buffer_high) != 2 ||
-                    buffer_len <= 0 || buffer_high <= 0) {
+                    buffer_len <= 0 || buffer_high <= 0)
+                {
                     printf("ERROR: bad flag-size. Using standard settings\n");
                 }
 
-                else {
+                else
+                {
                     disp_set->len = buffer_len;
                     disp_set->high = buffer_high;
                     disp_set->size = buffer_len * buffer_high;
@@ -86,33 +62,22 @@ int check_arg(display_t* disp_set,
     }
     return 0;
 }
+//------------------------------------------------------------------------------------------------
 
-int check_flag(const char* input_arg,
-               const char* flag) {
-    assert(input_arg);
-    assert(flag);
-
-    size_t len_flag = strlen(flag);
-
-    for (size_t i = 0; i < len_flag - 1; i++) {
-        if (input_arg[i] != flag[i]) {
-            return -1;
-        }
-    }
-
-    return (int) len_flag;
-}
-
-
-int check_realloc(int** bin_code, size_t* max_elements, size_t current_element)
+//------------------------------------------------------------------------------------------------
+int check_realloc(int** bin_code,
+                  size_t* max_elements,
+                  size_t current_element)
 {
     assert(bin_code);
     assert(max_elements);
 
-    if (current_element > *max_elements - REALLOC_CONST) {
+    if (current_element > *max_elements - REALLOC_CONST)
+    {
         int* buffer_address = realloc_buffer(*bin_code, *max_elements);
 
-        if (buffer_address == NULL) {
+        if (buffer_address == NULL)
+        {
             printf(_R_ "ERROR in check_realloc: Null address\n" _N_);
             return -1;
         }
@@ -122,36 +87,46 @@ int check_realloc(int** bin_code, size_t* max_elements, size_t current_element)
     }
     return 0;
 }
+//------------------------------------------------------------------------------------------------
 
-
+//------------------------------------------------------------------------------------------------
 int char_reg_to_int(const char* name_reg)
 {
     assert(name_reg);
 
-    for (int i = 0; i < AMOUNT_REGISTERS; i++) {
-        if (strcmp(name_reg, CHAR_REG[i]) == 0) {
+    for (int i = 0; i < AMOUNT_REGISTERS; i++)
+    {
+        if (strcmp(name_reg, CHAR_REG[i]) == 0)
+        {
             return i;
         }
     }
 
     return -1;
 }
+//------------------------------------------------------------------------------------------------
 
-int asm_check_label(asm_struct* asm_data,
+//------------------------------------------------------------------------------------------------
+int check_label(asm_struct* asm_data,
                   char* comand,
                   int number_start,
                   int add_index)
 {
     assert(asm_data);
 
-    if (number_start != 0) {
+    if (number_start != 0)
+    {
+        fprintf(asm_data->text_stream, "::: ");
+        fprintf(asm_data->text_stream, " %s\n", asm_data->asm_code + asm_data->cur_char);
+
         asm_data->amount_line++;
         asm_data->cur_char += add_index + 1;
 
         return 0;
     }
 
-    for (int i = 0; i < AMOUNT_POINTS; i++) {
+    for (int i = 0; i < AMOUNT_POINTS; i++)
+    {
         if (asm_data->table_label[i].name[0] != ':') {
             strcpy(asm_data->table_label[i].name, comand);
             asm_data->table_label[i].address = asm_data->cur_element;
@@ -162,32 +137,46 @@ int asm_check_label(asm_struct* asm_data,
 
     return 1;
 }
+//------------------------------------------------------------------------------------------------
 
-int asm_check_var(asm_struct* asm_data)
+//------------------------------------------------------------------------------------------------
+int check_var(asm_struct* asm_data)
 {
     char name[100] = "";
     int value = 0;
     sscanf(asm_data->asm_code + asm_data->cur_char, "%s %d", name, &value);
 
-    for (int i = 0; i < AMOUNT_VARS; i++) {
-        if (asm_data->table_var[i].name[0] == 0) {
+    for (int i = 0; i < AMOUNT_VARS; i++)
+    {
+        if (strcmp(asm_data->table_var[i].name, name) == 0)
+        {
+            printf("ERROR: redeclaration const num \"%s\n\"", name);
+            return -1;
+        }
+
+        else if (asm_data->table_var[i].name[0] == '\0')
+        {
             strcpy(asm_data->table_var[i].name, name);
             asm_data->table_var[i].value = value;
             break;
         }
 
-        if (i == AMOUNT_VARS - 1) {
+        if (i == AMOUNT_VARS - 1)
+        {
             printf("ERROR: too many variables\n");
             return -1;
         }
     }
+
     fprintf(asm_data->text_stream, "### ");
     return 0;
 }
+//------------------------------------------------------------------------------------------------
 
-int asm_skip_comment(asm_struct* asm_data,
-                     char* comand,
-                     int add_index)
+//------------------------------------------------------------------------------------------------
+int skip_comment(asm_struct* asm_data,
+                 char* comand,
+                 int add_index)
 {
     assert(asm_data);
 
@@ -204,9 +193,9 @@ int asm_skip_comment(asm_struct* asm_data,
     }
     return 1;
 }
+//------------------------------------------------------------------------------------------------
 
-
-
+//------------------------------------------------------------------------------------------------
 asm_error_t my_assembler (const char* name_asm_file,
                           const char* name_byte_file,
                           const char* name_text_file,
@@ -222,7 +211,8 @@ asm_error_t my_assembler (const char* name_asm_file,
     asm_struct asm_data = {};
     variable_t table_var[AMOUNT_VARS] = {};
 
-    int amount_chars = asm_create(&asm_data,
+    int amount_chars = asm_create(
+               &asm_data,
                name_asm_file,
                name_text_file,
                table_label,
@@ -246,14 +236,14 @@ asm_error_t my_assembler (const char* name_asm_file,
 
         char comand[40] = "";
 
-        if (asm_skip_comment(&asm_data, comand, add_index) == 0)
+        if (skip_comment(&asm_data, comand, add_index) == 0)
         {
             continue;
         }
 
         if (comand[0] == ':')
         {
-            if (asm_check_label(&asm_data, comand, number_start, add_index) == 0)
+            if (check_label(&asm_data, comand, number_start, add_index) == 0)
             {
                 continue;
             }
@@ -261,7 +251,7 @@ asm_error_t my_assembler (const char* name_asm_file,
 
         else if (comand[0] == '#')
         {
-            if (asm_check_var(&asm_data) == -1) {
+            if (check_var(&asm_data) == -1) {
                 return ERROR;
             }
         }
@@ -278,60 +268,6 @@ asm_error_t my_assembler (const char* name_asm_file,
                 return ERROR;
             }
         }
-
-
-
-//         if (comand[0] == ':')
-//         {
-//             if (number_start != 0) {
-//                 asm_data.amount_line++;
-//                 asm_data.cur_char += add_index + 1;
-//
-//                 continue;
-//             }
-//
-//             for (int i = 0; i < AMOUNT_POINTS; i++) {
-//                 if (((table_label[i]).name)[0] != ':') {
-//                     strcpy((table_label[i]).name, comand);
-//                     (table_label[i]).address = asm_data.cur_element;
-//                     break;
-//                 }
-//             }
-//             fprintf(asm_data.text_stream, "::: ");
-//         }
-
-//         else if (comand[0] == '#') {
-//             char name[100] = "";
-//             int value = 0;
-//             sscanf(asm_data.asm_code + asm_data.cur_char, "%s %d", name, &value);
-//
-//             for (int i = 0; i < AMOUNT_VARS; i++) {
-//                 if (((table_var[i]).name)[0] == 0) {
-//                     strcpy((table_var[i]).name, name);
-//                     (table_var[i]).value = value;
-//                     break;
-//                 }
-//
-//                 if (i == AMOUNT_VARS - 1) {
-//                     printf("ERROR: too many variables\n");
-//                     return ERROR;
-//                 }
-//             }
-//             fprintf(asm_data.text_stream, "### ");
-//         }
-
-//         else {
-//             fprintf(asm_data.text_stream, "[%3d] |", asm_data.cur_element - AMOUNT_SUP_NUM + 1);
-//
-//             asm_data.hash_cmd = cmd_to_hash(comand);
-//
-//             if (asm_check_cmd(&asm_data) != A_NOT_ERRORS) {
-//                 free(asm_data.bin_code);
-//                 free(asm_data.asm_code);
-//                 return ERROR;
-//             }
-//         }
-
         fprintf(asm_data.text_stream, " %s\n", asm_data.asm_code + asm_data.cur_char);
 
         asm_data.cur_char += add_index + 1;
@@ -362,91 +298,54 @@ asm_error_t my_assembler (const char* name_asm_file,
 
     return A_NOT_ERRORS;
 }
+//------------------------------------------------------------------------------------------------
 
+// TODO сделать разные функции
+//------------------------------------------------------------------------------------------------
 asm_error_t asm_check_cmd(asm_struct* asm_data)
 {
     assert(asm_data);
 
-    for (size_t i = 0; i < sizeof(CMD_INF) / sizeof(CMD_INF[0]); i++) {
-        if (asm_data->hash_cmd == (CMD_INF[i]).hash_cmd) {
-            if ((CMD_INF[i]).amount_arg == 0) {
+    for (size_t i = 0; i < sizeof(CMD_INF) / sizeof(CMD_INF[0]); i++)
+    {
+        if (asm_data->hash_cmd == (CMD_INF[i]).hash_cmd)
+        {
+            if ((CMD_INF[i]).amount_arg == 0)
+            {
                 asm_data->bin_code[asm_data->cur_element++] = (CMD_INF[i]).number;
 
-                fprintf(asm_data->text_stream, "%08X          |",
-                       (unsigned int) (CMD_INF[i]).number);
+                fprintf(asm_data->text_stream, "%08d          |",
+                       (CMD_INF[i]).number);
 
                 return A_NOT_ERRORS;
             }
-
-            else if ((CMD_INF[i]).type_arg == NUM) {
-                char arg_c[100] = "";
-                char trash[100] = "";
-                int arg = 0;
-
-                if (sscanf(asm_data->asm_code + asm_data->cur_char, "%s %s", trash, arg_c) == 1) {
-                    EXIT_FUNCTION(asm_data, NO_ARG);
-                }
-
-                if (arg_c[0] == '#') {
-                    for (size_t i_2 = 0; i_2 < AMOUNT_VARS; i_2++) {
-                        if (strcmp((asm_data->table_var[i_2]).name, arg_c) == 0) {
-                            arg = (asm_data->table_var)[i_2].value;
-                            break;
-                        }
-
-                        if (i_2 == AMOUNT_VARS - 1) {
-                            EXIT_FUNCTION(asm_data, NO_VAR);
-                        }
-                    }
-                }
-
-                else {
-                    arg = atoi(arg_c);
-
-                    if (arg == 0 && arg_c[0] != '0') {
-                        EXIT_FUNCTION(asm_data, NO_INT);
-                    }
-                }
-
-                if (arg < MIN_MEAN || arg > MAX_MEAN) {
-                    EXIT_FUNCTION(asm_data, LIMIT);
-                }
-
-                asm_data->bin_code[asm_data->cur_element++] = (CMD_INF[i]).number;
-                asm_data->bin_code[asm_data->cur_element++] = arg;
-
-                fprintf(asm_data->text_stream, "%08X %08X |",
-                       (unsigned int) (CMD_INF[i]).number,
-                       (unsigned int) arg);
-
-                return A_NOT_ERRORS;
-            }
-
-            else if ((CMD_INF[i]).type_arg == ADR) {
-                if (check_J_cmd(asm_data, (CMD_INF[i]).number) != A_NOT_ERRORS) {
+//------------------------------------------------------------------------------------------------
+            else if ((CMD_INF[i]).type_arg == NUM)
+            {
+                if (check_NUM_cmd(asm_data, i) != A_NOT_ERRORS)
+                {
                     return ERROR;
                 }
 
                 return A_NOT_ERRORS;
             }
-
-            else if ((CMD_INF[i]).type_arg == REG) {
-                char char_reg[4] = "";
-                char trash[100] = "";
-
-                if (sscanf(asm_data->asm_code + asm_data->cur_char, "%s %s", trash, char_reg) == 1) {
-                    EXIT_FUNCTION(asm_data, NO_REG);
+//------------------------------------------------------------------------------------------------
+            else if ((CMD_INF[i]).type_arg == ADR)
+            {
+                if (check_J_cmd(asm_data, (CMD_INF[i]).number) != A_NOT_ERRORS)
+                {
+                    return ERROR;
                 }
 
-                int reg = 0;
-                if ((reg = char_reg_to_int(char_reg)) == -1) {
-                    EXIT_FUNCTION(asm_data, UNKNOWN_REG); \
+                return A_NOT_ERRORS;
+            }
+//------------------------------------------------------------------------------------------------
+            else if ((CMD_INF[i]).type_arg == REG)
+            {
+                if (check_REG_cmd(asm_data, i) != A_NOT_ERRORS)
+                {
+                    return ERROR;
                 }
-
-                asm_data->bin_code[asm_data->cur_element++] = (CMD_INF[i]).number;
-                asm_data->bin_code[asm_data->cur_element++] = reg;
-                \
-                fprintf(asm_data->text_stream, "%08X %08X |", (unsigned int) (CMD_INF[i]).number, (unsigned int) reg);
 
                 return A_NOT_ERRORS;
             }
@@ -455,7 +354,9 @@ asm_error_t asm_check_cmd(asm_struct* asm_data)
 
     return ERROR;
 }
+//------------------------------------------------------------------------------------------------
 
+//------------------------------------------------------------------------------------------------
 asm_error_t check_J_cmd(asm_struct* asm_data, int cmd)
 {
     assert(asm_data);
@@ -466,24 +367,22 @@ asm_error_t check_J_cmd(asm_struct* asm_data, int cmd)
     int new_C_E = 0;
 
 
-    if (sscanf(asm_data->asm_code + asm_data->cur_char + 1, "%s %s", trash, char_adr) == 1) {
+    if (sscanf(asm_data->asm_code + asm_data->cur_char + 1, "%s %s", trash, char_adr) == 1)
+    {
         EXIT_FUNCTION(asm_data, NO_ADR);
     }
 
     char_adr[19] = '\0'; // На всякий
 
-    // printf("CHAR: %s\n", char_adr);
-
-    if (char_adr[0] == ':') {
-        for (int i = 0; i < AMOUNT_POINTS; i++) {
-            // printf("TABLE_NAME: %s, INPUT_NAME: %s\n", asm_data->table_label[i].name, char_adr);
-
-            if (strcmp((asm_data->table_label[i]).name, char_adr) == 0) {
+    if (char_adr[0] == ':')
+    {
+        for (int i = 0; i < AMOUNT_POINTS; i++)
+        {
+            if (strcmp((asm_data->table_label[i]).name, char_adr) == 0)
+            {
                 new_C_E = (asm_data->table_label[i]).address - AMOUNT_SUP_NUM + 1;
-                // printf("NAME: %s, ADR: %d\n", asm_data->table_label[i].name, asm_data->table_label[i].address);
                 break;
             }
-            // printf("NAME: %s, ADR: %d\n", asm_data->table_label[i].name, asm_data->table_label[i].address);
         }
     }
 
@@ -493,8 +392,7 @@ asm_error_t check_J_cmd(asm_struct* asm_data, int cmd)
             EXIT_FUNCTION(asm_data, INVALID_POINT);
         }
 
-        new_C_E = asm_data->cur_element + add_num - 2;
-        // printf("new_C_E: %d\n", new_C_E);
+        new_C_E = asm_data->cur_element + add_num - 3;
     }
 
     else if (isdigit(char_adr[0]) != 0) {
@@ -508,10 +406,99 @@ asm_error_t check_J_cmd(asm_struct* asm_data, int cmd)
     asm_data->bin_code[asm_data->cur_element++] = cmd;
     asm_data->bin_code[asm_data->cur_element++] = new_C_E;
 
-    fprintf(asm_data->text_stream, "%08X %08d |", (unsigned int) cmd, (int) new_C_E);
+    fprintf(asm_data->text_stream, "%08d %08d |", cmd, (int) new_C_E);
     return A_NOT_ERRORS;
 }
+//------------------------------------------------------------------------------------------------
 
+//------------------------------------------------------------------------------------------------
+asm_error_t check_NUM_cmd(asm_struct* asm_data,
+                          size_t cur_el_struct)
+{
+    assert(asm_data);
+
+    char arg_c[100] = "";
+    char trash[100] = "";
+    int arg = 0;
+
+    if (sscanf(asm_data->asm_code + asm_data->cur_char, "%s %s", trash, arg_c) == 1)
+    {
+        EXIT_FUNCTION(asm_data, NO_ARG);
+    }
+
+    if (arg_c[0] == '#')
+    {
+        for (size_t i_2 = 0; i_2 < AMOUNT_VARS; i_2++)
+        {
+            if (strcmp((asm_data->table_var[i_2]).name, arg_c) == 0)
+            {
+                arg = (asm_data->table_var)[i_2].value;
+                break;
+            }
+
+            if (i_2 == AMOUNT_VARS - 1)
+            {
+                EXIT_FUNCTION(asm_data, NO_VAR);
+            }
+        }
+    }
+
+    else
+    {
+        arg = atoi(arg_c);
+
+        if (arg == 0 && arg_c[0] != '0')
+        {
+            EXIT_FUNCTION(asm_data, NO_INT);
+        }
+    }
+
+    if (arg < MIN_MEAN || arg > MAX_MEAN)
+    {
+        EXIT_FUNCTION(asm_data, LIMIT);
+    }
+
+    asm_data->bin_code[asm_data->cur_element++] = (CMD_INF[cur_el_struct]).number;
+    asm_data->bin_code[asm_data->cur_element++] = arg;
+
+    fprintf(asm_data->text_stream, "%08d %08d |",
+            (CMD_INF[cur_el_struct]).number,
+            arg);
+
+    return A_NOT_ERRORS;
+}
+//------------------------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------------------------
+asm_error_t check_REG_cmd(asm_struct* asm_data,
+                          size_t cur_el_struct)
+{
+    assert(asm_data);
+
+    char char_reg[4] = "";
+    char trash[100] = "";
+
+    if (sscanf(asm_data->asm_code + asm_data->cur_char, "%s %s", trash, char_reg) == 1)
+    {
+        EXIT_FUNCTION(asm_data, NO_REG);
+    }
+
+    int reg = 0;
+    if ((reg = char_reg_to_int(char_reg)) == -1)
+    {
+        EXIT_FUNCTION(asm_data, UNKNOWN_REG);
+    }
+
+    asm_data->bin_code[asm_data->cur_element++] = (CMD_INF[cur_el_struct]).number;
+    asm_data->bin_code[asm_data->cur_element++] = reg;
+
+    fprintf(asm_data->text_stream, "%08d %08d |", (CMD_INF[cur_el_struct]).number, reg);
+
+    return A_NOT_ERRORS;
+}
+//------------------------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------------------------
 int sign_to_j_cmd(const char* string)
 {
     assert(string);
@@ -552,7 +539,9 @@ int sign_to_j_cmd(const char* string)
 
     return -1;
 }
+//------------------------------------------------------------------------------------------------
 
+//------------------------------------------------------------------------------------------------
 int asm_create(asm_struct* asm_data,
                const char* name_asm_file,
                const char* name_text_file,
@@ -570,6 +559,8 @@ int asm_create(asm_struct* asm_data,
 
     FILE* asm_stream = fopen_file(name_asm_file, "rb");
     FILE* text_stream = fopen_file(name_text_file, "w");
+
+
 
     char* asm_code = create_char_buffer(file_size_check(name_asm_file) + 1);
     if (asm_code == NULL) {
@@ -593,3 +584,52 @@ int asm_create(asm_struct* asm_data,
 
     return amount_chars;
 }
+//------------------------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------------------------
+int bin_find(const int hash_cmd)
+{
+    int cur_element = AMOUNT_CMD / 2;
+    while (cur_element != 1)
+    {
+        if (hash_cmd < CMD_INF[cur_element].hash_cmd)
+        {
+            cur_element += cur_element / 2;
+        }
+
+        else if (hash_cmd == CMD_INF[cur_element].hash_cmd)
+        {
+            return cur_element;
+        }
+
+        else
+        {
+            cur_element -= cur_element / 2;
+        }
+    }
+
+    return -1;
+}
+//------------------------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------------------------
+// int bubble_sort(const int* mass_num, const int amount_el)
+// {
+//     assert(mass_num);
+//
+//     for (int i_1 = 0; i_1 < amount_el - 1; i_1++)
+//     {
+//         for (int i_2 = i_1 + 1; i_2 < amount_el; i_2++)
+//         {
+//             if (mass_num[i_1] > mass_num[i_2])
+//             {
+//                 int buffer = mass_num[i_1];
+//                 mass_num[i_1] = mass_num[i_2];
+//                 mass_num[i_2] = buffer;
+//             }
+//         }
+//     }
+//     return 0;
+// }
+// //------------------------------------------------------------------------------------------------
+

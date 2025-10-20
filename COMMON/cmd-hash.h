@@ -1,4 +1,10 @@
+#ifndef CMD_HASH_H
+#define CMD_HASH_H
+
+#include "../COMMON/comand.h"
+
 enum INT_HASH {
+
     HASH_PUSH = 15743,
     HASH_ADD = 11816,
     HASH_SUB = 12905,
@@ -27,3 +33,5 @@ enum INT_HASH {
     HASH_DRAW = 15149,
     HASH_CTIME = 17393,
 };
+
+#endif // CMD_HASH_H

@@ -1,44 +1,32 @@
-#ifndef O_SUPPORT_H
-#define O_SUPPORT_H
+#ifndef PROC_FUNC_H
+#define PROC_FUNC_H
 
-#include <stdlib.h>
-
-#include "color.h"
+#include "processor.h"
 
 // -------------------------------------------------------------------------------------------------------
-#define asrt_to_file(_File_ret_value) {if (_File_ret_value == -1) { \
- printf("%sERROR with file %s %d\n%s", _R_, __FILE__, __LINE__, _N_); \
- exit(1); } \
-}
+int math_func(cpu_t* proc, int sign, int trash_2);
 // -------------------------------------------------------------------------------------------------------
-#define asrt_to_file_f(_File_ret_value) {if (_File_ret_value == NULL) { \
- printf("%sERROR with file %s %d\n%s", _R_, __FILE__, __LINE__, _N_); \
- exit(1); } \
- }
+int j_func(cpu_t* proc, int type_jmp, int trash_2);
 // -------------------------------------------------------------------------------------------------------
-FILE* fopen_file(const char* name_file, const char* type_open);
+int reg_func(cpu_t* proc, int type_use, int type_data);
 // -------------------------------------------------------------------------------------------------------
-void fclose_file(FILE* address);
+int in_out_func(cpu_t* proc, int type_use, int trash_2);
 // -------------------------------------------------------------------------------------------------------
-size_t file_size_check(const char* name_file);
+int push_func(cpu_t* proc, int trash_1, int trash_2);
 // -------------------------------------------------------------------------------------------------------
-int* create_int_buffer(const size_t start_size);
+int vraw_func(cpu_t* proc, int type_use, int trash_2);
 // -------------------------------------------------------------------------------------------------------
-char* create_char_buffer(const size_t start_size);
+int time_func(cpu_t* proc, int trash_1, int trash_2);
 // -------------------------------------------------------------------------------------------------------
-size_t pass_space(const char* string_place, size_t index);
+int hlt_func(cpu_t* proc, int trash_1, int trash_2);
 // -------------------------------------------------------------------------------------------------------
-size_t find_char (const char* string, const char symbol);
+int sqrt_func(cpu_t* proc, int trash_1, int trash_2);
 // -------------------------------------------------------------------------------------------------------
-int check_inf(FILE* bin_file);
+int draw_func(cpu_t* proc, int trash_1, int trash_2);
 // -------------------------------------------------------------------------------------------------------
-int* realloc_buffer(int* address, const size_t max_size);
-// -------------------------------------------------------------------------------------------------------
-int cmd_to_hash(const char* comand);
-// -------------------------------------------------------------------------------------------------------
-int check_flag(const char* input_arg,
-               const char* flag);
+int func_func(cpu_t* proc, int type_use, int trash_2);
 // -------------------------------------------------------------------------------------------------------
 
 
-#endif // O_SUPPORT_H
+
+#endif

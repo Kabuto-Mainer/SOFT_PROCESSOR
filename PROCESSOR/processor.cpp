@@ -7,13 +7,14 @@
 #include <sys/time.h>
 
 #include "stack_define.h"
+#include "proc-func.h"
 #include "processor.h"
 #include "stack.h"
 #include "../COMMON/support.h"
 #include "../COMMON/comand.h"
 #include "../COMMON/color.h"
 
-
+// -------------------------------------------------------------------------------------------------------
 int* create_bin_buffer(const char* name_bin_file,
                 int* amount_elements,
                 display_t* disp_set) {
@@ -67,8 +68,9 @@ int* create_bin_buffer(const char* name_bin_file,
     fclose_file(bin_file);
     return bin_code;
 }
+// -------------------------------------------------------------------------------------------------------
 
-
+// -------------------------------------------------------------------------------------------------------
 int my_proc(const char* name_bin_file)
 {
     assert(name_bin_file);
@@ -76,8 +78,9 @@ int my_proc(const char* name_bin_file)
     int amount_elements = 0;
     cpu_t proc = {};
     display_t disp_set = {LEN_DISPLAY, HIGH_DISPLAY, VRAM_SIZE};
+    proc.disp_set = disp_set;
 
-    if (cpu_ctor(&proc, name_bin_file, &amount_elements, &disp_set) == -1) {
+    if (cpu_ctor(&proc, name_bin_file, &amount_elements) == -1) {
         printf(_R_ "ERROR: cpu_ctor return -1\n" _N_);
         return -1;
     }
@@ -334,16 +337,16 @@ int my_proc(const char* name_bin_file)
     cpu_dtor(&proc);
     return -1;
 }
+// -------------------------------------------------------------------------------------------------------
 
-
+// -------------------------------------------------------------------------------------------------------
 int cpu_ctor(cpu_t* proc,
              const char* name_bin_file,
-             int* amount_elements,
-             display_t* disp_set) {
+             int* amount_elements) {
     assert(proc);
     assert(name_bin_file);
 
-    int* bin_code = create_bin_buffer(name_bin_file, amount_elements, disp_set);
+    int* bin_code = create_bin_buffer(name_bin_file, amount_elements, &(proc->disp_set));
     if (bin_code == NULL) {
         return -1;
     }
@@ -355,13 +358,13 @@ int cpu_ctor(cpu_t* proc,
     }
     proc->RAM = RAM_address;
 
-    int* VRAM_address = create_int_buffer((size_t) disp_set->size);
+    int* VRAM_address = create_int_buffer((size_t) proc->disp_set.size);
     if (VRAM_address == NULL) {
         return -1;
     }
     proc->VRAM = VRAM_address;
 
-    for (int i = 0; i < disp_set->size; i++) {
+    for (int i = 0; i < proc->disp_set.size; i++) {
         VRAM_address[i] = 0;
     }
 
@@ -386,8 +389,9 @@ int cpu_ctor(cpu_t* proc,
 
     return 0;
 }
+// -------------------------------------------------------------------------------------------------------
 
-
+// -------------------------------------------------------------------------------------------------------
 int cpu_dtor(cpu_t* proc) {
     assert(proc);
 
@@ -400,8 +404,9 @@ int cpu_dtor(cpu_t* proc) {
 
     return 0;
 }
+// -------------------------------------------------------------------------------------------------------
 
-
+// -------------------------------------------------------------------------------------------------------
 int proc_dump(cpu_t* proc) {
     assert(proc);
 
@@ -420,13 +425,16 @@ int proc_dump(cpu_t* proc) {
     print_end(proc);
 
     printf(_R_ "\n=== Registers ===\n\n");
-
     print_reg(proc);
+
+    // printf(_R_ "\n=== Registers ===\n\n");
+
 
     return 0;
 }
+// -------------------------------------------------------------------------------------------------------
 
-
+// -------------------------------------------------------------------------------------------------------
 int print_before_end(cpu_t* proc) {
     assert(proc);
 
@@ -436,7 +444,9 @@ int print_before_end(cpu_t* proc) {
 
     return 0;
 }
+// -------------------------------------------------------------------------------------------------------
 
+// -------------------------------------------------------------------------------------------------------
 int print_end(cpu_t* proc) {
     assert(proc);
 
@@ -470,7 +480,9 @@ int print_end(cpu_t* proc) {
 
     return 0;
 }
+// -------------------------------------------------------------------------------------------------------
 
+// -------------------------------------------------------------------------------------------------------
 int print_line(cpu_t* proc, unsigned int i) {
     assert(proc);
 
@@ -502,7 +514,9 @@ int print_line(cpu_t* proc, unsigned int i) {
     putchar('\n');
     return 0;
 }
+// -------------------------------------------------------------------------------------------------------
 
+// -------------------------------------------------------------------------------------------------------
 int print_reg(cpu_t* proc) {
     assert(proc);
 
@@ -512,5 +526,8 @@ int print_reg(cpu_t* proc) {
 
     return 0;
 }
+// -------------------------------------------------------------------------------------------------------
+
+
 
 
