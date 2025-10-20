@@ -7,6 +7,7 @@
 struct cpu_t{
     stack_struct stack;
     stack_struct address;
+    display_t disp_set;
     int* RAM;
     int* VRAM;
     int* bin_code;
@@ -50,8 +51,7 @@ int* create_bin_buffer(const char* name_bin_file,
 //------------------------------------------------------------------------------------------------
 int cpu_ctor(cpu_t* proc_str,
                   const char* name_bin_file,
-                  int* amount_elements,
-                  display_t* disp_set);
+                  int* amount_elements);
 //------------------------------------------------------------------------------------------------
 int cpu_dtor(cpu_t* proc);
 //------------------------------------------------------------------------------------------------
