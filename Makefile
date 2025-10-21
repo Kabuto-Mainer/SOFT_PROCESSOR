@@ -4,7 +4,7 @@
 all: hash-cmd assembler processor test disassembler
 
 # Флаги компиляции
-flags = -D_DEBUG -Werror -ggdb3 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Waggressive-loop-optimizations -Wc++14-compat -Wmissing-declarations -Wcast-align -Wcast-qual -Wchar-subscripts -Wconditionally-supported -Wconversion -Wctor-dtor-privacy -Wempty-body -Wfloat-equal -Wformat-nonliteral -Wformat-security -Wformat-signedness -Wformat=2 -Winline -Wlogical-op -Wnon-virtual-dtor -Wopenmp-simd -Woverloaded-virtual -Wpacked -Wpointer-arith -Winit-self -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo -Wstrict-null-sentinel -Wstrict-overflow=2 -Wsuggest-attribute=noreturn -Wsuggest-final-methods -Wsuggest-final-types -Wsuggest-override -Wswitch-default -Wswitch-enum -Wsync-nand -Wundef -Wunreachable-code -Wunused -Wuseless-cast -Wvariadic-macros -Wno-literal-suffix -Wno-missing-field-initializers -Wno-narrowing -Wno-old-style-cast -Wno-varargs -Wstack-protector -fcheck-new -fsized-deallocation -fstack-protector -fstrict-overflow -flto-odr-type-merging -fno-omit-frame-pointer -pie -fPIE -Werror=vla -fsanitize=address,alignment,bool,bounds,enum,float-cast-overflow,float-divide-by-zero,integer-divide-by-zero,leak,nonnull-attribute,null,object-size,return,returns-nonnull-attribute,shift,signed-integer-overflow,undefined,unreachable,vla-bound,vptr
+flags = -D_DEBUG -Werror -ggdb3 -lSDL2 -std=c++17 -O0 -Wall -Wextra -Weffc++ -Waggressive-loop-optimizations -Wc++14-compat -Wmissing-declarations -Wcast-align -Wcast-qual -Wchar-subscripts -Wconditionally-supported -Wconversion -Wctor-dtor-privacy -Wempty-body -Wfloat-equal -Wformat-nonliteral -Wformat-security -Wformat-signedness -Wformat=2 -Winline -Wlogical-op -Wnon-virtual-dtor -Wopenmp-simd -Woverloaded-virtual -Wpacked -Wpointer-arith -Winit-self -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo -Wstrict-null-sentinel -Wstrict-overflow=2 -Wsuggest-attribute=noreturn -Wsuggest-final-methods -Wsuggest-final-types -Wsuggest-override -Wswitch-default -Wswitch-enum -Wsync-nand -Wundef -Wunreachable-code -Wunused -Wuseless-cast -Wvariadic-macros -Wno-literal-suffix -Wno-missing-field-initializers -Wno-narrowing -Wno-old-style-cast -Wno-varargs -Wstack-protector -fcheck-new -fsized-deallocation -fstack-protector -fstrict-overflow -flto-odr-type-merging -fno-omit-frame-pointer -pie -fPIE -Werror=vla -fsanitize=address,alignment,bool,bounds,enum,float-cast-overflow,float-divide-by-zero,integer-divide-by-zero,leak,nonnull-attribute,null,object-size,return,returns-nonnull-attribute,shift,signed-integer-overflow,undefined,unreachable,vla-bound,vptr
 
 # ----------------------------------------------------------------------------------------------------------
 # Общие .cpp файлы
@@ -24,7 +24,7 @@ stack_all = PROCESSOR/stack_define.h PROCESSOR/stack.h $(stack_cpp)
 
 # ----------------------------------------------------------------------------------------------------------
 # Файлы .cpp для сборки processor
-proc_cpp = PROCESSOR/processor.cpp $(stack_cpp) PROCESSOR/OS.cpp PROCESSOR/proc-func.cpp
+proc_cpp = PROCESSOR/processor.cpp $(stack_cpp) PROCESSOR/OS.cpp PROCESSOR/proc-func.cpp PROCESSOR/display.cpp
 
 # Файлы processor
 proc_all = PROCESSOR/processor.h $(stack_all) $(proc_cpp) PROCESSOR/proc-func.h
@@ -58,7 +58,7 @@ test_cpp = TEST/test-func.cpp
 test_all = TEST/
 # ----------------------------------------------------------------------------------------------------------
 
-comand_cpp = PROCESSOR/processor.cpp PROCESSOR/proc-func.cpp PROCESSOR/stack.cpp
+comand_cpp = PROCESSOR/processor.cpp PROCESSOR/proc-func.cpp PROCESSOR/stack.cpp PROCESSOR/display.cpp
 
 
 # ----------------------------------------------------------------------------------------------------------

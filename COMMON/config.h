@@ -32,11 +32,6 @@ const char name_type[] = "int";
    printf("%d", num); \
 }
 
-struct display_t {
-    int len;
-    int high;
-    int size;
-};
 
 // Количество регистров
 const int AMOUNT_REGISTERS = 12;
@@ -89,7 +84,7 @@ const int CURRENT_VERSION = 3;
 
 
 // Размер одного пикселя
-const int PIXEL_SIZE = 5;
+const int PIXEL_SIZE = 1;
 
 // Стандартные настройки графики
 const int LEN_DISPLAY = 160;

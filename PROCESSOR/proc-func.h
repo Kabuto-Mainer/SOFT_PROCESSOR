@@ -1,7 +1,7 @@
 #ifndef PROC_FUNC_H
 #define PROC_FUNC_H
 
-#include "processor.h"
+#include "proc-type.h"
 
 // -------------------------------------------------------------------------------------------------------
 int math_func(cpu_t* proc, int sign, int trash_2);

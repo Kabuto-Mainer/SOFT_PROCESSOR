@@ -4,6 +4,8 @@
 #include "cmd-hash.h"
 #include "../PROCESSOR/processor.h"
 #include "../PROCESSOR/proc-func.h"
+#include "../PROCESSOR/proc-type.h"
+
 
 // -------------------------------------------------------------------------------------------------------
 const char NAME_ASM_FILE[] = "CODE-FILE/asm-code.asm";
@@ -11,8 +13,6 @@ const char NAME_HASH_FILE[] = "COMMON/cmd-hash.h";
 const char NAME_BIN_FILE[] = "CODE-FILE/bin-code.bin";
 const char NAME_TEXT_FILE[] = "CODE-FILE/listing.asm";
 const char NAME_DISASMB_FILE[] = "CODE-FILE/disasmb-text.asm";
-// -------------------------------------------------------------------------------------------------------
-typedef int (*cpu_func)(cpu_t*, int, int);
 //------------------------------------------------------------------------------------------------
 enum J_OPER
 {
@@ -31,7 +31,7 @@ enum P_SUP_NUM
     P_ERROR     = 1,
     P_END       = 2,
     RAW_TYPE    = 10,
-    REG_TYPE  = 11,
+    REG_TYPE    = 11,
     PUSH_TYPE   = 20,
     POP_TYPE    = 21,
     IN_TYPE     = 30,
