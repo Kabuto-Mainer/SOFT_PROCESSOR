@@ -7,6 +7,8 @@
 #include <sys/time.h>
 
 #include "stack_define.h"
+#include "proc-type.h"
+#include "display.h"
 #include "proc-func.h"
 #include "processor.h"
 #include "stack.h"
@@ -394,6 +396,11 @@ int cpu_ctor(cpu_t* proc,
         return -1;
     }
 
+    if (create_display(&(proc->disp_set)) != P_OK)
+    {
+        return -1;
+    }
+
     for (int i = 0; i < AMOUNT_REGISTERS; i++) {
         proc->regs[i] = 0;
     }
@@ -411,6 +418,8 @@ int cpu_dtor(cpu_t* proc) {
 
     stack_destruct(&(proc->stack));
     stack_destruct(&(proc->address));
+
+    destroy_display(proc);
 
     free(proc->RAM);
     free(proc->VRAM);

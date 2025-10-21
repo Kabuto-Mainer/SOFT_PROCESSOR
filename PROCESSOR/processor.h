@@ -1,46 +1,36 @@
 #ifndef PROCESSOR_H
 #define PROCESSOR_H
 
+#include <stdlib.h>
+#include <SDL2/SDL.h>
+
 #include "stack_define.h"
+#include "proc-type.h"
 #include "../COMMON/color.h"
 
-struct cpu_t{
-    stack_struct stack;
-    stack_struct address;
-    display_t disp_set;
-    int* RAM;
-    int* VRAM;
-    int* bin_code;
-    int C_E;
-    int regs[AMOUNT_REGISTERS];
-    int amount_el;
-};
-//------------------------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------------------------
-#define J_COMAND(OP) \
-    int arg_1 = 0; \
-    int arg_2 = 0; \
-    \
-    stack_pop(&(proc.stack), &arg_1); \
-    stack_pop(&(proc.stack), &arg_2); \
-    \
-    proc.C_E++; \
-    if (arg_1 OP arg_2) { \
-        proc.C_E = proc.bin_code[proc.C_E] - 2; \
-    } \
-    break;
-//------------------------------------------------------------------------------------------------
-#define ARF_COMAND(OP)  \
-    int arg_1 = 0; \
-    int arg_2 = 0; \
-    \
-    stack_pop(&(proc.stack), &arg_1); \
-    stack_pop(&(proc.stack), &arg_2); \
-    \
-    stack_push(&(proc.stack), arg_1 OP arg_2); \
-    break; \
-//------------------------------------------------------------------------------------------------
+// struct display_t {
+//     int len;
+//     int high;
+//     int size;
+//     SDL_Window* window;
+//     SDL_Renderer* renderer;
+//     SDL_Texture* texture;
+// };
+// //------------------------------------------------------------------------------------------------
+//
+// //------------------------------------------------------------------------------------------------
+// struct cpu_t{
+//     stack_struct stack;
+//     stack_struct address;
+//     display_t disp_set;
+//     int* RAM;
+//     int* VRAM;
+//     int* bin_code;
+//     int C_E;
+//     int regs[AMOUNT_REGISTERS];
+//     int amount_el;
+// };
+// //------------------------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------------------------
 int my_proc(const char* name_asm_file);

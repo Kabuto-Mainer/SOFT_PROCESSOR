@@ -7,9 +7,12 @@
 #include <sys/time.h>
 
 #include "stack_define.h"
-#include "processor.h"
+#include "proc-type.h"
+// #include "processor.h"
 #include "stack.h"
 #include "proc-func.h"
+#include "display.h"
+
 
 #include "../COMMON/support.h"
 #include "../COMMON/comand.h"
@@ -323,14 +326,18 @@ int draw_func(cpu_t* proc, int trash_1, int trash_2)
 
     assert(proc);
 
-    system("clear");
-    for (int i = 0; i < proc->disp_set.size; i++) {
-        putchar(proc->VRAM[i]);
-
-        if (i % proc->disp_set.len == 0) {
-            putchar('\n');
-        }
+    if (update_display(proc) != P_OK)
+    {
+        return P_END;
     }
+//     system("clear");
+//     for (int i = 0; i < proc->disp_set.size; i++) {
+//         putchar(proc->VRAM[i]);
+//
+//         if (i % proc->disp_set.len == 0) {
+//             putchar('\n');
+//         }
+//     }
     return P_OK;
 }
 // -------------------------------------------------------------------------------------------------------

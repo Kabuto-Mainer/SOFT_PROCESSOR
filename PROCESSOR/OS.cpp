@@ -1,14 +1,6 @@
-#include <X11/Xlib.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdint.h>
 #include <stdio.h>
-#include <assert.h>
-#include <unistd.h>
 
 #include "processor.h"
-#include "display.h"
-#include "proc-func.h"
 
 #include "../COMMON/comand.h"
 #include "../COMMON/config.h"

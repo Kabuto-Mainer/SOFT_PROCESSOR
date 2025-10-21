@@ -1,12 +1,13 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
-// struct display_t {
-//     Display* disp;
-//     int num_disp;
-//     Window wind;
-//     GC graph_cont;
-// };
+#include "processor.h"
+
+int destroy_display(cpu_t* proc);
+
+int update_display(cpu_t* proc);
+
+int create_display(display_t* disp_set);
 
 
 #endif
