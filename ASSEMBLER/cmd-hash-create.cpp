@@ -43,17 +43,13 @@ int main(void) {
 
     FILE* output_stream = fopen_file(NAME_HASH_FILE, "w");
 
+    fprintf(output_stream, "\n// This is auto generation code. Do not change. Use \"make run-h\" to build it\n\n");
+
     fprintf(output_stream, "#ifndef CMD_HASH_H\n#define CMD_HASH_H\n\n");
     fprintf(output_stream, "#include \"../COMMON/comand.h\"\n\n");
 
     fprintf(output_stream, "enum INT_HASH {\n");
     fprintf(output_stream, "\n");
-
-    // for (size_t i = 0; i < (AMOUNT_CMD); i++) {
-    //     all_hash[i] = cmd_to_hash(CHAR_CMD[i]);
-    //     fprintf(output_stream, "    HASH_%s = %d,\n", CHAR_CMD[i], cmd_to_hash(CHAR_CMD[i]));
-    // }
-
 
     for (size_t i = 0; i < (AMOUNT_CMD); i++) {
         fprintf(output_stream, "    HASH_%s = %d,\n", CHAR_CMD[i], cmd_to_hash(CHAR_CMD[i]));

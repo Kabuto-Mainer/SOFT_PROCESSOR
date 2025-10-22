@@ -169,13 +169,13 @@ struct asm_func_t
     INT_CMD number;
 
     cpu_func func;
-    int* args;
+    const int* args;
 };
 //------------------------------------------------------------------------------------------------
 const asm_func_t CMD_INF[] =
 {
     {HASH_PUSH,    1,  NUM,  INT_PUSH,    *push_func,    NULL                           },
-    {HASH_ADD,     0,  NO,   INT_ADD,     *math_func,    (int[]) {'+'}                  },
+    {HASH_ADD,     0,  NO,   INT_ADD,     *math_func,    (int[]) {'+'}                 },
     {HASH_SUB,     0,  NO,   INT_SUB,     *math_func,    (int[]) {'-'}                  },
     {HASH_DIV,     0,  NO,   INT_DIV,     *math_func,    (int[]) {'/'}                  },
     {HASH_MUL,     0,  NO,   INT_MUL,     *math_func,    (int[]) {'*'}                  },
