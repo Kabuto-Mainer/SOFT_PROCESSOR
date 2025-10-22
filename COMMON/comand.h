@@ -37,14 +37,25 @@ enum P_SUP_NUM
     IN_TYPE     = 30,
     OUT_TYPE    = 31,
     CALL_TYPE   = 40,
-    RET_TYPE    = 41
+    RET_TYPE    = 41,
+    CLS_TYPE    = 50,
+    MACR_TYPE   = 51
 };
 //------------------------------------------------------------------------------------------------
 enum flags_t
 {
     F_INP_FILE = 0,
     F_OUT_FILE = 1,
-    F_SIZE_DISP = 2
+    F_SIZE_DISP = 2,
+    F_SOUND = 3
+};
+//------------------------------------------------------------------------------------------------
+const char FLAGS[][20] =
+{
+    "-InpFile=",
+    "-OutFile=",
+    "-SizeDisp=",
+    "-Sound="
 };
 //------------------------------------------------------------------------------------------------
 enum type_arg_t
@@ -55,7 +66,7 @@ enum type_arg_t
     ADR = 3
 };
 //------------------------------------------------------------------------------------------------
-const char CHAR_CMD[][8] = {
+const char CHAR_CMD[][10] = {
                         "PUSH",
                         "ADD",
                         "SUB",
@@ -82,37 +93,41 @@ const char CHAR_CMD[][8] = {
                         "PAINT",
                         "COLOR",
                         "DRAW",
-                        "CTIME"
+                        "CTIME",
+                        "PAINTXY",
+                        "SOUND"
 };
 // -------------------------------------------------------------------------------------------------------
 enum INT_CMD {
-    INT_PUSH  = 0,
-    INT_ADD   = 1,
-    INT_SUB   = 2,
-    INT_DIV   = 3,
-    INT_MUL   = 4,
-    INT_SQRT  = 5,
-    INT_OUT   = 6,
-    INT_HLT   = 7,
-    INT_POPR  = 8,
-    INT_PUSHR = 9,
-    INT_IN    = 10,
-    INT_JMP   = 11,
-    INT_JB    = 12,
-    INT_JBE   = 13,
-    INT_JA    = 14,
-    INT_JAE   = 15,
-    INT_JE    = 16,
-    INT_JNE   = 17,
-    INT_HACK  = 18,
-    INT_CALL  = 19,
-    INT_RET   = 20,
-    INT_PUSHM = 21,
-    INT_POPM  = 22,
-    INT_PAINT = 23,
-    INT_COLOR = 24,
-    INT_DRAW  = 25,
-    INT_CTIME = 26
+    INT_PUSH    = 0,
+    INT_ADD     = 1,
+    INT_SUB     = 2,
+    INT_DIV     = 3,
+    INT_MUL     = 4,
+    INT_SQRT    = 5,
+    INT_OUT     = 6,
+    INT_HLT     = 7,
+    INT_POPR    = 8,
+    INT_PUSHR   = 9,
+    INT_IN      = 10,
+    INT_JMP     = 11,
+    INT_JB      = 12,
+    INT_JBE     = 13,
+    INT_JA      = 14,
+    INT_JAE     = 15,
+    INT_JE      = 16,
+    INT_JNE     = 17,
+    INT_HACK    = 18,
+    INT_CALL    = 19,
+    INT_RET     = 20,
+    INT_PUSHM   = 21,
+    INT_POPM    = 22,
+    INT_PAINT   = 23,
+    INT_COLOR   = 24,
+    INT_DRAW    = 25,
+    INT_CTIME   = 26,
+    INT_PAINTXY = 27,
+    INT_SOUND   = 28
 };
 // -------------------------------------------------------------------------------------------------------
 enum INT_REG{
@@ -154,46 +169,40 @@ struct asm_func_t
     INT_CMD number;
 
     cpu_func func;
-    int num_1;
-    int num_2;
+    int* args;
 };
 //------------------------------------------------------------------------------------------------
 const asm_func_t CMD_INF[] =
 {
-    {HASH_PUSH,  1, NUM, INT_PUSH,  *push_func,   0,          0},
-    {HASH_ADD,   0, NO,  INT_ADD,   *math_func,   '+',        0},
-    {HASH_SUB,   0, NO,  INT_SUB,   *math_func,   '-',        0},
-    {HASH_DIV,   0, NO,  INT_DIV,   *math_func,   '/',        0},
-    {HASH_MUL,   0, NO,  INT_MUL,   *math_func,   '*',        0},
-    {HASH_SQRT,  0, NO,  INT_SQRT,  *sqrt_func,   0,          0},
-    {HASH_OUT,   0, NO,  INT_OUT,   *in_out_func, OUT_TYPE,   0},
-    {HASH_HLT,   0, NO,  INT_HLT,   *hlt_func,    0,          0},
-    {HASH_POPR,  1, REG, INT_POPR,  *reg_func,    POP_TYPE,   REG_TYPE},
-    {HASH_PUSHR, 1, REG, INT_PUSHR, *reg_func,    PUSH_TYPE,  REG_TYPE},
-    {HASH_IN,    0, NO,  INT_IN,    *in_out_func, IN_TYPE,    0},
-    {HASH_JMP,   1, ADR, INT_JMP,   *j_func,      OPER_JMP,   0},
-    {HASH_JB,    1, ADR, INT_JB,    *j_func,      OPER_JB,    0},
-    {HASH_JBE,   1, ADR, INT_JBE,   *j_func,      OPER_JBE,   0},
-    {HASH_JA,    1, ADR, INT_JA,    *j_func,      OPER_JA,    0},
-    {HASH_JAE,   1, ADR, INT_JAE,   *j_func,      OPER_JAE,   0},
-    {HASH_JE,    1, ADR, INT_JE,    *j_func,      OPER_JE,    0},
-    {HASH_JNE,   1, ADR, INT_JNE,   *j_func,      OPER_JNE,   0},
-    {HASH_HACK,  0, NO,  INT_HACK,  NULL,         0,          0},
-    {HASH_CALL,  1, ADR, INT_CALL,  *func_func,   CALL_TYPE,  0},
-    {HASH_RET,   0, NO,  INT_RET,   *func_func,   RET_TYPE,   0},
-    {HASH_POPM,  1, REG, INT_POPM,  *reg_func,    POP_TYPE,   RAW_TYPE},
-    {HASH_PUSHM, 1, REG, INT_PUSHM, *reg_func,    PUSH_TYPE,  RAW_TYPE},
-    {HASH_PAINT, 1, NUM, INT_PAINT, *vraw_func,   OUT_TYPE,   0},
-    {HASH_COLOR, 0, NO,  INT_COLOR, *vraw_func,   IN_TYPE,    0},
-    {HASH_DRAW,  0, NO,  INT_DRAW,  *draw_func,   0,          0},
-    {HASH_CTIME, 0, NO,  INT_CTIME, *time_func,   0,          0}
-};
-//------------------------------------------------------------------------------------------------
-const char FLAGS[][20] =
-{
-    "-InpFile=",
-    "-OutFile=",
-    "-SizeDisp="
+    {HASH_PUSH,    1,  NUM,  INT_PUSH,    *push_func,    NULL                           },
+    {HASH_ADD,     0,  NO,   INT_ADD,     *math_func,    (int[]) {'+'}                  },
+    {HASH_SUB,     0,  NO,   INT_SUB,     *math_func,    (int[]) {'-'}                  },
+    {HASH_DIV,     0,  NO,   INT_DIV,     *math_func,    (int[]) {'/'}                  },
+    {HASH_MUL,     0,  NO,   INT_MUL,     *math_func,    (int[]) {'*'}                  },
+    {HASH_SQRT,    0,  NO,   INT_SQRT,    *sqrt_func,    NULL                           },
+    {HASH_OUT,     0,  NO,   INT_OUT,     *in_out_func,  (int[]) {OUT_TYPE}             },
+    {HASH_HLT,     0,  NO,   INT_HLT,     *hlt_func,     NULL                           },
+    {HASH_POPR,    1,  REG,  INT_POPR,    *reg_func,     (int[]) {POP_TYPE, REG_TYPE}   },
+    {HASH_PUSHR,   1,  REG,  INT_PUSHR,   *reg_func,     (int[]) {PUSH_TYPE, REG_TYPE}  },
+    {HASH_IN,      0,  NO,   INT_IN,      *in_out_func,  (int[]) {IN_TYPE}              },
+    {HASH_JMP,     1,  ADR,  INT_JMP,     *j_func,       (int[]) {OPER_JMP}             },
+    {HASH_JB,      1,  ADR,  INT_JB,      *j_func,       (int[]) {OPER_JB}              },
+    {HASH_JBE,     1,  ADR,  INT_JBE,     *j_func,       (int[]) {OPER_JBE}             },
+    {HASH_JA,      1,  ADR,  INT_JA,      *j_func,       (int[]) {OPER_JA}              },
+    {HASH_JAE,     1,  ADR,  INT_JAE,     *j_func,       (int[]) {OPER_JAE}             },
+    {HASH_JE,      1,  ADR,  INT_JE,      *j_func,       (int[]) {OPER_JE}              },
+    {HASH_JNE,     1,  ADR,  INT_JNE,     *j_func,       (int[]) {OPER_JNE}             },
+    {HASH_HACK,    0,  NO,   INT_HACK,    NULL,          NULL                           },
+    {HASH_CALL,    1,  ADR,  INT_CALL,    *func_func,    (int[]) {CALL_TYPE}            },
+    {HASH_RET,     0,  NO,   INT_RET,     *func_func,    (int[]) {RET_TYPE}             },
+    {HASH_POPM,    1,  REG,  INT_POPM,    *reg_func,     (int[]) {POP_TYPE, RAW_TYPE}   },
+    {HASH_PUSHM,   1,  REG,  INT_PUSHM,   *reg_func,     (int[]) {PUSH_TYPE, RAW_TYPE}  },
+    {HASH_PAINT,   1,  NUM,  INT_PAINT,   *vraw_func,    (int[]) {OUT_TYPE}             },
+    {HASH_COLOR,   0,  NO,   INT_COLOR,   *vraw_func,    (int[]) {IN_TYPE}              },
+    {HASH_DRAW,    0,  NO,   INT_DRAW,    *draw_func,    NULL                           },
+    {HASH_CTIME,   0,  NO,   INT_CTIME,   *time_func,    NULL                           },
+    {HASH_PAINTXY, 3,  NUM,  INT_PAINTXY, *vraw_func,    (int[]) {MACR_TYPE}            },
+    // {HASH_SOUND,   1,  NUM,  INT_SOUND,
 };
 //------------------------------------------------------------------------------------------------
 

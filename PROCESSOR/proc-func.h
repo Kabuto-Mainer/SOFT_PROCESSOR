@@ -4,27 +4,27 @@
 #include "proc-type.h"
 
 // -------------------------------------------------------------------------------------------------------
-int math_func(cpu_t* proc, int sign, int trash_2);
+int math_func(cpu_t* proc, int* sign);
 // -------------------------------------------------------------------------------------------------------
-int j_func(cpu_t* proc, int type_jmp, int trash_2);
+int j_func(cpu_t* proc, int* type_jmp);
 // -------------------------------------------------------------------------------------------------------
-int reg_func(cpu_t* proc, int type_use, int type_data);
+int reg_func(cpu_t* proc, int* type_inf);
 // -------------------------------------------------------------------------------------------------------
-int in_out_func(cpu_t* proc, int type_use, int trash_2);
+int in_out_func(cpu_t* proc, int* type_use);
 // -------------------------------------------------------------------------------------------------------
-int push_func(cpu_t* proc, int trash_1, int trash_2);
+int push_func(cpu_t* proc, int* trash);
 // -------------------------------------------------------------------------------------------------------
-int vraw_func(cpu_t* proc, int type_use, int trash_2);
+int vraw_func(cpu_t* proc, int* type_use);
 // -------------------------------------------------------------------------------------------------------
-int time_func(cpu_t* proc, int trash_1, int trash_2);
+int time_func(cpu_t* proc, int* trash);
 // -------------------------------------------------------------------------------------------------------
-int hlt_func(cpu_t* proc, int trash_1, int trash_2);
+int hlt_func(cpu_t* proc, int* trash);
 // -------------------------------------------------------------------------------------------------------
-int sqrt_func(cpu_t* proc, int trash_1, int trash_2);
+int sqrt_func(cpu_t* proc, int* trash);
 // -------------------------------------------------------------------------------------------------------
-int draw_func(cpu_t* proc, int trash_1, int trash_2);
+int draw_func(cpu_t* proc, int* trash);
 // -------------------------------------------------------------------------------------------------------
-int func_func(cpu_t* proc, int type_use, int trash_2);
+int func_func(cpu_t* proc, int* type_use);
 // -------------------------------------------------------------------------------------------------------
 
 

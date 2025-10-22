@@ -32,10 +32,10 @@ proc_all = PROCESSOR/processor.h $(stack_all) $(proc_cpp) PROCESSOR/proc-func.h
 
 # ----------------------------------------------------------------------------------------------------------
 # Файлы .cpp assembler
-asmb_cpp = ASSEMBLER/assembler.cpp ASSEMBLER/asm-start.cpp
+asmb_cpp = ASSEMBLER/assembler.cpp ASSEMBLER/asm-start.cpp ASSEMBLER/asm-sort.cpp
 
 # Файлы assembler
-asmb_all = ASSEMBLER/assembler.h $(asmb_cpp)
+asmb_all = ASSEMBLER/assembler.h $(asmb_cpp) ASSEMBLER/asm-sort.h ASSEMBLER/asm-type.h
 # ----------------------------------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------------------------------
@@ -52,7 +52,7 @@ text_file = TEXT_FILE/bin_code.bin TEXT_FILE/asm_code.asm TEXT_FILE/listing.asm 
 
 # ----------------------------------------------------------------------------------------------------------
 # Файлы .cpp для TEST
-test_cpp = TEST/test-func.cpp
+test_cpp = TEST/test-func.cpp ASSEMBLER/asm-sort.cpp ASSEMBLER/assembler.cpp
 
 # Файлы для TEST
 test_all = TEST/
@@ -80,7 +80,7 @@ hash-cmd:
 # Компиляция test
 test:
 	@echo -------------------------------------------------------------------------
-	g++ TEST/test-func.cpp ASSEMBLER/assembler.cpp $(comand_cpp) $(common_cpp) $(flags) -o BIN/test.exe
+	g++ $(test_cpp) $(comand_cpp) $(common_cpp) $(flags) -o BIN/test.exe
 
 # Компиляция disassembler
 disassembler:

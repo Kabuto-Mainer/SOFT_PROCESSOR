@@ -32,6 +32,8 @@ enum INT_HASH {
     HASH_COLOR = 17822,
     HASH_DRAW = 15149,
     HASH_CTIME = 17393,
+    HASH_PAINTXY = 23564,
+    HASH_SOUND = 18152,
 };
 
 #endif // CMD_HASH_H

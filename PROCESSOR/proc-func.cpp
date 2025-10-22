@@ -19,18 +19,17 @@
 #include "../COMMON/color.h"
 
 // -------------------------------------------------------------------------------------------------------
-int math_func(cpu_t* proc, int sign, int trash_2)
+int math_func(cpu_t* proc, int* sign)
 {
-    (void) trash_2;
-
     assert(proc);
+    assert(sign);
 
     int arg_1 = 0;
     int arg_2 = 0;
 
     stack_pop(&(proc->stack), &arg_1);
     stack_pop(&(proc->stack), &arg_2);
-    switch (sign)
+    switch (sign[0])
     {
         case '+': // '+'
         {
@@ -69,13 +68,12 @@ int math_func(cpu_t* proc, int sign, int trash_2)
     return P_OK;
 }
 // -------------------------------------------------------------------------------------------------------
-int j_func(cpu_t* proc, int type_jmp, int trash_2)
+int j_func(cpu_t* proc, int* type_jmp)
 {
-    (void) trash_2;
-
     assert(proc);
+    assert(type_jmp);
 
-    if (type_jmp == OPER_JMP)
+    if (type_jmp[0] == OPER_JMP)
     {
         proc->C_E++;
         proc->C_E = proc->bin_code[proc->C_E] - 2;
@@ -89,7 +87,7 @@ int j_func(cpu_t* proc, int type_jmp, int trash_2)
     stack_pop(&(proc->stack), &arg_2);
 
     proc->C_E++;
-    switch (type_jmp)
+    switch (type_jmp[0])
     {
         case OPER_JB: // '<'
         {
@@ -133,7 +131,7 @@ int j_func(cpu_t* proc, int type_jmp, int trash_2)
 
         case OPER_JNE: // '!='
         {
-            if (arg_1 <= arg_2) {
+            if (arg_1 != arg_2) {
                 proc->C_E = proc->bin_code[proc->C_E] - 2; \
             }
             return P_OK;
@@ -148,13 +146,16 @@ int j_func(cpu_t* proc, int type_jmp, int trash_2)
     return P_ERROR;
 }
 // -------------------------------------------------------------------------------------------------------
-int reg_func(cpu_t* proc, int type_use, int type_data)
+int reg_func(cpu_t* proc, int* type_inf)
 {
     assert(proc);
+    assert(type_inf);
 
-    if (type_data == RAW_TYPE)
+    // type_inf[] = {RAW/REG_TYPE, PUSH/POP_TYPE}
+
+    if (type_inf[1] == RAW_TYPE)
     {
-        if (type_use == PUSH_TYPE)
+        if (type_inf[0] == PUSH_TYPE)
         {
             int arg = proc->RAM[proc->regs[proc->bin_code[++(proc->C_E)]]];
             stack_push(&(proc->stack), arg);
@@ -174,7 +175,7 @@ int reg_func(cpu_t* proc, int type_use, int type_data)
 
     else
     {
-        if (type_use == PUSH_TYPE)
+        if (type_inf[0] == PUSH_TYPE)
         {
             int reg = proc->bin_code[++proc->C_E];
             int num = proc->regs[reg];
@@ -196,13 +197,12 @@ int reg_func(cpu_t* proc, int type_use, int type_data)
     return P_ERROR;
 }
 // -------------------------------------------------------------------------------------------------------
-int in_out_func(cpu_t* proc, int type_use, int trash_2)
+int in_out_func(cpu_t* proc, int* type_use)
 {
-    (void) trash_2;
-
     assert(proc);
+    assert(type_use);
 
-    if (type_use == IN_TYPE)
+    if (type_use[0] == IN_TYPE)
     {
         int num = 0;
 
@@ -224,31 +224,40 @@ int in_out_func(cpu_t* proc, int type_use, int trash_2)
     return P_ERROR;
 }
 // -------------------------------------------------------------------------------------------------------
-int push_func(cpu_t* proc, int trash_1, int trash_2)
+int push_func(cpu_t* proc, int* trash)
 {
-    (void) trash_1;
-    (void) trash_2;
-
     assert(proc);
+    (void) trash;
 
     proc->C_E++;
     stack_push(&(proc->stack), proc->bin_code[proc->C_E]);
     return P_OK;
 }
 // -------------------------------------------------------------------------------------------------------
-int vraw_func(cpu_t* proc, int type_use, int trash_2)
+int vraw_func(cpu_t* proc, int* type_use)
 {
-    (void) trash_2;
-
     assert(proc);
+    assert(type_use);
 
-    if (type_use == OUT_TYPE)
+    if (type_use[0] == OUT_TYPE)
     {
         int x = 0;
         int y = 0;
 
         stack_pop(&(proc->stack), &y);
         stack_pop(&(proc->stack), &x);
+
+        int address = y * proc->disp_set.len + x;
+        int color = proc->bin_code[++proc->C_E];
+
+        (proc->VRAM)[address] = color;
+        return P_OK;
+    }
+
+    else if (type_use[0] == MACR_TYPE)
+    {
+        int x = proc->bin_code[++(proc->C_E)];
+        int y = proc->bin_code[++(proc->C_E)];
 
         int address = y * proc->disp_set.len + x;
         int color = proc->bin_code[++proc->C_E];
@@ -275,12 +284,10 @@ int vraw_func(cpu_t* proc, int type_use, int trash_2)
     return P_ERROR;
 }
 // -------------------------------------------------------------------------------------------------------
-int time_func(cpu_t* proc, int trash_1, int trash_2)
+int time_func(cpu_t* proc, int* trash)
 {
-    (void) trash_1;
-    (void) trash_2;
-
     assert(proc);
+    (void) trash;
 
     struct timeval tv;
     gettimeofday(&tv, NULL);
@@ -291,21 +298,17 @@ int time_func(cpu_t* proc, int trash_1, int trash_2)
     return P_OK;
 }
 // -------------------------------------------------------------------------------------------------------
-int hlt_func(cpu_t* proc, int trash_1, int trash_2)
+int hlt_func(cpu_t* proc, int* trash)
 {
-    (void) trash_1;
-    (void) trash_2;
-
     assert(proc);
+    (void) trash;
     return P_END;
 }
 // -------------------------------------------------------------------------------------------------------
-int sqrt_func(cpu_t* proc, int trash_1, int trash_2)
+int sqrt_func(cpu_t* proc, int* trash)
 {
-    (void) trash_1;
-    (void) trash_2;
-
     assert(proc);
+    (void) trash;
 
     int arg = 0;
     stack_pop(&(proc->stack), &arg);
@@ -319,12 +322,10 @@ int sqrt_func(cpu_t* proc, int trash_1, int trash_2)
     return P_OK;
 }
 // -------------------------------------------------------------------------------------------------------
-int draw_func(cpu_t* proc, int trash_1, int trash_2)
+int draw_func(cpu_t* proc, int* trash)
 {
-    (void) trash_1;
-    (void) trash_2;
-
     assert(proc);
+    (void) trash;
 
     if (update_display(proc) != P_OK)
     {
@@ -341,12 +342,11 @@ int draw_func(cpu_t* proc, int trash_1, int trash_2)
     return P_OK;
 }
 // -------------------------------------------------------------------------------------------------------
-int func_func(cpu_t* proc, int type_use, int trash_2)
+int func_func(cpu_t* proc, int* type_use)
 {
-    (void) trash_2;
     assert(proc);
 
-    if (type_use == CALL_TYPE)
+    if (type_use[0] == CALL_TYPE)
     {
         proc->C_E++;
         stack_push(&(proc->address), proc->C_E + 1);
@@ -366,3 +366,12 @@ int func_func(cpu_t* proc, int type_use, int trash_2)
     return P_ERROR;
 }
 // -------------------------------------------------------------------------------------------------------
+// int sound_func(cpu_t* proc, int* address)
+// {
+//     assert(proc);
+//     assert(address);
+//
+//
+//
+//
+// }

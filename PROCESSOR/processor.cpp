@@ -53,6 +53,20 @@ int* create_bin_buffer(const char* name_bin_file,
     }
     disp_set->size = disp_set->len * disp_set->high;
 
+    if (fread(&(disp_set->sound_stream), sizeof(int), 1, bin_file) != 1)
+    {
+        fclose_file(bin_file);
+        printf(_R_ "ERROR: read NUMBER_STREAM not correct\n" _N_);
+        return NULL;
+    }
+
+    if (fread(&(disp_set->code_stream), sizeof(int), 1, bin_file) != 1)
+    {
+        fclose_file(bin_file);
+        printf(_R_ "ERROR: read CODE_STREAM not correct\n" _N_);
+        return NULL;
+    }
+
     printf("LEN: %d\nHIGH: %d\n", disp_set->len, disp_set->high);
 
 //! Нам точно известно, что amount_elements > 2
@@ -334,19 +348,18 @@ int my_proc(const char* name_bin_file)
 //                 return -1;
 //             }
 //         }
-//
-        for (int i = 0; i < AMOUNT_CMD; i++)
+        int comand = proc.bin_code[proc.C_E];
+        if (comand >= AMOUNT_CMD || comand < 0)
         {
-            if (proc.bin_code[proc.C_E] == CMD_INF[i].number)
-            {
-                // printf("CMD_INF: %d\n", CMD_INF[i].number);
-                if ((CMD_INF[i].func(&proc, CMD_INF[i].num_1, CMD_INF[i].num_2)) != P_OK)
-                {
-                    cpu_dtor(&proc);
-                    return 0;
-                }
-                break;
-            }
+            printf("ERROR: unknown comand in bin_code\n");
+            cpu_dtor(&proc);
+            return 0;
+        }
+
+        if ((CMD_INF[comand].func(&proc, CMD_INF[comand].args)) != P_OK)
+        {
+            cpu_dtor(&proc);
+            return 0;
         }
     }
     printf(_R_ "Invalid go???\n" _N_);
