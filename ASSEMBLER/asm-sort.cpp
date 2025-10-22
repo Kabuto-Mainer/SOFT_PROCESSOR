@@ -13,18 +13,18 @@
 // TODO +-
 int sort_comp_label(const void* struct_1, const void* struct_2)
 {
-    const label_t* label_1 = (const label_t*) struct_1;
-    const label_t* label_2 = (const label_t*) struct_2;
+    const label_t* l_1 = (const label_t*) struct_1;
+    const label_t* l_2 = (const label_t*) struct_2;
 
-    return (label_1->hash_label - label_2->hash_label);
+    return (l_1->hash_label > l_2->hash_label) - (l_1->hash_label < l_2->hash_label);
 }
 //------------------------------------------------------------------------------------------------
 int search_comp_label(const void* hash_label, const void* label_struct)
 {
     const int* hash = (const int*) hash_label;
-    const label_t* label_data = (const label_t*) label_struct;
+    const label_t* label = (const label_t*) label_struct;
 
-    return (*hash - label_data->hash_label);
+    return (*hash > label->hash_label) - (*hash < label->hash_label);
 }
 //------------------------------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@ int sort_comp_var(const void* struct_1, const void* struct_2)
     const variable_t* var_1 = (const variable_t*) struct_1;
     const variable_t* var_2 = (const variable_t*) struct_2;
 
-    return (var_1->hash_var - var_2->hash_var);
+    return (var_1->hash_var > var_2->hash_var) - (var_1->hash_var < var_2->hash_var);
 }
 //------------------------------------------------------------------------------------------------
 
@@ -42,9 +42,9 @@ int sort_comp_var(const void* struct_1, const void* struct_2)
 int search_comp_var(const void* hash_var, const void* var_struct)
 {
     const int* hash = (const int*) hash_var;
-    const variable_t* var_data = (const variable_t*) var_struct;
+    const variable_t* var = (const variable_t*) var_struct;
 
-    return (*hash - var_data->hash_var);
+    return (*hash > var->hash_var) - (*hash < var->hash_var);
 }
 //------------------------------------------------------------------------------------------------
 
@@ -87,32 +87,42 @@ int sort_var(asm_struct* asm_data)
 //------------------------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------------------------
-int search_label(asm_struct* asm_data, int hash_label)
+label_t* search_label(asm_struct* asm_data, int hash_label)
 {
     assert(asm_data);
 
-    int* return_value = (int*) bsearch(&hash_label,
+    label_t* return_value = (label_t*) bsearch(&hash_label,
                                        asm_data->table_label,
                                        (size_t) asm_data->amount_labels,
                                        sizeof(asm_data->table_label[0]),
                                        &search_comp_label);
 
-    return *return_value;
+    if (return_value == NULL && asm_data->current_run == 0)
+    {
+        return (asm_data->table_label);
+    }
+
+    else if (return_value == NULL)
+    {
+        return NULL;
+    }
+
+    return return_value;
 }
 //------------------------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------------------------
-int search_var(asm_struct* asm_data, int hash_var)
+variable_t* search_var(asm_struct* asm_data, int hash_var)
 {
     assert(asm_data);
 
-    int* return_value = (int*) bsearch((void*) &hash_var,
-                                        asm_data->table_var,
-                                        (size_t) asm_data->amount_vars,
-                                        sizeof(asm_data->table_var[0]),
-                                        &search_comp_var);
+    variable_t* return_value = (variable_t*) bsearch((void*) &hash_var,
+                                                     asm_data->table_var,
+                                                     (size_t) asm_data->amount_vars,
+                                                     sizeof(asm_data->table_var[0]),
+                                                     &search_comp_var);
 
-    return *return_value;
+    return return_value;
 }
 //------------------------------------------------------------------------------------------------
 

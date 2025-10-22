@@ -15,11 +15,12 @@
 int main(int argv, char* args[])
 {
     label_t table_label[AMOUNT_POINTS] = {0};
+    int amount_labels = 0;
 
-    // for (int i = 0; i < AMOUNT_POINTS; i++)
-    // {
-    //     table_label[i] = {"\0", -1};
-    // }
+    for (int i = 0; i < AMOUNT_POINTS; i++)
+    {
+        table_label[i] = {0, "", -1};
+    }
 
     display_t disp_set = {-1, -1};
     disp_set.len = LEN_DISPLAY;
@@ -38,13 +39,24 @@ int main(int argv, char* args[])
               argv,
               args);
 
-    my_assembler(name_input_file, name_output_file, NAME_TEXT_FILE, table_label, 0, &disp_set);
+    my_assembler(name_input_file,
+                 name_output_file,
+                 NAME_TEXT_FILE,
+                 table_label,
+                 &amount_labels,
+                 0,
+                 &disp_set);
 
-    // printf("TABLE[0]: %d %d\n", table_label->hash_label, table_label->address);
 
     if (table_label[0].hash_label != 0)
     {
-        my_assembler(name_input_file, name_output_file, NAME_TEXT_FILE, table_label, 1, &disp_set);
+        my_assembler(name_input_file,
+                     name_output_file,
+                     NAME_TEXT_FILE,
+                     table_label,
+                     &amount_labels,
+                     1,
+                     &disp_set);
     }
     return 0;
 }
