@@ -1,10 +1,12 @@
-:465
+#DEF 30
 
-PUSH 30
+PUSH #DEF
 OUT
 HLT
 
-:465
+JMP :46
+
+:46
 
 PUSH 40
 OUT

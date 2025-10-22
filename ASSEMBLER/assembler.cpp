@@ -136,12 +136,11 @@ int char_reg_to_int(const char* name_reg)
 //------------------------------------------------------------------------------------------------
 asm_error_t check_label(asm_struct* asm_data,
                   char* comand,
-                  int number_start,
                   int add_index)
 {
     assert(asm_data);
 
-    if (number_start != 0)
+    if (asm_data->current_run != 0)
     {
         fprintf(asm_data->text_stream, "::: ");
         fprintf(asm_data->text_stream, " %s\n", asm_data->asm_code + asm_data->cur_char);
@@ -164,7 +163,6 @@ asm_error_t check_label(asm_struct* asm_data,
 
             strcpy(asm_data->table_label[i].name, comand);
             sort_label(asm_data);
-            // printf("TABLE[%d]: %d %d\n", i, hash_label, asm_data->cur_element);
             break;
         }
 
@@ -264,6 +262,7 @@ asm_error_t my_assembler (const char* name_asm_file,
                           const char* name_byte_file,
                           const char* name_text_file,
                           label_t* table_label,
+                          int* amount_labels,
                           int number_start,
                           display_t* disp_set)
 {
@@ -275,7 +274,9 @@ asm_error_t my_assembler (const char* name_asm_file,
     asm_struct asm_data = {};
     asm_data.current_run = number_start;
     asm_data.amount_vars = 0;
+    asm_data.amount_labels = *amount_labels;
     variable_t table_var[AMOUNT_VARS] = {};
+
 
     int amount_chars = asm_create(
                                 &asm_data,
@@ -316,7 +317,7 @@ asm_error_t my_assembler (const char* name_asm_file,
 
         if (comand[0] == ':')
         {
-            if (check_label(&asm_data, comand, number_start, add_index) == A_NOT_ERRORS)
+            if (check_label(&asm_data, comand, add_index) == A_NOT_ERRORS)
             {
                 continue;
             }
@@ -366,6 +367,7 @@ asm_error_t my_assembler (const char* name_asm_file,
         asm_data.amount_line++;
 
     }
+
     asm_data.bin_code[0] = OWN_SIGNATURE;
     asm_data.bin_code[1] = CURRENT_VERSION;
     asm_data.bin_code[2] = asm_data.cur_element;
@@ -374,6 +376,7 @@ asm_error_t my_assembler (const char* name_asm_file,
     asm_data.bin_code[5] = disp_set->sound_stream;
     asm_data.bin_code[6] = disp_set->code_stream;
 
+    *amount_labels = asm_data.amount_labels;
 
     FILE* bin_file = fopen_file(name_byte_file, "wb");
     if (fwrite(asm_data.bin_code, sizeof(int), (size_t) asm_data.cur_element, bin_file) != (size_t) asm_data.cur_element)
@@ -426,7 +429,7 @@ asm_error_t asm_check_cmd(asm_struct* asm_data)
 //------------------------------------------------------------------------------------------------
             else if ((CMD_INF[i]).type_arg == ADR)
             {
-                if (check_J_cmd(asm_data, (CMD_INF[i]).number) != A_NOT_ERRORS)
+                if (check_jmp_cmd(asm_data, (CMD_INF[i]).number) != A_NOT_ERRORS)
                 {
                     return ERROR;
                 }
@@ -451,9 +454,8 @@ asm_error_t asm_check_cmd(asm_struct* asm_data)
 //------------------------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------------------------
-asm_error_t check_J_cmd(asm_struct* asm_data, int cmd)
+asm_error_t check_jmp_cmd(asm_struct* asm_data, int cmd)
 {
-// TODO rename
     assert(asm_data);
     assert(asm_data->table_label);
 
@@ -472,20 +474,14 @@ asm_error_t check_J_cmd(asm_struct* asm_data, int cmd)
     if (char_adr[0] == ':')
     {
         int hash_label = cmd_to_hash(char_adr);
-        // TODO bin find
-        for (int i = 0; i < AMOUNT_POINTS; i++)
-        {
-            if (asm_data->table_label[i].hash_label == hash_label)
-            {
-                new_C_E = (asm_data->table_label[i]).address - AMOUNT_SUP_NUM + 1;
-                break;
-            }
+        label_t* label = search_label(asm_data, hash_label);
 
-            if ((i == AMOUNT_POINTS - 1) && asm_data->current_run != 0)
-            {
-                EXIT_FUNCTION(asm_data, INVALID_POINT);
-            }
+        if (label == NULL)
+        {
+            EXIT_FUNCTION(asm_data, INVALID_POINT);
         }
+
+        new_C_E = (*label).address - AMOUNT_SUP_NUM + 1;
     }
 
     else if (char_adr[0] == '$') {
@@ -546,20 +542,28 @@ asm_error_t check_NUM_cmd(asm_struct* asm_data,
         if (arg_c[0] == '#')
         {
             int hash_var = cmd_to_hash(arg_c);
-            // TODO bin find
-            for (size_t i_2 = 0; i_2 < AMOUNT_VARS; i_2++)
-            {
-                if (asm_data->table_var[i_2].hash_var == hash_var)
-                {
-                    arg = asm_data->table_var[i_2].value;
-                    break;
-                }
+            variable_t* var = search_var(asm_data, hash_var);
 
-                if (i_2 == AMOUNT_VARS - 1)
-                {
-                    EXIT_FUNCTION(asm_data, NO_VAR);
-                }
+            if (var == NULL)
+            {
+                EXIT_FUNCTION(asm_data, NO_VAR);
             }
+
+            arg = var->value;
+
+//             for (size_t i_2 = 0; i_2 < AMOUNT_VARS; i_2++)
+//             {
+//                 if (asm_data->table_var[i_2].hash_var == hash_var)
+//                 {
+//                     arg = asm_data->table_var[i_2].value;
+//                     break;
+//                 }
+//
+//                 if (i_2 == AMOUNT_VARS - 1)
+//                 {
+//                     EXIT_FUNCTION(asm_data, NO_VAR);
+//                 }
+//             }
         }
 
         else

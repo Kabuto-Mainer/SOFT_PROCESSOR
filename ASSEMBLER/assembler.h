@@ -21,6 +21,7 @@ asm_error_t my_assembler (const char* name_asm_file,
                           const char* name_byte_file,
                           const char* name_text_file,
                           label_t* table_label,
+                          int* amount_labels,
                           int number_start,
                           display_t* disp_set);
 //------------------------------------------------------------------------------------------------
@@ -36,7 +37,7 @@ int check_arg(display_t* disp_set,
               int argv,
               char* args[]);
 //------------------------------------------------------------------------------------------------
-asm_error_t check_J_cmd(asm_struct* asm_data,
+asm_error_t check_jmp_cmd(asm_struct* asm_data,
                         int cmd);
 //------------------------------------------------------------------------------------------------
 asm_error_t check_NUM_cmd(asm_struct* asm_data,
@@ -53,7 +54,6 @@ int skip_trash(asm_struct* asm_data,
 //------------------------------------------------------------------------------------------------
 asm_error_t check_label(asm_struct* asm_data,
                   char* comand,
-                  int number_start,
                   int add_index);
 //------------------------------------------------------------------------------------------------
 asm_error_t check_var(asm_struct* asm_data,
