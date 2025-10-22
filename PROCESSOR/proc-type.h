@@ -5,8 +5,6 @@
 #include <SDL2/SDL.h>
 #include "stack_define.h"
 
-
-typedef int (*cpu_func)(cpu_t*, int, int);
 //------------------------------------------------------------------------------------------------
 struct display_t {
     int len;
@@ -15,6 +13,8 @@ struct display_t {
     SDL_Window* window;
     SDL_Renderer* renderer;
     SDL_Texture* texture;
+    int sound_stream;
+    int code_stream;
 };
 //------------------------------------------------------------------------------------------------
 
@@ -30,6 +30,8 @@ struct cpu_t{
     int regs[AMOUNT_REGISTERS];
     int amount_el;
 };
+//------------------------------------------------------------------------------------------------
+typedef int (*cpu_func)(cpu_t*, int* );
 //------------------------------------------------------------------------------------------------
 
 

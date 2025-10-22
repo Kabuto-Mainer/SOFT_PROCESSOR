@@ -1,0 +1,16 @@
+:465
+
+PUSH 30
+OUT
+HLT
+
+:465
+
+PUSH 40
+OUT
+HLT
+
+
+PUSH 50
+OUT
+HLT

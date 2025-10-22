@@ -75,7 +75,7 @@ const int RAM_SIZE = 100 * sizeof(int);
 const long long int TIME_DIV = 1e7;
 
 // Количество доп. элементов в bin-code
-const int AMOUNT_SUP_NUM = 5;
+const int AMOUNT_SUP_NUM = 7;
 
 // Сингнатура и текущая версия
 const int OWN_SIGNATURE = 1388;
@@ -84,11 +84,26 @@ const int CURRENT_VERSION = 3;
 
 
 // Размер одного пикселя
-const int PIXEL_SIZE = 1;
+const int PIXEL_SIZE = 5;
 
 // Стандартные настройки графики
 const int LEN_DISPLAY = 160;
 const int HIGH_DISPLAY = 120;
 const int VRAM_SIZE = LEN_DISPLAY * HIGH_DISPLAY;
+
+const char NAME_SOUND_STREAM[][100] =
+{
+   "PROCESSOR/all-sound/stream0.raw",
+   "PROCESSOR/all-sound/stream1.raw",
+   "PROCESSOR/all-sound/stream2.raw",
+   "PROCESSOR/all-sound/stream3.raw",
+   "PROCESSOR/all-sound/stream4.raw",
+   "PROCESSOR/all-sound/stream5.raw",
+   "PROCESSOR/all-sound/stream6.raw",
+   "PROCESSOR/all-sound/stream7.raw",
+   "PROCESSOR/all-sound/stream8.raw"
+};
+
+const int AMOUNT_SOUND_STREAM = sizeof(NAME_SOUND_STREAM) / sizeof(NAME_SOUND_STREAM[0]);
 
 #endif // CONST_H

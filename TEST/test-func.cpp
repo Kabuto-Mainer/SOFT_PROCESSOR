@@ -38,7 +38,7 @@ int create_input_file(const char* name_asm_file,
 
     for (int i = 0; i < AMOUNT_POINTS; i++)
     {
-        table_label[i] = {"\0", -1};
+        table_label[i] = {0, 0};
     }
 
     display_t disp_set = {-1, -1};
