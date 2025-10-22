@@ -1,3 +1,6 @@
+
+// This is auto generation code. Do not change. Use "make run-h" to build it
+
 #ifndef CMD_HASH_H
 #define CMD_HASH_H
 

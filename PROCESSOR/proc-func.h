@@ -4,27 +4,27 @@
 #include "proc-type.h"
 
 // -------------------------------------------------------------------------------------------------------
-int math_func(cpu_t* proc, int* sign);
+int math_func(cpu_t* proc, const int* sign);
 // -------------------------------------------------------------------------------------------------------
-int j_func(cpu_t* proc, int* type_jmp);
+int j_func(cpu_t* proc, const int* type_jmp);
 // -------------------------------------------------------------------------------------------------------
-int reg_func(cpu_t* proc, int* type_inf);
+int reg_func(cpu_t* proc, const int* type_inf);
 // -------------------------------------------------------------------------------------------------------
-int in_out_func(cpu_t* proc, int* type_use);
+int in_out_func(cpu_t* proc, const int* type_use);
 // -------------------------------------------------------------------------------------------------------
-int push_func(cpu_t* proc, int* trash);
+int push_func(cpu_t* proc, const int* trash);
 // -------------------------------------------------------------------------------------------------------
-int vraw_func(cpu_t* proc, int* type_use);
+int vraw_func(cpu_t* proc, const int* type_use);
 // -------------------------------------------------------------------------------------------------------
-int time_func(cpu_t* proc, int* trash);
+int time_func(cpu_t* proc, const int* trash);
 // -------------------------------------------------------------------------------------------------------
-int hlt_func(cpu_t* proc, int* trash);
+int hlt_func(cpu_t* proc, const int* trash);
 // -------------------------------------------------------------------------------------------------------
-int sqrt_func(cpu_t* proc, int* trash);
+int sqrt_func(cpu_t* proc, const int* trash);
 // -------------------------------------------------------------------------------------------------------
-int draw_func(cpu_t* proc, int* trash);
+int draw_func(cpu_t* proc, const int* trash);
 // -------------------------------------------------------------------------------------------------------
-int func_func(cpu_t* proc, int* type_use);
+int func_func(cpu_t* proc, const int* type_use);
 // -------------------------------------------------------------------------------------------------------
 
 

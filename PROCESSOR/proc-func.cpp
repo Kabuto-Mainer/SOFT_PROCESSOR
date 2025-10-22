@@ -19,7 +19,7 @@
 #include "../COMMON/color.h"
 
 // -------------------------------------------------------------------------------------------------------
-int math_func(cpu_t* proc, int* sign)
+int math_func(cpu_t* proc, const int* sign)
 {
     assert(proc);
     assert(sign);
@@ -68,7 +68,7 @@ int math_func(cpu_t* proc, int* sign)
     return P_OK;
 }
 // -------------------------------------------------------------------------------------------------------
-int j_func(cpu_t* proc, int* type_jmp)
+int j_func(cpu_t* proc, const int* type_jmp)
 {
     assert(proc);
     assert(type_jmp);
@@ -146,7 +146,7 @@ int j_func(cpu_t* proc, int* type_jmp)
     return P_ERROR;
 }
 // -------------------------------------------------------------------------------------------------------
-int reg_func(cpu_t* proc, int* type_inf)
+int reg_func(cpu_t* proc, const int* type_inf)
 {
     assert(proc);
     assert(type_inf);
@@ -197,7 +197,7 @@ int reg_func(cpu_t* proc, int* type_inf)
     return P_ERROR;
 }
 // -------------------------------------------------------------------------------------------------------
-int in_out_func(cpu_t* proc, int* type_use)
+int in_out_func(cpu_t* proc, const int* type_use)
 {
     assert(proc);
     assert(type_use);
@@ -224,7 +224,7 @@ int in_out_func(cpu_t* proc, int* type_use)
     return P_ERROR;
 }
 // -------------------------------------------------------------------------------------------------------
-int push_func(cpu_t* proc, int* trash)
+int push_func(cpu_t* proc, const int* trash)
 {
     assert(proc);
     (void) trash;
@@ -234,7 +234,7 @@ int push_func(cpu_t* proc, int* trash)
     return P_OK;
 }
 // -------------------------------------------------------------------------------------------------------
-int vraw_func(cpu_t* proc, int* type_use)
+int vraw_func(cpu_t* proc, const int* type_use)
 {
     assert(proc);
     assert(type_use);
@@ -284,7 +284,7 @@ int vraw_func(cpu_t* proc, int* type_use)
     return P_ERROR;
 }
 // -------------------------------------------------------------------------------------------------------
-int time_func(cpu_t* proc, int* trash)
+int time_func(cpu_t* proc, const int* trash)
 {
     assert(proc);
     (void) trash;
@@ -298,14 +298,14 @@ int time_func(cpu_t* proc, int* trash)
     return P_OK;
 }
 // -------------------------------------------------------------------------------------------------------
-int hlt_func(cpu_t* proc, int* trash)
+int hlt_func(cpu_t* proc, const int* trash)
 {
     assert(proc);
     (void) trash;
     return P_END;
 }
 // -------------------------------------------------------------------------------------------------------
-int sqrt_func(cpu_t* proc, int* trash)
+int sqrt_func(cpu_t* proc, const int* trash)
 {
     assert(proc);
     (void) trash;
@@ -322,7 +322,7 @@ int sqrt_func(cpu_t* proc, int* trash)
     return P_OK;
 }
 // -------------------------------------------------------------------------------------------------------
-int draw_func(cpu_t* proc, int* trash)
+int draw_func(cpu_t* proc, const int* trash)
 {
     assert(proc);
     (void) trash;
@@ -342,7 +342,7 @@ int draw_func(cpu_t* proc, int* trash)
     return P_OK;
 }
 // -------------------------------------------------------------------------------------------------------
-int func_func(cpu_t* proc, int* type_use)
+int func_func(cpu_t* proc, const int* type_use)
 {
     assert(proc);
 
@@ -366,7 +366,7 @@ int func_func(cpu_t* proc, int* type_use)
     return P_ERROR;
 }
 // -------------------------------------------------------------------------------------------------------
-// int sound_func(cpu_t* proc, int* address)
+// int sound_func(cpu_t* proc, const int* address)
 // {
 //     assert(proc);
 //     assert(address);
