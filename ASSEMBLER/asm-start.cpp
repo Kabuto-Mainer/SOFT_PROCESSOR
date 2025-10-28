@@ -26,14 +26,17 @@ int main(int argv, char* args[])
     disp_set.len = LEN_DISPLAY;
     disp_set.high = HIGH_DISPLAY;
     disp_set.size = LEN_DISPLAY * HIGH_DISPLAY;
-    disp_set.sound_stream = -1;
-    disp_set.code_stream = -1;
+
+    audio_t audio_set = {};
+    audio_set.sound_stream = -1;
+    audio_set.code_stream = -1;
 
     const char* name_input_file = NAME_ASM_FILE;
     const char* name_output_file = NAME_BIN_FILE;
 
     printf("ARG: %d\n", argv);
     check_arg(&disp_set,
+              &audio_set,
               &name_input_file,
               &name_output_file,
               argv,
@@ -45,7 +48,8 @@ int main(int argv, char* args[])
                  table_label,
                  &amount_labels,
                  0,
-                 &disp_set);
+                 &disp_set,
+                 &audio_set);
 
 
     if (table_label[0].hash_label != 0)
@@ -56,7 +60,8 @@ int main(int argv, char* args[])
                      table_label,
                      &amount_labels,
                      1,
-                     &disp_set);
+                     &disp_set,
+                     &audio_set);
     }
     return 0;
 }

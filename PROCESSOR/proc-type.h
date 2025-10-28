@@ -5,24 +5,38 @@
 #include <SDL2/SDL.h>
 #include "stack_define.h"
 
+
 //------------------------------------------------------------------------------------------------
-struct display_t {
+struct display_t
+{
     int len;
     int high;
     int size;
     SDL_Window* window;
     SDL_Renderer* renderer;
     SDL_Texture* texture;
-    int sound_stream;
-    int code_stream;
 };
 //------------------------------------------------------------------------------------------------
+struct audio_t
+{
+    SDL_AudioSpec audio;
+    SDL_AudioDeviceID dev;
+
+    int sound_stream;
+    int code_stream;
+
+    int amount_frames;
+    int16_t* audio_file;
+};
+
 
 //------------------------------------------------------------------------------------------------
-struct cpu_t{
+struct cpu_t
+{
     stack_struct stack;
     stack_struct address;
     display_t disp_set;
+    audio_t audio_set;
     int* RAM;
     int* VRAM;
     int* bin_code;
@@ -31,7 +45,7 @@ struct cpu_t{
     int amount_el;
 };
 //------------------------------------------------------------------------------------------------
-typedef int (*cpu_func)(cpu_t*, const int* );
+typedef int (*cpu_func)(cpu_t*, const int );
 //------------------------------------------------------------------------------------------------
 
 

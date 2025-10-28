@@ -37,7 +37,8 @@ int my_proc(const char* name_asm_file);
 //------------------------------------------------------------------------------------------------
 int* create_bin_buffer(const char* name_bin_file,
                 int* amount_elements,
-                display_t* disp_set);
+                display_t* disp_set,
+                audio_t* audio_set);
 //------------------------------------------------------------------------------------------------
 int cpu_ctor(cpu_t* proc_str,
                   const char* name_bin_file,
@@ -54,6 +55,8 @@ int print_end(cpu_t* proc);
 int print_reg(cpu_t* proc);
 //------------------------------------------------------------------------------------------------
 int print_line(cpu_t* proc, unsigned int i);
+//------------------------------------------------------------------------------------------------
+int check_correct_func(void);
 //------------------------------------------------------------------------------------------------
 
 

@@ -1,6 +1,7 @@
 #ifndef ASM_TYPE_H
 #define ASM_TYPE_H
 
+#include "../COMMON/comand.h"
 
 //------------------------------------------------------------------------------------------------
 struct label_t
@@ -23,6 +24,8 @@ struct asm_struct
     FILE* text_stream;
     int* bin_code;
     char* asm_code;
+
+    int sort_func[AMOUNT_CMD];
 
     label_t* table_label;
     int amount_labels;

@@ -18,10 +18,12 @@
 
 // -------------------------------------------------------------------------------------------------------
 int* create_bin_buffer(const char* name_bin_file,
-                int* amount_elements,
-                display_t* disp_set) {
+                       int* amount_elements,
+                       display_t* disp_set,
+                       audio_t* audio_set) {
     assert(name_bin_file);
     assert(disp_set);
+    assert(audio_set);
     assert(amount_elements);
 
     FILE* bin_file = fopen_file(name_bin_file, "rb");
@@ -53,14 +55,14 @@ int* create_bin_buffer(const char* name_bin_file,
     }
     disp_set->size = disp_set->len * disp_set->high;
 
-    if (fread(&(disp_set->sound_stream), sizeof(int), 1, bin_file) != 1)
+    if (fread(&(audio_set->sound_stream), sizeof(int), 1, bin_file) != 1)
     {
         fclose_file(bin_file);
         printf(_R_ "ERROR: read NUMBER_STREAM not correct\n" _N_);
         return NULL;
     }
 
-    if (fread(&(disp_set->code_stream), sizeof(int), 1, bin_file) != 1)
+    if (fread(&(audio_set->code_stream), sizeof(int), 1, bin_file) != 1)
     {
         fclose_file(bin_file);
         printf(_R_ "ERROR: read CODE_STREAM not correct\n" _N_);
@@ -90,6 +92,12 @@ int* create_bin_buffer(const char* name_bin_file,
 int my_proc(const char* name_bin_file)
 {
     assert(name_bin_file);
+
+    if (check_correct_func() != P_OK)
+    {
+        printf(_R_ "ERROR: not correct CMD_INF\n" _N_);
+        return -1;
+    }
 
     int amount_elements = 0;
     cpu_t proc = {};
@@ -356,7 +364,7 @@ int my_proc(const char* name_bin_file)
             return 0;
         }
 
-        if ((CMD_INF[comand].func(&proc, CMD_INF[comand].args)) != P_OK)
+        if ((CMD_INF[comand].func(&proc, CMD_INF[comand].number)) != P_OK)
         {
             cpu_dtor(&proc);
             return 0;
@@ -375,7 +383,10 @@ int cpu_ctor(cpu_t* proc,
     assert(proc);
     assert(name_bin_file);
 
-    int* bin_code = create_bin_buffer(name_bin_file, amount_elements, &(proc->disp_set));
+    int* bin_code = create_bin_buffer(name_bin_file,
+                                      amount_elements,
+                                      &(proc->disp_set),
+                                      &(proc->audio_set));
     if (bin_code == NULL) {
         return -1;
     }
@@ -414,6 +425,11 @@ int cpu_ctor(cpu_t* proc,
         return -1;
     }
 
+    if (create_sound(&(proc->audio_set)) != P_OK)
+    {
+        return -1;
+    }
+
     for (int i = 0; i < AMOUNT_REGISTERS; i++) {
         proc->regs[i] = 0;
     }
@@ -437,6 +453,10 @@ int cpu_dtor(cpu_t* proc) {
     free(proc->RAM);
     free(proc->VRAM);
     free(proc->bin_code);
+
+    SDL_CloseAudioDevice(proc->audio_set.dev);
+    SDL_Quit();
+    free(proc->audio_set.audio_file);
 
     return 0;
 }
@@ -564,6 +584,18 @@ int print_reg(cpu_t* proc) {
 }
 // -------------------------------------------------------------------------------------------------------
 
-
+// -------------------------------------------------------------------------------------------------------
+int check_correct_func(void)
+{
+    for (int i = 0; i < AMOUNT_CMD - 1; i++)
+    {
+        if (CMD_INF[i].number >= CMD_INF[i + 1].number)
+        {
+            printf("%d: %d %d: %d\n", i, CMD_INF[i].number, i + 1,  CMD_INF[i + 1].number);
+            return P_ERROR;
+        }
+    }
+    return P_OK;
+}
 
 

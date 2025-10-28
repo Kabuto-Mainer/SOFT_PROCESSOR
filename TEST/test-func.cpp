@@ -46,10 +46,28 @@ int create_input_file(const char* name_asm_file,
     disp_set.high = HIGH_DISPLAY;
     disp_set.size = LEN_DISPLAY * HIGH_DISPLAY;
 
+    audio_t audio_set = {};
+    audio_set.code_stream = -1;
+    audio_set.sound_stream = -1;
+
     int amount_labels = 0;
 
-    my_assembler(name_asm_file, name_bin_file, name_listening, table_label, &amount_labels, 0, &disp_set);
-    my_assembler(name_asm_file, name_bin_file, name_listening, table_label, &amount_labels, 1, &disp_set);
+    my_assembler(name_asm_file,
+                 name_bin_file,
+                 name_listening,
+                 table_label,
+                 &amount_labels,
+                 0,
+                 &disp_set,
+                 &audio_set);
+    my_assembler(name_asm_file,
+                 name_bin_file,
+                 name_listening,
+                 table_label,
+                 &amount_labels,
+                 1,
+                 &disp_set,
+                 &audio_set);
 
     return 0;
 }

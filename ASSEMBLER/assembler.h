@@ -23,7 +23,8 @@ asm_error_t my_assembler (const char* name_asm_file,
                           label_t* table_label,
                           int* amount_labels,
                           int number_start,
-                          display_t* disp_set);
+                          display_t* disp_set,
+                          audio_t* audio_set);
 //------------------------------------------------------------------------------------------------
 int asm_create(asm_struct* asm_data,
                const char* name_asm_file,
@@ -32,6 +33,7 @@ int asm_create(asm_struct* asm_data,
                variable_t* table_var);
 //------------------------------------------------------------------------------------------------
 int check_arg(display_t* disp_set,
+              audio_t* audio_set,
               const char** name_if,
               const char** name_of,
               int argv,
@@ -72,7 +74,8 @@ int bin_find(const int hash_cmd);
 int bubble_sort(const int* mass_num, const int amount_el);
 //------------------------------------------------------------------------------------------------
 int create_sound_stream(const char* name_sound_file,
-                        const char* name_sound_stream);
+                        const char* name_sound_stream,
+                        const int code_stream);
 //------------------------------------------------------------------------------------------------
 // int compare_label(const void* struct_1, const void* struct_2);
 // //------------------------------------------------------------------------------------------------

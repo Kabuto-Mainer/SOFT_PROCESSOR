@@ -11,7 +11,7 @@
 #define MOD_WORK DEBUG
 
 // Канареечная зашита
-#define BIRD_SECURE ON
+#define BIRD_SECURE OFF
 
 // Хеш зашиты
 #define HASH_SECURE OFF
@@ -22,7 +22,7 @@
 
 // Заполнение стека
 //* Необходимо для работы Канареечной и Хеш зашиты
-#define COMPLETION_DATA ON
+#define COMPLETION_DATA OFF
 
 
 // Тип данных стека. В режиме процессора должен быть <int>
@@ -84,12 +84,19 @@ const int CURRENT_VERSION = 3;
 
 
 // Размер одного пикселя
-const int PIXEL_SIZE = 5;
+const int PIXEL_SIZE = 1;
 
 // Стандартные настройки графики
 const int LEN_DISPLAY = 160;
 const int HIGH_DISPLAY = 120;
 const int VRAM_SIZE = LEN_DISPLAY * HIGH_DISPLAY;
+
+const int U_AUDIO = 44100;
+const int SUPPORT_FPS = 10;
+const int CHANAL = 1;
+
+const int LATE_SOUND_FRAME = 2;
+
 
 const char NAME_SOUND_STREAM[][100] =
 {

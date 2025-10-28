@@ -1,0 +1,32 @@
+digraph {
+  rankdir=LR;
+  splines=ortho;
+  nodesep=0.4;
+  ranksep=0.6;
+  node [shape=Mrecord, style=filled, fontname="Helvetica"];
+  edge [arrowhead=vee, arrowsize=0.6, penwidth=1.2];
+
+block0 [label="INDEX=0|DATA=0|NEXT=0|PREV=0", fillcolor="#FF0000"];
+block1 [label="INDEX=1|DATA=60|NEXT=2|PREV=0", fillcolor="#FFC0C0"];
+block2 [label="INDEX=2|DATA=60|NEXT=0|PREV=1", fillcolor="#FFC0C0"];
+block3 [label="INDEX=3|DATA=-1|NEXT=4|PREV=-1", fillcolor="#A0FFA0"];
+block4 [label="INDEX=4|DATA=-1|NEXT=5|PREV=3", fillcolor="#A0FFA0"];
+block5 [label="INDEX=5|DATA=-1|NEXT=6|PREV=4", fillcolor="#A0FFA0"];
+block6 [label="INDEX=6|DATA=-1|NEXT=7|PREV=5", fillcolor="#A0FFA0"];
+block7 [label="INDEX=7|DATA=-1|NEXT=0|PREV=6", fillcolor="#A0FFA0"];
+head [label="HEAD=1", shape=box, style=filled, fillcolor="#FF6666"];
+tail [label="TAIL=2", shape=box, style=filled, fillcolor="#FFFF66"];
+
+block0 -> block1 [style=invis, weight=100];
+block1 -> block2 [style=invis, weight=100];
+block2 -> block3 [style=invis, weight=100];
+block3 -> block4 [style=invis, weight=100];
+block4 -> block5 [style=invis, weight=100];
+block5 -> block6 [style=invis, weight=100];
+block6 -> block7 [style=invis, weight=100];
+
+block1 -> block2 [color="#00D000", penwidth=1.5, arrowsize=0.6, constraint=true];
+block2 -> block1 [color="#D00000", penwidth=1.5, arrowsize=0.5, constraint=false];
+head -> block1 [color="#FF0000", penwidth=1.5, arrowsize=0.7];
+tail -> block2 [color="#FFA500", penwidth=1.5, arrowsize=0.7];
+}

@@ -15,12 +15,14 @@
 
 //------------------------------------------------------------------------------------------------
 int check_arg(display_t* disp_set,
+              audio_t* audio_set,
               const char** name_if,
               const char** name_of,
               int argv,
               char* args[])
 {
     assert(disp_set);
+    assert(audio_set);
     assert(name_if);
     assert(name_of);
 
@@ -65,12 +67,13 @@ int check_arg(display_t* disp_set,
             else if ((len_flag = check_flag(args[i], FLAGS[F_SOUND])) != -1)
             {
                 int number_stream = 0;
-                char name_input_file[50] = {};
-                if (sscanf(args[i] + len_flag, "%s:%d", name_input_file, &number_stream) != 2)
+                char name_input_file[200] = "";
+
+                int buffer = 0;
+                if ((buffer = sscanf(args[i] + len_flag, "%[^:]:%d", name_input_file, &number_stream)) != 2)
                 {
                     printf("ERROR: bad flag-size. Not using sound\n");
                 }
-
                 else if (number_stream >= AMOUNT_SOUND_STREAM || number_stream < 0)
                 {
                     printf("ERROR: bad sound_stream. Not using sound\n");
@@ -78,10 +81,11 @@ int check_arg(display_t* disp_set,
 
                 else
                 {
-                    disp_set->sound_stream = number_stream;
-                    disp_set->code_stream = rand();
+                    audio_set->sound_stream = number_stream;
+                    audio_set->code_stream = rand();
                     create_sound_stream(name_input_file,
-                                        NAME_SOUND_STREAM[number_stream]);
+                                        NAME_SOUND_STREAM[number_stream],
+                                        audio_set->code_stream);
                     printf("SOUND_STREAM: %d\n", number_stream);
                 }
             }
@@ -264,12 +268,15 @@ asm_error_t my_assembler (const char* name_asm_file,
                           label_t* table_label,
                           int* amount_labels,
                           int number_start,
-                          display_t* disp_set)
+                          display_t* disp_set,
+                          audio_t* audio_set)
 {
     assert(name_asm_file);
     assert(name_byte_file);
     assert(name_text_file);
     assert(table_label);
+    assert(disp_set);
+    assert(audio_set);
 
     asm_struct asm_data = {};
     asm_data.current_run = number_start;
@@ -373,8 +380,8 @@ asm_error_t my_assembler (const char* name_asm_file,
     asm_data.bin_code[2] = asm_data.cur_element;
     asm_data.bin_code[3] = disp_set->len;
     asm_data.bin_code[4] = disp_set->high;
-    asm_data.bin_code[5] = disp_set->sound_stream;
-    asm_data.bin_code[6] = disp_set->code_stream;
+    asm_data.bin_code[5] = audio_set->sound_stream;
+    asm_data.bin_code[6] = audio_set->code_stream;
 
     *amount_labels = asm_data.amount_labels;
 
@@ -402,51 +409,55 @@ asm_error_t asm_check_cmd(asm_struct* asm_data)
 {
     assert(asm_data);
 
-    for (size_t i = 0; i < AMOUNT_CMD; i++)
+    int index = search_func(asm_data->sort_func, asm_data->hash_cmd);
+    // for (size_t i = 0; i < AMOUNT_CMD; i++)
+    // {
+    //     // printf("I = %zu\n", i);
+    //     if (asm_data->hash_cmd == CMD_INF[i].hash_cmd)
+    //     {
+    if (index == -1)
     {
-        // printf("I = %zu\n", i);
-        if (asm_data->hash_cmd == CMD_INF[i].hash_cmd)
+        EXIT_FUNCTION(asm_data, UNKNOWN_CMD);
+    }
+
+    if ((CMD_INF[index]).amount_arg == 0)
+    {
+        asm_data->bin_code[asm_data->cur_element++] = CMD_INF[index].number;
+
+        fprintf(asm_data->text_stream, "%08d          |",
+                CMD_INF[index].number);
+
+        return A_NOT_ERRORS;
+    }
+//------------------------------------------------------------------------------------------------
+    else if (CMD_INF[index].type_arg == NUM)
+    {
+        if (check_NUM_cmd(asm_data, (size_t) index) != A_NOT_ERRORS)
         {
-            if ((CMD_INF[i]).amount_arg == 0)
-            {
-                asm_data->bin_code[asm_data->cur_element++] = CMD_INF[i].number;
-
-                fprintf(asm_data->text_stream, "%08d          |",
-                       CMD_INF[i].number);
-
-                return A_NOT_ERRORS;
-            }
-//------------------------------------------------------------------------------------------------
-            else if (CMD_INF[i].type_arg == NUM)
-            {
-                if (check_NUM_cmd(asm_data, i) != A_NOT_ERRORS)
-                {
-                    return ERROR;
-                }
-
-                return A_NOT_ERRORS;
-            }
-//------------------------------------------------------------------------------------------------
-            else if ((CMD_INF[i]).type_arg == ADR)
-            {
-                if (check_jmp_cmd(asm_data, (CMD_INF[i]).number) != A_NOT_ERRORS)
-                {
-                    return ERROR;
-                }
-
-                return A_NOT_ERRORS;
-            }
-//------------------------------------------------------------------------------------------------
-            else if ((CMD_INF[i]).type_arg == REG)
-            {
-                if (check_REG_cmd(asm_data, i) != A_NOT_ERRORS)
-                {
-                    return ERROR;
-                }
-
-                return A_NOT_ERRORS;
-            }
+            return ERROR;
         }
+
+        return A_NOT_ERRORS;
+    }
+//------------------------------------------------------------------------------------------------
+    else if ((CMD_INF[index]).type_arg == ADR)
+    {
+        if (check_jmp_cmd(asm_data, (CMD_INF[index]).number) != A_NOT_ERRORS)
+        {
+            return ERROR;
+        }
+
+        return A_NOT_ERRORS;
+    }
+//------------------------------------------------------------------------------------------------
+    else if ((CMD_INF[index]).type_arg == REG)
+    {
+        if (check_REG_cmd(asm_data, (size_t) index) != A_NOT_ERRORS)
+        {
+            return ERROR;
+        }
+
+        return A_NOT_ERRORS;
     }
 
     return ERROR;
@@ -550,20 +561,6 @@ asm_error_t check_NUM_cmd(asm_struct* asm_data,
             }
 
             arg = var->value;
-
-//             for (size_t i_2 = 0; i_2 < AMOUNT_VARS; i_2++)
-//             {
-//                 if (asm_data->table_var[i_2].hash_var == hash_var)
-//                 {
-//                     arg = asm_data->table_var[i_2].value;
-//                     break;
-//                 }
-//
-//                 if (i_2 == AMOUNT_VARS - 1)
-//                 {
-//                     EXIT_FUNCTION(asm_data, NO_VAR);
-//                 }
-//             }
         }
 
         else
@@ -678,6 +675,8 @@ int asm_create(asm_struct* asm_data,
     asm_data->cur_char = 0;
     asm_data->cur_element = AMOUNT_SUP_NUM;
 
+    sort_func(asm_data);
+
     size_t max_elements = START_AMOUNT_CMD;
 
     FILE* asm_stream = fopen_file(name_asm_file, "rb");
@@ -735,7 +734,8 @@ int bin_find(const int hash_cmd)
 
 //------------------------------------------------------------------------------------------------
 int create_sound_stream(const char* name_sound_file,
-                        const char* name_sound_stream)
+                        const char* name_sound_stream,
+                        const int code_stream)
 {
     assert(name_sound_file);
     assert(name_sound_stream);
@@ -748,10 +748,13 @@ int create_sound_stream(const char* name_sound_file,
     int* buffer = (int*) calloc(size_input, sizeof(int));
 
     size_t amount_check_el = fread(buffer, sizeof(int), size_input, input_stream);
+    fwrite(&code_stream, sizeof(int), 1, output_stream);
     fwrite(buffer, sizeof(int), amount_check_el, output_stream);
+
 
     fclose_file(input_stream);
     fclose_file(output_stream);
+    free(buffer);
 
     return 0;
 }

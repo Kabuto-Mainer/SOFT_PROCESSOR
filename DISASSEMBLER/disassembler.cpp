@@ -42,7 +42,8 @@ int my_bincode_to_asm(const char* name_bin_file, const char* name_text_file)
         return -1;
     }
 
-    fread(bin_code, sizeof(int), amount_elements, bin_stream);
+    size_t trash = fread(bin_code, sizeof(int), amount_elements, bin_stream);
+    (void) trash;
 
     fclose_file(bin_stream);
 
