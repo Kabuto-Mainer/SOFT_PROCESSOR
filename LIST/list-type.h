@@ -71,10 +71,8 @@ struct list_t
 {
     lsd_t* data;
     lsi_t free;
-    lsi_t tail;
-    lsi_t head;
-    index_t* index_inf;
 
+    index_t* index_inf;
     list_inf_t list_inf;
 };
 // -------------------------------------------------------------------------------------------------------

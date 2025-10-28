@@ -132,7 +132,7 @@ run-l:
 
 # Git commit
 gitcom:
-	@(git add ASSEMBLER/ BIN/ COMMON/ DISASSEMBLER/ PROCESSOR/ CODE-FILE/ Makefile myasm/ TEST/ LIST/)
+	@(git add ASSEMBLER/ BIN/ COMMON/ DISASSEMBLER/ PROCESSOR/ Makefile myasm/ TEST/ LIST/)
 	@echo -- Add file to git commit ---
 	@(git commit -m "$(m)")
 	@echo --- Git committing ---
