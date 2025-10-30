@@ -23,16 +23,30 @@ int main(void)
     list_ctr(&test_list, list_inf);
     printf("Creating completed succesfull\n");
 
-    list_insert_after(&test_list, 0, 60);
-//
-//     COMMON_VERIFIER(&test_list, "main", 1);
-    list_insert_after(&test_list, 1, 60);
-    // DUMP_LIST(&test_list, 0, 0);
-//     COMMON_VERIFIER(&test_list, "main", 1);
-    // list_dump(&test_list, NAME_LOG_FILE);
+    insertAfter(&test_list, 0, 10);
+    insertAfter(&test_list, 1, 20);
+    insertAfter(&test_list, 2, 30);
+    // deleteAfter(&test_list, 5);
+    insertAfter(&test_list, 4, 40);
+    insertAfter(&test_list, 3, 41);
+    insertAfter(&test_list, 3, 42);
 
-    list_print(&test_list);
+    // test_list.index_inf[3].next = 1000;
+    // test_list.index_inf[1].next = 0;
+    // printList(&test_list);
+
+    insertAfter(&test_list, 3, 43);
+    // insertAfter(&test_list, 3, 47);
+
+    // deleteAfter(&test_list, 1);
+    // insertAfter(&test_list, 0, 50);
+    // insertAfter(&test_list, 4, 70);
+
+
+
+
     list_dtr(&test_list);
     return 0;
 }
+
 

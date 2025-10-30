@@ -3,52 +3,92 @@
 
 #include "list-type.h"
 
+
+// Управление объектом
 // -------------------------------------------------------------------------------------------------------
 list_error_t list_ctr(list_t* list,
                       list_inf_t list_inf);
 // -------------------------------------------------------------------------------------------------------
 list_error_t list_dtr(list_t* list);
 // -------------------------------------------------------------------------------------------------------
-int clean_log_file(void);
-// -------------------------------------------------------------------------------------------------------
 int fulling_list_inf(list_inf_t* input_list_inf,
                      list_inf_t* list_inf);
 // -------------------------------------------------------------------------------------------------------
-list_error_t list_insert_after(list_t* list,
-                               lsi_t prev_index,
-                               lsd_t value);
+
+
+
+//  Основные функции
 // -------------------------------------------------------------------------------------------------------
-list_error_t list_append(list_t* list,
-                         lsd_t value);
+lsi_t list_insert_after(list_t* list,
+                        lsi_t prev_index,
+                        lsd_t value);
 // -------------------------------------------------------------------------------------------------------
-list_error_t list_delete_current(list_t* list,
-                                 lsi_t del_index);
+lsi_t list_delete_current(list_t* list,
+                          lsi_t del_index);
 // -------------------------------------------------------------------------------------------------------
-list_error_t list_delete_after(list_t* list,
-                               lsi_t before_del_index);
+int list_print(list_t* list);
 // -------------------------------------------------------------------------------------------------------
-int list_verifier(list_t* list,
+
+
+
+// -------------------------------------------------------------------------------------------------------
+int def_insertAfter(list_t* list,
+                lsi_t prev_index,
+                lsd_t value,
+                const char* name_func,
+                const char* name_file,
+                int number_line);
+// -------------------------------------------------------------------------------------------------------
+
+// -------------------------------------------------------------------------------------------------------
+int def_deleteCurrent(list_t* list,
+                  lsi_t del_index,
+                  const char* name_func,
                   const char* name_file,
-                  const int number_line,
-                  const char* name_func);
+                  int number_line);
 // -------------------------------------------------------------------------------------------------------
-list_error_t list_check_del(list_t* list,
-                            lsi_t index);
+
 // -------------------------------------------------------------------------------------------------------
-list_error_t list_check_insert(list_t* list,
-                               lsi_t index,
-                               lsd_t value);
+int def_deleteAfter(list_t* list,
+                    lsi_t del_index,
+                    const char* name_func,
+                    const char* name_file,
+                    int number_line);
 // -------------------------------------------------------------------------------------------------------
-list_error_t list_dump(list_t* list,
+
+// -------------------------------------------------------------------------------------------------------
+int def_printList(list_t* list,
+                  const char* name_func,
+                  const char* name_file,
+                  int number_line);
+// -------------------------------------------------------------------------------------------------------
+
+
+
+
+// Проверки
+// -------------------------------------------------------------------------------------------------------
+int list_verifier(list_t* list);
+// -------------------------------------------------------------------------------------------------------
+int list_push_error_inf(list_t* list,
+                        const char* name_file,
+                        int number_line,
+                        const char* name_func);
+// -------------------------------------------------------------------------------------------------------
+int list_print_error(list_t* list);
+// -------------------------------------------------------------------------------------------------------
+
+
+
+// Дампы
+// -------------------------------------------------------------------------------------------------------
+list_error_t list_dump_log(list_t* list,
                        const char* name_file,
                        const char* dump_reason);
 // -------------------------------------------------------------------------------------------------------
-list_error_t list_print(list_t* list);
+int clean_log_file(void);
 // -------------------------------------------------------------------------------------------------------
 int create_head_html_file(void);
-// -------------------------------------------------------------------------------------------------------
-int create_head_html_block(FILE* file,
-                           list_dump_t type_dump);
 // -------------------------------------------------------------------------------------------------------
 int list_dump_html(list_t* list,
                    const char* name_html_file,
@@ -56,15 +96,26 @@ int list_dump_html(list_t* list,
 // -------------------------------------------------------------------------------------------------------
 list_error_t create_graph(list_t* list);
 // -------------------------------------------------------------------------------------------------------
-#define COMMON_VERIFIER(list, name_func, return_value, dump_reason) \
-    if (list_verifier(list, __FILE__, __LINE__, name_func) != L_NOT_ERRORS) \
-    { \
-        list_dump(list, NAME_LOG_FILE, dump_reason); \
-        list_dump_html(list, NAME_DUMP_FILE, dump_reason); \
-        return return_value; \
-    } \
-    list_dump(list, NAME_LOG_FILE, dump_reason); \
-    list_dump_html(list, NAME_DUMP_FILE, dump_reason);
+
+
+
+// Мини функции
+// -------------------------------------------------------------------------------------------------------
+lsi_t list_tail(list_t* list);
+// -------------------------------------------------------------------------------------------------------
+lsi_t list_head(list_t* list);
+// -------------------------------------------------------------------------------------------------------
+int list_error(list_t* list);
+// -------------------------------------------------------------------------------------------------------
+
+
+#define insertAfter(list, index, value) def_insertAfter(list, index, value, "insertAfter", __FILE__, __LINE__)
+
+
+#define deleteCurrent(list, index) def_deleteCurrent(list, index, "deleteCurrent", __FILE__, __LINE__)
+#define deleteAfter(list, index) def_deleteAfter(list, index, "deleteAfter", __FILE__, __LINE__)
+
+#define printList(list) def_printList(list, "printList", __FILE__, __LINE__)
 
 
 

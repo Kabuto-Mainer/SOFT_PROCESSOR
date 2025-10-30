@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <time.h>
+#include <sys/time.h>
 
 #include "list-type.h"
 #include "list-config.h"
@@ -12,6 +14,8 @@
 
 static int AMOUNT_IMAGES = 0;
 
+
+// Управление объектом
 // -------------------------------------------------------------------------------------------------------
 list_error_t list_ctr(list_t* list,
                       list_inf_t list_inf)
@@ -30,28 +34,25 @@ list_error_t list_ctr(list_t* list,
         return L_CALLOC_NULL;
     }
 
-    for (int i = 1; i < START_SIZE_LIST - 1; i++)
+    for (int i = 0; i < START_SIZE_LIST - 1; i++)
     {
         buf_index[i].next = i + 1;
         buf_index[i].prev = i - 1;
     }
     buf_index[0].next = 0;
-    buf_index[0].prev = 0;
-    buf_index[1].prev = 0;
+    buf_index[0].prev = 1;
+    buf_index[1].prev = START_SIZE_LIST - 1;
 
-
-    buf_index[START_SIZE_LIST - 1].next = 0;
+    buf_index[START_SIZE_LIST - 1].next = 1;
     buf_index[START_SIZE_LIST - 1].prev = START_SIZE_LIST - 2;
 
-    for (int i = 1; i < START_SIZE_LIST; i++)
+    for (int i = 0; i < START_SIZE_LIST; i++)
     {
-        buf_data[i] = -1;
+        buf_data[i] = L_FREE_NUM;
     }
-    buf_data[0] = 0;
+    // buf_data[0] = 0;
 
     list->free = 1;
-    list->tail = 0;
-    list->head = 0;
 
     list->data = buf_data;
     list->index_inf = buf_index;
@@ -80,7 +81,14 @@ int fulling_list_inf(list_inf_t* input_list_inf,
     list_inf->error_inf.name_call_file = NULL;
     list_inf->error_inf.name_call_func = NULL;
     list_inf->error_inf.number_call_line = -1;
-    list_inf->current_size = START_SIZE_LIST;
+    list_inf->current_size = 0;
+    list_inf->capacity = START_SIZE_LIST;
+
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+
+    list_inf->create_inf.time_start = ((long long)tv.tv_sec * 1000 + tv.tv_usec / 1000) % TIME_DIV;
+
 
     return 0;
 }
@@ -98,164 +106,284 @@ list_error_t list_dtr(list_t* list)
 }
 // -------------------------------------------------------------------------------------------------------
 
+
+
+// Основные функции
 // -------------------------------------------------------------------------------------------------------
-list_error_t list_insert_after(list_t* list,
-                               lsi_t prev_index,
-                               lsd_t value)
+lsi_t list_insert_after(list_t* list,
+                        lsi_t prev_index,
+                        lsd_t value)
 {
     assert(list);
-
-    COMMON_VERIFIER(list, CHAR_FUNC_INSERT_AFTER, L_ERROR, "dump before insert");
 
     index_t* index_data = list->index_inf;
     lsi_t new_index = list->free;
+
     list->free = index_data[new_index].next;
-    index_data[list->free].prev = L_FREE_NUM;
+    index_data[list->free].prev = index_data[new_index].prev;
+    index_data[index_data[new_index].prev].next = list->free;
 
     list->data[new_index] = value;
+
     index_data[new_index].next = index_data[prev_index].next;
     index_data[prev_index].next = new_index;
     index_data[new_index].prev = prev_index;
+    index_data[index_data[new_index].next].prev = new_index;
 
+    list->list_inf.current_size++;
 
-    if (index_data[new_index].next == 0)
-    {
-        list->tail = new_index;
-    }
-    else
-    {
-        index_data[index_data[new_index].next].prev = new_index;
-    }
-
-    if (prev_index == 0)
-    {
-        index_data[0].next = 0;
-        index_data[new_index].next = list->head;
-    }
-
-    if (index_data[new_index].prev == 0)
-    {
-        list->head = new_index;
-    }
-
-    COMMON_VERIFIER(list, CHAR_FUNC_INSERT_AFTER, L_ERROR, "dump after insert");
-
-    return L_NOT_ERRORS;
+    return new_index;
 }
 // -------------------------------------------------------------------------------------------------------
-//
-// // -------------------------------------------------------------------------------------------------------
-// list_error_t list_append(list_t* list,
-//                          lsd_t value)
-// {
-//     assert(list);
-//
-//     // printf("LIST APPEND\n");
-//     COMMON_VERIFIER(list, CHAR_FUNC_APPEND, L_ERROR);
-//
-//     index_t* index_data = list->index_inf;
-//     lsi_t new_index = list->free;
-//     list->data[new_index] = value;
-//
-//     index_data[list->tail].next = new_index;
-//     if (list->tail == 0)
-//     {
-//         index_data[0].next = 0;
-//         list->head = new_index;
-//     }
-//
-//     index_data[new_index].prev = list->tail;
-//     list->tail = new_index;
-//     list->free = index_data[new_index].next;
-//     index_data[list->free].prev = L_FREE_NUM;
-//     index_data[new_index].next = 0;
-//
-//
-//     COMMON_VERIFIER(list, CHAR_FUNC_APPEND, L_ERROR);
-//
-//     return L_NOT_ERRORS;
-// }
-// // -------------------------------------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------------------------------------
-list_error_t list_delete_current(list_t* list,
-                                 lsi_t del_index)
+lsi_t list_delete_current(list_t* list,
+                          lsi_t del_index)
 {
     assert(list);
-
-    COMMON_VERIFIER(list, CHAR_FUNC_DELETE_CURRENT, L_ERROR, "dump before delete");
 
     index_t* index_data = list->index_inf;
     lsi_t prev_del_index = index_data[del_index].prev;
 
     index_data[prev_del_index].next = index_data[del_index].next;
     index_data[index_data[del_index].next].prev = prev_del_index;
-    index_data[0].prev = 0;
-
-    if (list->tail == del_index)
-    {
-        index_data[prev_del_index].next = 0;
-        list->tail = prev_del_index;
-    }
-
     list->data[del_index] = L_FREE_NUM;
 
     index_data[del_index].next = list->free;
+    index_data[del_index].prev = index_data[list->free].prev;
+    index_data[index_data[list->free].prev].next = del_index;
     index_data[list->free].prev = del_index;
-    index_data[del_index].prev = 0;
-
-    COMMON_VERIFIER(list, CHAR_FUNC_DELETE_CURRENT, L_ERROR, "dump after delete");
-
-    return L_NOT_ERRORS;
-}
-// -------------------------------------------------------------------------------------------------------
-
-// -------------------------------------------------------------------------------------------------------
-list_error_t list_delete_after(list_t* list,
-                               lsi_t before_del_index)
-{
-    assert(list);
-
-    COMMON_VERIFIER(list, CHAR_FUNC_DELETE_AFTER, L_ERROR, "dump before delete");
-
-    index_t* index_data = list->index_inf;
-    lsi_t del_index = index_data[before_del_index].next;
-
-    list->data[del_index] = L_FREE_NUM;
-
-    index_data[before_del_index].next = index_data[del_index].next;
-    index_data[index_data[del_index].next].prev = before_del_index;
-    index_data[0].prev = 0;
-
-    if (del_index == list->tail)
-    {
-        list->tail = before_del_index;
-    }
-
-    index_data[list->free].prev = del_index;
-    index_data[del_index].next = list->free;
-    index_data[del_index].prev = 0;
     list->free = del_index;
 
-    COMMON_VERIFIER(list, CHAR_FUNC_DELETE_AFTER, L_ERROR, "dump after delete");
+    list->list_inf.current_size--;
 
-    return L_NOT_ERRORS;
+    return prev_del_index;
 }
-//
-// // Необходим int
-// // -------------------------------------------------------------------------------------------------------
-int list_verifier(list_t* list,
-                  const char* name_file,
-                  const int number_line,
-                  const char* name_func)
+// -------------------------------------------------------------------------------------------------------
+
+// -------------------------------------------------------------------------------------------------------
+int list_print(list_t* list)
 {
     assert(list);
 
-    list->list_inf.error_inf.name_call_file = name_file;
-    list->list_inf.error_inf.name_call_func = name_func;
-    list->list_inf.error_inf.number_call_line = number_line;
+    printf("INDEX  | DATA   NEXT   PREV\n");
+    for (size_t i = 0; i < list->list_inf.capacity; i++)
+    {
+        printf("[%4zu] | [" DUMP_FORMAT_LSD_T "] [" DUMP_FORMAT_LSI_T "] [" DUMP_FORMAT_LSI_T "]\n",
+               i, list->data[i], list->index_inf[i].next, list->index_inf[i].prev);
+    }
 
+    return 0;
+}
+// -------------------------------------------------------------------------------------------------------
+
+
+
+// Функции для пользователя
+// -------------------------------------------------------------------------------------------------------
+int def_insertAfter(list_t* list,
+                    lsi_t prev_index,
+                    lsd_t value,
+                    const char* name_func,
+                    const char* name_file,
+                    int number_line)
+{
+    assert(list);
+
+    list_push_error_inf(list, name_file, number_line, name_func);
+
+    char buffer[200] = {};
+    int* ret_ver = &(list->list_inf.error_inf.current_error);
+
+    list_verifier(list);
+
+    if ((*ret_ver & L_NULL_DATA) != L_NULL_DATA)
+    {
+        // printf("PREF: %d  CAP: %zu\n", prev_index, list->list_inf.capacity);
+        if ((size_t) prev_index >= list->list_inf.capacity)
+        {
+            *ret_ver |= L_INSERT_INDEX;
+        }
+
+        if (list->list_inf.current_size >= list->list_inf.capacity)
+        {
+            *ret_ver |= L_INSERT_SIZE;
+        }
+
+    }
+        // printf("ERROR in insert: %d\n", list->list_inf.error_inf.current_error);
+    if (*ret_ver != L_NOT_ERRORS)
+    {
+        sprintf(buffer, "ERROR from insertAfter before insert [" FORMAT_LSD_T "] after [" FORMAT_LSI_T "]\n", value, prev_index);
+        list_dump_log(list, NAME_LOG_FILE, buffer);
+        list_dump_html(list, NAME_DUMP_FILE, buffer);
+        return -1;
+    }
+    sprintf(buffer, "DUMP from insertAfter before insert [" FORMAT_LSD_T "] after [" FORMAT_LSI_T "]\n", value, prev_index);
+    list_dump_log(list, NAME_LOG_FILE, buffer);
+    list_dump_html(list, NAME_DUMP_FILE, buffer);
+
+    int return_index = list_insert_after(list, prev_index, value);
+
+    list_verifier(list);
+
+    if (*ret_ver != L_NOT_ERRORS)
+    {
+        sprintf(buffer, "ERROR from insertAfter after insert [" FORMAT_LSD_T "] after [" FORMAT_LSI_T "]\n", value, prev_index);
+        list_dump_log(list, NAME_LOG_FILE, buffer);
+        list_dump_html(list, NAME_DUMP_FILE, buffer);
+        return -1;
+    }
+
+    sprintf(buffer, "DUMP from insertAfter after insert [" FORMAT_LSD_T "] after [" FORMAT_LSI_T "]\n", value, prev_index);
+    list_dump_log(list, NAME_LOG_FILE, buffer);
+    list_dump_html(list, NAME_DUMP_FILE, buffer);
+
+    return return_index;
+}
+// -------------------------------------------------------------------------------------------------------
+
+// -------------------------------------------------------------------------------------------------------
+int def_deleteCurrent(list_t* list,
+                      lsi_t del_index,
+                      const char* name_func,
+                      const char* name_file,
+                      int number_line)
+{
+    assert(list);
+
+    list_push_error_inf(list, name_file, number_line, name_func);
+
+    char buffer[200] = {};
+    int* ret_ver = &(list->list_inf.error_inf.current_error);
+
+    list_verifier(list);
+    if (*ret_ver != L_NOT_ERRORS && (*ret_ver & L_NULL_DATA) != L_NULL_DATA)
+    {
+        if ((size_t) del_index >= list->list_inf.current_size)
+        {
+            *ret_ver |= L_BAD_DEL;
+        }
+
+        if (list->list_inf.current_size == 0)
+        {
+            *ret_ver |= L_DELETE_SIZE;
+        }
+    }
+    if (*ret_ver != L_NOT_ERRORS)
+    {
+        sprintf(buffer, "ERROR from deleteCurrent before delete [" FORMAT_LSI_T "]\n", del_index);
+        list_dump_log(list, NAME_LOG_FILE, buffer);
+        list_dump_html(list, NAME_DUMP_FILE, buffer);
+        return -1;
+    }
+    sprintf(buffer, "DUMP from deleteCurrent before delete [" FORMAT_LSI_T "]\n", del_index);
+    list_dump_log(list, NAME_LOG_FILE, buffer);
+    list_dump_html(list, NAME_DUMP_FILE, buffer);
+
+    int return_index = list_delete_current(list, del_index);
+
+    list_verifier(list);
+    if (*ret_ver != L_NOT_ERRORS)
+    {
+        sprintf(buffer, "ERROR from deleteCurrent after delete [" FORMAT_LSI_T "]\n", del_index);
+        list_dump_log(list, NAME_LOG_FILE, buffer);
+        list_dump_html(list, NAME_DUMP_FILE, buffer);
+        return -1;
+    }
+    sprintf(buffer, "DUMP from deleteCurrent after delete [" FORMAT_LSI_T "] \n", del_index);
+    list_dump_log(list, NAME_LOG_FILE, buffer);
+    list_dump_html(list, NAME_DUMP_FILE, buffer);
+
+    return return_index;
+}
+// -------------------------------------------------------------------------------------------------------
+
+// -------------------------------------------------------------------------------------------------------
+int def_deleteAfter(list_t* list,
+                    lsi_t del_index,
+                    const char* name_func,
+                    const char* name_file,
+                    int number_line)
+{
+    assert(list);
+
+    list_push_error_inf(list, name_file, number_line, name_func);
+
+    char buffer[200] = {};
+    int* ret_ver = &(list->list_inf.error_inf.current_error);
+
+    list_verifier(list);
+    // printf("DEL INDEX: %d\n", del_index);
+    if ((size_t) del_index >= list->list_inf.current_size)
+    {
+        *ret_ver |= L_BAD_DEL;
+    }
+    if (list->list_inf.current_size == 0)
+    {
+        *ret_ver |= L_DELETE_SIZE;
+    }
+
+    if (*ret_ver != L_NOT_ERRORS)
+    {
+        sprintf(buffer, "ERROR from deleteAfter before delete [" FORMAT_LSI_T "]\n", del_index);
+        list_dump_log(list, NAME_LOG_FILE, buffer);
+        list_dump_html(list, NAME_DUMP_FILE, buffer);
+        return -1;
+    }
+
+    sprintf(buffer, "DUMP from deleteAfter before delete [" FORMAT_LSI_T "]\n", del_index);
+    list_dump_log(list, NAME_LOG_FILE, buffer);
+    list_dump_html(list, NAME_DUMP_FILE, buffer);
+
+    int return_index = list_delete_current(list, list->index_inf[del_index].next);
+
+    list_verifier(list);
+    if (*ret_ver != L_NOT_ERRORS)
+    {
+        sprintf(buffer, "ERROR from deleteAfter after delete [" FORMAT_LSI_T "]\n", del_index);
+        list_dump_log(list, NAME_LOG_FILE, buffer);
+        list_dump_html(list, NAME_DUMP_FILE, buffer);
+        return -1;
+    }
+    sprintf(buffer, "DUMP from deleteAfter after delete [" FORMAT_LSI_T "] \n", del_index);
+    list_dump_log(list, NAME_LOG_FILE, buffer);
+    list_dump_html(list, NAME_DUMP_FILE, buffer);
+
+    return return_index;
+}
+// -------------------------------------------------------------------------------------------------------
+
+// -------------------------------------------------------------------------------------------------------
+int def_printList(list_t* list,
+                  const char* name_func,
+                  const char* name_file,
+                  int number_line)
+{
+    assert(list);
+
+    list_push_error_inf(list, name_file, number_line, name_func);
+
+    char buffer[200] = "DUMP before printList";
+
+    list_dump_log(list, NAME_LOG_FILE, buffer);
+    list_dump_html(list, NAME_DUMP_FILE, buffer);
+
+    list_print(list);
+
+    return 0;
+}
+// -------------------------------------------------------------------------------------------------------
+
+
+//!Вроде сделан
+// Проверки
+// -------------------------------------------------------------------------------------------------------
+int list_verifier(list_t* list)
+{
+    assert(list);
     int return_error = list->list_inf.error_inf.current_error;
+    // printf("ERROR 1: %d\n", return_error);
 
     if (list->data == NULL)
     {
@@ -267,137 +395,158 @@ int list_verifier(list_t* list,
         return_error |= L_NULL_INDEX;
     }
 
-    if (list->data[list->free] !=  L_FREE_NUM)
+    if ((size_t) list->free >= list->list_inf.capacity)
     {
-        return_error |= L_BAD_FREE;
+        return_error |= L_BIG_FREE;
     }
 
-    // Мы можем преобразовывать в size_t, т.к. при отрицательных числах будет переполнение и мы получим очень большое число
-    if ((size_t) list->tail >= list->list_inf.current_size ||
-        (size_t) list->head >= list->list_inf.current_size)
+    // printf("ERROR 2: %d\n", return_error);
+
+    if (list->list_inf.current_size >= list->list_inf.capacity)
     {
-        return_error |= L_BAD_TAIL;
+        return_error |= L_SIZE_B_CAPACITY;
     }
 
-    if (list->index_inf[list->tail].next != 0)
-    {
-        return_error |= L_BAD_TAIL;
-    }
-
-    if (list->index_inf[list->head].prev != 0)
-    {
-        return_error |= L_BAD_HEAD;
-    }
-
-    // Дальше нам необходимо использовать NEXT и prev
+    // Дальше нам необходимо использовать NEXT, PREV и FREE
     if ((return_error & L_NULL_DATA) == L_NULL_DATA ||
-        (return_error & L_NULL_INDEX) == L_NULL_INDEX)
+        (return_error & L_NULL_INDEX) == L_NULL_INDEX ||
+        (return_error & L_BIG_FREE) == L_BIG_FREE)
     {
-        list->list_inf.error_inf.current_error = return_error;
+        list->list_inf.error_inf.current_error |= return_error;
         return return_error;
     }
 
-    if ((return_error & L_BAD_TAIL) == L_BAD_TAIL ||
-        (return_error & L_BAD_HEAD) == L_BAD_HEAD)
+    // printf("ERROR 3: %d\n", return_error);
+    lsi_t* main_index = (lsi_t*) calloc(list->list_inf.current_size, sizeof(lsi_t));
+    if (main_index == NULL)
     {
-        list->list_inf.error_inf.current_error = return_error;
+        return_error |= L_CALLOC_NULL;
         return return_error;
     }
 
-    for (lsi_t index = list->head;
-         index != list->tail;
-         index = list->index_inf[index].next)
+    lsi_t index = list->index_inf[0].next;
+    for (size_t i = 0; i < list->list_inf.current_size; i++)
     {
-        if ((size_t) index > list->list_inf.current_size)
+        if ((size_t) index >= list->list_inf.capacity)
         {
-            return_error |= L_TOO_BIG_INDEX;
+            return_error |= L_BIG_INDEX;
+            break;
+        }
+
+        if ((size_t) list->index_inf[index].next >= list->list_inf.capacity)
+        {
+            return_error |= L_BIG_INDEX;
             break;
         }
 
         if (index != list->index_inf[list->index_inf[index].next].prev)
         {
-            return_error |= L_BAD_INDEX_INF;
+            return_error |= L_BAD_INDEX_ORDER;
             break;
         }
+        main_index[i] = index;
+        index = list->index_inf[index].next;
     }
 
-    for (lsi_t index = list->free;
-         list->index_inf[index].next != 0;
-         index = list->index_inf[index].next)
+    if (index != 0)
     {
-        if ((size_t) index > list->list_inf.current_size)
+        return_error |= L_BAD_INDEX_ORDER;
+    }
+
+    index = list->free;
+    for (size_t i = 0; i < list->list_inf.capacity - list->list_inf.current_size - 1; i++)
+    {
+        // printf("INDEX: [%d] NEXT: [%d]\n", index, list->index_inf[index].next);
+        if ((size_t) index >= list->list_inf.capacity)
         {
-            return_error |= L_TOO_BIG_INDEX;
+            return_error |= L_BIG_FREE;
+            break;
+        }
+
+        if ((size_t) list->index_inf[index].next >= list->list_inf.capacity)
+        {
+            return_error |= L_BIG_FREE;
             break;
         }
 
         if (index != list->index_inf[list->index_inf[index].next].prev)
         {
-            return_error |= L_BAD_INDEX_FREE;
+            return_error |= L_BAD_FREE_ORDER;
             break;
         }
+
+        for (size_t idx_main = 0; idx_main < list->list_inf.current_size; idx_main++)
+        {
+            if (index == main_index[idx_main])
+            {
+                return_error |= L_MIX_INDEX_FREE;
+                break;
+            }
+        }
+        index = list->index_inf[index].next;
+    }
+    // printf("INDEX: %d FREE: %d\n", index, list->free);
+    if (index != list->free)
+    {
+        return_error |= L_BAD_FREE_ORDER;
     }
 
-    list->list_inf.error_inf.current_error = return_error;
-    list->list_inf.error_inf.name_call_file = name_file;
-    list->list_inf.error_inf.name_call_func = name_func;
-    list->list_inf.error_inf.number_call_line = number_line;
+    free(main_index);
 
+    list_print_error(list);
+
+    list->list_inf.error_inf.current_error |= return_error;
     return return_error;
 }
 // -------------------------------------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------------------------------------
-list_error_t list_check_insert(list_t* list,
-                               lsi_t index,
-                               lsd_t value)
+int list_push_error_inf(list_t* list,
+                        const char* name_file,
+                        int number_line,
+                        const char* name_func)
 {
     assert(list);
-    (void) value;
 
-    if ((size_t) index > list->list_inf.current_size)
-    {
-        list->list_inf.error_inf.current_error |= L_INSERT_INDEX;
-    }
+    list->list_inf.error_inf.name_call_file = name_file;
+    list->list_inf.error_inf.name_call_func = name_func;
+    list->list_inf.error_inf.number_call_line = number_line;
 
-    if (list->free == 0)
-    {
-        list->list_inf.error_inf.current_error |= L_BAD_SIZE;
-    }
-
-    if (list->data[index] == L_FREE_NUM && index != 0)
-    {
-        list->list_inf.error_inf.current_error |= L_INSERT_INDEX;
-    }
-
-    return L_NOT_ERRORS;
+    return 0;
 }
 // -------------------------------------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------------------------------------
-list_error_t list_check_del(list_t* list,
-                            lsi_t index)
+int list_print_error(list_t* list)
 {
     assert(list);
 
-    if (index < 0 || (size_t) index > list->list_inf.current_size)
+    int error = list->list_inf.error_inf.current_error;
+
+    if (error != L_NOT_ERRORS)
     {
-        list->list_inf.error_inf.current_error |= L_BAD_DEL;
+        printf("ERRORS:\n");
+
+        for (int i = 1; i <= MAX_ERROR; i *= 2)
+        {
+            if ((list->list_inf.error_inf.current_error & i) == i)
+            {
+                printf("    [" FORMAT_ERROR "]\n", (unsigned) i);
+            }
+        }
     }
 
-    if (list->data[index] == -1)
-    {
-        list->list_inf.error_inf.current_error |= L_BAD_DEL;
-    }
-
-    return L_NOT_ERRORS;
+    return 0;
 }
 // -------------------------------------------------------------------------------------------------------
 
+
+
+// Дампы
 // -------------------------------------------------------------------------------------------------------
-list_error_t list_dump(list_t* list,
-                       const char* name_file,
-                       const char* dump_reason)
+list_error_t list_dump_log(list_t* list,
+                           const char* name_file,
+                           const char* dump_reason)
 {
     assert(list);
     assert(name_file);
@@ -413,6 +562,14 @@ list_error_t list_dump(list_t* list,
             list->list_inf.error_inf.name_call_file,
             list->list_inf.error_inf.number_call_line);
 
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+
+    long long current_time = ((long long)tv.tv_sec * 1000 + tv.tv_usec / 1000) % TIME_DIV;
+    fprintf(file,
+            "Time after start: [%lld] miliseconds\n",
+            current_time - list->list_inf.create_inf.time_start);
+
     fprintf(file, "Reason to dump: %s\n", dump_reason);
 
     if (list->list_inf.error_inf.current_error == L_NOT_ERRORS)
@@ -425,6 +582,7 @@ list_error_t list_dump(list_t* list,
 
         size_t counter = 1;
         int error_func = list->list_inf.error_inf.current_error;
+        // printf("ERROR: %d\n", error_func);
 
         for (int error = 1; error <= MAX_ERROR; error *= 2)
         {
@@ -436,33 +594,53 @@ list_error_t list_dump(list_t* list,
         }
     }
 
-    fprintf(file, "List stats:\n  Name list: \"%s\"\n  Place creation \"%s:%d\"\n    ---------------\n",
+    fprintf(file, "List stats:\n    Name list: \"%s\"\n    Place creation \"%s:%d\"\n    ----------------\n",
              list->list_inf.create_inf.name_list,
              list->list_inf.create_inf.name_file,
              list->list_inf.create_inf.number_line);
-    fprintf(file, "  Head: [%04d]\n  Tail: [%04d]\n  Free: [%04d]\n",
-            list->head, list->tail, list->free);
+    fprintf(file, "    Head: [" DUMP_FORMAT_LSI_T "]\n    Tail: [" DUMP_FORMAT_LSI_T "]\n    Free: [" DUMP_FORMAT_LSI_T "]\n",
+            list->index_inf[0].next,
+            list->index_inf[0].prev,
+            list->free);
 
     if ((list->list_inf.error_inf.current_error & L_NULL_DATA) != L_NULL_DATA ||
         (list->list_inf.error_inf.current_error & L_NULL_INDEX) != L_NULL_INDEX)
     {
-        fprintf(file, "List:\nINDEX  |  DATA   NEXT   PREV\n");
-
-        for (size_t i = 0; i < list->list_inf.current_size; i++)
+        fprintf(file, "INDEX  | DATA       NEXT       PREV\n");
+        for (size_t i = 0; i < list->list_inf.capacity; i++)
         {
-            fprintf(file, "[%04zu] | [%04d] [%04d] [%04d]\n",
-                    i,
-                    list->data[i],
-                    list->index_inf[i].next,
-                    list->index_inf[i].prev);
+            fprintf(file,
+                    "[%4zu] | [" DUMP_FORMAT_LSD_T "] [" DUMP_FORMAT_LSI_T "] [" DUMP_FORMAT_LSI_T "]\n",
+                    i, list->data[i], list->index_inf[i].next, list->index_inf[i].prev);
         }
     }
 
     fprintf(file, "-----------------------------------------------------------------------------------\n");
-
     fclose_file(file);
 
     return L_NOT_ERRORS;
+}
+// -------------------------------------------------------------------------------------------------------
+
+// -------------------------------------------------------------------------------------------------------
+int clean_log_file(void)
+{
+    FILE* buffer = fopen_file(NAME_LOG_FILE, "w");
+    fclose_file(buffer);
+
+    return 0;
+}
+// -------------------------------------------------------------------------------------------------------
+
+// -------------------------------------------------------------------------------------------------------
+int create_head_html_file(void)
+{
+    FILE* html_file = fopen_file(NAME_DUMP_FILE, "w");
+
+    fprintf(html_file, "<pre style=\"font-family: 'Courier New', monospace; font-size: 14px; color: #e0e0e0; background-color: #1e1e1e; padding: 10px; border-radius: 6px;\">\n\n");
+    fclose_file(html_file);
+
+    return 0;
 }
 // -------------------------------------------------------------------------------------------------------
 
@@ -471,64 +649,178 @@ list_error_t create_graph(list_t* list)
 {
     assert(list);
 
-    if (list->list_inf.error_inf.current_error != 0)
-        return L_NOT_ERRORS;
+    // if (list->list_inf.error_inf.current_error != 0)
+    // {
+    //     return L_NOT_ERRORS;
+    // }
 
     FILE* dot_file = fopen_file(NAME_DOT_FILE, "w");
 
     fprintf(dot_file,
-        "digraph {\n"
-        "  rankdir=LR;\n"
-        "  splines=ortho;\n"
-        "  nodesep=0.4;\n"
-        "  ranksep=0.6;\n"
-        "  node [shape=Mrecord, style=filled, fontname=\"Helvetica\"];\n"
-        "  edge [arrowhead=vee, arrowsize=0.6, penwidth=1.2];\n\n");
+            "digraph {\n"
+            "  rankdir=LR;\n"
+            "  bgcolor=\"#1e1e1e\""
+            // "  splines=ortho;\n"
+            "  nodesep=0.4;\n"
+            "  ranksep=0.6;\n"
+            "  node [shape=Mrecord, style=filled, fontname=\"Helvetica\"];\n"
+            "  edge [arrowhead=vee, arrowsize=0.6, penwidth=1.2];\n\n");
 
-    for (size_t i = 0; i < list->list_inf.current_size; i++)
+    // fprintf(dot_file,
+            // "head [label=\"HEAD\", shape=box, fillcolor=\"#b81882ff\"]\n"
+            // "tail [label=\"TAIL\", shape=box, fillcolor=\"#cac711ff\"]\n\n");
+
+    lsi_t* mass_index_inf = (lsi_t*) calloc(list->list_inf.capacity, sizeof(lsi_t));
+    if (mass_index_inf == NULL)
     {
-        const char* color;
-        if (i == 0)
-            color = "#FF0000";
-        else if (list->data[i] == L_FREE_NUM)
-            color = "#A0FFA0";
-        else
-            color = "#FFC0C0";
-
-        fprintf(dot_file,
-            "block%zu [label=\"INDEX=%zu|DATA=%d|NEXT=%d|PREV=%d\", fillcolor=\"%s\"];\n",
-            i, i, list->data[i], list->index_inf[i].next, list->index_inf[i].prev, color);
+        printf("ERROR: calloc return null address in create_graph\n");
+        return L_CALLOC_NULL;
     }
 
-    fprintf(dot_file,
-        "head [label=\"HEAD=%d\", shape=box, style=filled, fillcolor=\"#FF6666\"];\n"
-        "tail [label=\"TAIL=%d\", shape=box, style=filled, fillcolor=\"#FFFF66\"];\n\n",
-        list->head, list->tail);
+    lsi_t* mass_index_free = (lsi_t*) calloc(list->list_inf.capacity, sizeof(lsi_t));
+    if (mass_index_free == NULL)
+    {
+        printf("ERROR: calloc return null address in create_graph\n");
+        return L_CALLOC_NULL;
+    }
 
-    for (size_t i = 0; i < list->list_inf.current_size - 1; i++)
+    size_t count_el_inf = 0;
+    size_t count_el_free = 0;
+
+    lsi_t index = 0;
+    for (size_t i = 0; i < list->list_inf.current_size + 1; i++)
+    {
+        if ((size_t) index >= list->list_inf.capacity)
+        {
+            break;
+        }
+
+        if ((size_t) list->index_inf[index].next >= list->list_inf.capacity)
+        {
+            break;
+        }
+
+        if (index != list->index_inf[list->index_inf[index].next].prev)
+        {
+            break;
+        }
+
+        mass_index_inf[count_el_inf++] = index;
+        index = list->index_inf[index].next;
+    }
+
+    index = list->free;
+    for (size_t i = 0; i < list->list_inf.capacity - list->list_inf.current_size - 1; i++)
+    {
+        if ((size_t) index >= list->list_inf.capacity)
+        {
+            break;
+        }
+
+        if ((size_t) list->index_inf[index].next >= list->list_inf.capacity)
+        {
+            break;
+        }
+
+        if (index != list->index_inf[list->index_inf[index].next].prev)
+        {
+            break;
+        }
+
+        mass_index_free[count_el_free++] = index;
+        index = list->index_inf[index].next;
+    }
+
+    for (size_t i = 0; i < list->list_inf.capacity; i++)
+    {
+        const char* color = "";
+
+        if ((int)  i == 0)
+        {
+            color = "#696969ff";
+        }
+
+        if (color[0] == '\0')
+        {
+            if ((int) i == list->index_inf[0].next)
+            {
+                color = "#cc4ec1ff";
+            }
+
+            else if ((int) i == list->index_inf[0].prev)
+            {
+                color = "#d8d535ff";
+            }
+        }
+
+        if (color[0] == '\0')
+        {
+            for (size_t idx = 0; idx < count_el_inf; idx++)
+            {
+                if ((int) i == mass_index_inf[idx])
+                {
+                    color = "#2ab8dbff";
+                    break;
+                }
+            }
+        }
+
+        if (color[0] == '\0')
+        {
+            for (size_t idx = 0; idx < count_el_free; idx++)
+            {
+                if ((int) i == mass_index_free[idx])
+                {
+                    color = "#56e65dff";
+                    break;
+                }
+            }
+        }
+
+        if (color[0] == '\0')
+        {
+            color = "#e94747ff";
+        }
+
+        fprintf(dot_file,
+                "block%zu [label=\"INDEX=%zu|DATA=" FORMAT_LSD_T "|NEXT=" FORMAT_LSI_T "|PREV=" FORMAT_LSI_T "\", fillcolor=\"%s\"];\n",
+                i, i, list->data[i], list->index_inf[i].next, list->index_inf[i].prev, color);
+
+    }
+
+    for (size_t i = 0; i < list->list_inf.capacity - 1; i++)
     {
         fprintf(dot_file, "block%zu -> block%zu [style=invis, weight=100];\n", i, i + 1);
     }
+
     fprintf(dot_file, "\n");
 
-    for (lsi_t index = list->head; index != 0 && list->index_inf[index].next != 0; index = list->index_inf[index].next)
+    for (size_t i = 0; i < count_el_inf; i++)
     {
         fprintf(dot_file,
-            "block%d -> block%d [color=\"#00D000\", penwidth=1.5, arrowsize=0.6, constraint=true];\n",
-            index, list->index_inf[index].next);
+                "block" FORMAT_LSI_T " -> block" FORMAT_LSI_T " [color=\"#382dd1ff\", penwidth=1.5, arrowsize=0.6, constraint=true, dir = both];\n",
+                mass_index_inf[i], list->index_inf[mass_index_inf[i]].next);
     }
 
-    for (lsi_t index = list->head; index != 0 && list->index_inf[index].next != 0; index = list->index_inf[index].next)
+    for (size_t i = 0; i < count_el_free; i++)
     {
+        // printf("INDEX = %d\n", mass_index_free[i]);
         fprintf(dot_file,
-            "block%d -> block%d [color=\"#D00000\", penwidth=1.5, arrowsize=0.5, constraint=false];\n",
-            list->index_inf[index].next, index);
+                "block" FORMAT_LSI_T " -> block" FORMAT_LSI_T " [color=\"#1dad10ff\", penwidth=1.5, arrowsize=0.6, constraint=true, dir = both];\n",
+                mass_index_free[i], list->index_inf[mass_index_free[i]].next);
     }
+
+    free(mass_index_inf);
+    free(mass_index_free);
+
 
     fprintf(dot_file,
-        "head -> block%d [color=\"#FF0000\", penwidth=1.5, arrowsize=0.7];\n"
-        "tail -> block%d [color=\"#FFA500\", penwidth=1.5, arrowsize=0.7];\n",
-        list->head, list->tail);
+            "head -> block%d [color=\"#cc4ec1ff\", penwidth=1.5, arrowsize=0.7];\n"
+            "tail -> block%d [color=\"#FFA500\", penwidth=1.5, arrowsize=0.7];\n"
+            "free -> block%d [color=\"#00A500\", penwidth=1.5, arrowsize=0.7];\n",
+            list->index_inf[0].next,
+            list->index_inf[0].prev,
+            list->free);
 
     fprintf(dot_file, "}\n");
 
@@ -546,17 +838,7 @@ list_error_t create_graph(list_t* list)
 
     return L_NOT_ERRORS;
 }
-// -------------------------------------------------------------------------------------------------------
-
-// -------------------------------------------------------------------------------------------------------
-int clean_log_file(void)
-{
-    FILE* buffer = fopen_file(NAME_LOG_FILE, "w");
-    fclose_file(buffer);
-
-    return 0;
-}
-// -------------------------------------------------------------------------------------------------------
+// -----------------------------------------------  --------------------------------------------------------
 
 // -------------------------------------------------------------------------------------------------------
 int list_dump_html(list_t* list,
@@ -568,14 +850,82 @@ int list_dump_html(list_t* list,
 
     FILE* html_file = fopen(name_html_file, "a");
 
+    fprintf(html_file, "-----------------------------------------------------------------------------------\n");
 
-    list_dump(list, name_html_file, dump_reason);
+    fprintf(html_file,
+            "\n<mark style=\"background-color: #1808adff; color: #e0e0e0\">Dump has called function \"%s\" in \"%s:%d\"</mark>\n",
+            list->list_inf.error_inf.name_call_func,
+            list->list_inf.error_inf.name_call_file,
+            list->list_inf.error_inf.number_call_line);
+
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+
+    long long current_time = ((long long)tv.tv_sec * 1000 + tv.tv_usec / 1000) % TIME_DIV;
+    fprintf(html_file,
+            "<mark style=\"background-color: #1808adff; color: #e0e0e0\">Time after start: [%lld] miliseconds</mark>\n",
+            current_time - list->list_inf.create_inf.time_start);
+
+    fprintf(html_file, "<mark style=\"background-color: #1808adff; color: #e0e0e0\">Reason to dump: %s</mark>", dump_reason);
+
+    if (list->list_inf.error_inf.current_error == L_NOT_ERRORS)
+    {
+        fprintf(html_file, "<mark style=\"background-color: #3aaa06ff; color: #e0e0e0\">Not errors in list</mark>\n");
+    }
+    else
+    {
+        fprintf(html_file, "<mark style=\"background-color: #cc0505ff; color: #e0e0e0\">Errors with list:</mark>\n");
+
+        size_t counter = 1;
+        int error_func = list->list_inf.error_inf.current_error;
+        // printf("ERROR: %d\n", error_func);
+
+        for (int error = 1; error <= MAX_ERROR; error *= 2)
+        {
+            if ((error_func & error) == error)
+            {
+                fprintf(html_file, "<mark style=\"background-color: #cc0505ff; color: #e0e0e0\">    %s</mark>\n", DISC_ERROR[counter]);
+            }
+            counter++;
+        }
+    }
+
+    fprintf(html_file, "<mark style=\"background-color: #1808adff; color: #e0e0e0\">List stats:\n    Name list: \"%s\"\n    Place creation \"%s:%d\"\n    ----------------\n",
+             list->list_inf.create_inf.name_list,
+             list->list_inf.create_inf.name_file,
+             list->list_inf.create_inf.number_line);
+    fprintf(html_file, "    Head: [" DUMP_FORMAT_LSI_T "]\n    Tail: [" DUMP_FORMAT_LSI_T "]\n    Free: [" DUMP_FORMAT_LSI_T "]</mark>\n",
+            list->index_inf[0].next,
+            list->index_inf[0].prev,
+            list->free);
+
+    if ((list->list_inf.error_inf.current_error & L_NULL_DATA) != L_NULL_DATA ||
+        (list->list_inf.error_inf.current_error & L_NULL_INDEX) != L_NULL_INDEX)
+    {
+        fprintf(html_file,
+                "<mark style=\"background-color: #9509b8ff; color: #e0e0e0\">INDEX </mark> | "
+                "<mark style=\"background-color: #3b2dbeff; color: #e0e0e0\">DATA      </mark> "
+                "<mark style=\"background-color: #b60f0fff; color: #e0e0e0\">NEXT      </mark> "
+                "<mark style=\"background-color: #c78c0cff; color: #e0e0e0\">PREV      </mark> \n");
+        for (size_t i = 0; i < list->list_inf.capacity; i++)
+        {
+            fprintf(html_file,
+                    "<mark style=\"background-color: #9509b8ff; color: #e0e0e0\">[%4zu]</mark>"
+                    " | <mark style=\"background-color: #3b2dbeff; color: #e0e0e0\">[" DUMP_FORMAT_LSD_T "]</mark>"
+                    " <mark style=\"background-color: #b60f0fff; color: #e0e0e0\">[" DUMP_FORMAT_LSI_T "]</mark>"
+                    " <mark style=\"background-color: #c78c0cff; color: #e0e0e0\">[" DUMP_FORMAT_LSI_T "]</mark>\n",
+                    i, list->data[i], list->index_inf[i].next, list->index_inf[i].prev);
+        }
+    }
+
+    // fprintf(html_file, "-----------------------------------------------------------------------------------\n");
+
     create_graph(list);
 
     char address[100] = {};
     sprintf(address, "%s%d.png", ADDRESS_IMG_HTML, AMOUNT_IMAGES - 1);
-    printf("ADDRESS: %s\n", address);
-    fprintf(html_file, "<img src=%s width=1000px>\n", address);
+    // printf("ADDRESS: %s\n", address);
+    fprintf(html_file, "<img src=%s width=2000px>\n", address);
 
     fclose_file(html_file);
 
@@ -583,33 +933,32 @@ int list_dump_html(list_t* list,
 }
 // -------------------------------------------------------------------------------------------------------
 
-// -------------------------------------------------------------------------------------------------------
-int create_head_html_file(void)
-{
-    FILE* html_file = fopen_file(NAME_DUMP_FILE, "w");
 
-    fprintf(html_file, "<pre>\n");
 
-    return 0;
-}
+// Дополнительные функции
 // -------------------------------------------------------------------------------------------------------
-
-// -------------------------------------------------------------------------------------------------------
-list_error_t list_print(list_t* list)
+lsi_t list_tail(list_t* list)
 {
     assert(list);
-
-    COMMON_VERIFIER(list, CHAR_FUNC_PRINT, L_ERROR, "dump before print");
-
-    int counter = 0;
-    for (lsi_t i = list->head;
-         i != 0;
-         i = list->index_inf[i].next)
-    {
-        printf("[%d]: [%d]\n", counter++, list->data[i]);
-    }
-
-    return L_NOT_ERRORS;
+    return list->index_inf[0].prev;
 }
 // -------------------------------------------------------------------------------------------------------
 
+// -------------------------------------------------------------------------------------------------------
+lsi_t list_head(list_t* list)
+{
+    assert(list);
+    return list->index_inf[0].next;
+}
+// -------------------------------------------------------------------------------------------------------
+
+// -------------------------------------------------------------------------------------------------------
+int list_error(list_t* list)
+{
+    assert(list);
+    return list->list_inf.error_inf.current_error;
+}
+// -------------------------------------------------------------------------------------------------------
+
+// -------------------------------------------------------------------------------------------------------
+// lsi_t

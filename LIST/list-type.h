@@ -4,39 +4,49 @@
 
 enum list_error_t
 {
-    L_NOT_ERRORS        = 0,
-    L_CALLOC_NULL       = 1,
-    L_NULL_DATA         = 2,
-    L_NULL_INDEX        = 4,
-    L_BAD_FREE          = 8,
-    L_BIG_TAIL          = 16,
-    L_BIG_HEAD          = 32,
-    L_BAD_INDEX_INF     = 64,
-    L_BAD_INDEX_FREE    = 256,
-    L_BAD_TAIL          = 512,
-    L_BAD_HEAD          = 1024,
-    L_ERROR_VER         = 2048,
-    L_INSERT_INDEX      = 4096,
-    L_BAD_DEL           = 8192,
-    L_BAD_SIZE          = 16384,
-    L_TOO_BIG_INDEX     = 32768,
-    L_ERROR             = 65536
+    L_NOT_ERRORS        = 0x000000,
+    L_CALLOC_NULL       = 0x000001,
+    L_NULL_DATA         = 0x000002,
+    L_NULL_INDEX        = 0x000004,
+    L_FREE_NOT_FREE     = 0x000008,
+    L_BAD_INDEX_ORDER   = 0x000010,
+    L_BAD_FREE_ORDER    = 0x000020,
+    L_INFINITE_FREE     = 0x000040,
+    L_INSERT_SIZE       = 0x000080,
+    L_DELETE_SIZE       = 0x000100,
+    L_ERROR_VER         = 0x000200,
+    L_INSERT_INDEX      = 0x000400,
+    L_BAD_DEL           = 0x000800,
+    L_BIG_INDEX         = 0x001000,
+    L_BIG_FREE          = 0x002000,
+    L_MIX_INDEX_FREE    = 0x004000,
+    L_SIZE_B_CAPACITY   = 0x008000,
+    L_ERROR             = 0x010000
 };
 // -------------------------------------------------------------------------------------------------------
 // Необходимо именно тут для удобства
-const int MAX_ERROR = 32768;
+const int MAX_ERROR = 0x008000;
 // -------------------------------------------------------------------------------------------------------
-enum list_func_t
+#define FORMAT_ERROR "%06X"
+// -------------------------------------------------------------------------------------------------------
+enum return_value
 {
-    L_INSERT            = 0,
-    L_DELETE_AFTER      = 1,
-    L_DELETE_CURRENT    = 2,
+    R_OK = 0,
+    R_ERR = -1,
 };
 // -------------------------------------------------------------------------------------------------------
-typedef int lsd_t;
+
+
+// -------------------------------------------------------------------------------------------------------
+typedef double lsd_t;
 typedef int lsi_t;
 // -------------------------------------------------------------------------------------------------------
-const lsd_t L_FREE_NUM = -1;
+#define FORMAT_LSD_T "%lg"
+#define FORMAT_LSI_T "%d"
+#define DUMP_FORMAT_LSD_T "%8.2f"
+#define DUMP_FORMAT_LSI_T "%8d"
+// -------------------------------------------------------------------------------------------------------
+const lsd_t L_FREE_NUM = 0xDEDE;
 // -------------------------------------------------------------------------------------------------------
 struct index_t
 {
@@ -47,9 +57,10 @@ struct index_t
 struct list_create_inf_t
 {
     const char* name_file;
-    int number_line;
     const char* name_list;
+    int number_line;
     size_t start_size;
+    long long time_start;
 };
 // -------------------------------------------------------------------------------------------------------
 struct list_error_inf_t
@@ -65,6 +76,7 @@ struct list_inf_t
     list_create_inf_t create_inf;
     list_error_inf_t error_inf;
     size_t current_size;
+    size_t capacity;
 };
 // -------------------------------------------------------------------------------------------------------
 struct list_t
@@ -76,18 +88,6 @@ struct list_t
     list_inf_t list_inf;
 };
 // -------------------------------------------------------------------------------------------------------
-enum list_dump_t
-{
-    L_BASE_DUMP       = 0,
-    L_INSERT_AFTER      = 1,
-    L_INSERT_BEFORE     = 2,
-    L_DELETE_A_AFTER    = 3,
-    L_DELETE_A_BEFORE   = 4,
-    L_DELETE_C_AFTER    = 5,
-    L_DELETE_C_BEFORE   = 6,
-    L_APPEND_AFTER      = 7,
-    L_APPEND_BEFORE     = 8
-};
 
 
 

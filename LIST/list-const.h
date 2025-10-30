@@ -4,23 +4,24 @@
 // ------------------------------------------------------------------------------------------------------
 const char DISC_ERROR[][100] =
 {
-    "NOT_ERRORS",                       // 0
-    "CALLOC RETURN NULL",               // 1
-    "ADDRESS DATA = NULL",              // 2
-    "ADDRESS INDEX_INF = NULL",         // 4
-    "VALUE FREE INDEX != L_FREE_NUM",   // 8
-    "TAIL BIGGER SIZE",                 // 16
-    "HEAD BIGGER SIZE",                 // 32
-    "ORDER NEXT INDEX IS NOT TRUE",     // 64
-    "ORDER PREV INDEX IS NOT TRUE",     // 128
-    "ORDER FREE INDEX IS NOT TRUE",     // 256
-    "NEXT OF TAIL IS NOT = 0",          // 512
-    "PREV OF HEAD IS NOT = 0",          // 1024
-    "ERROR IN VERIFIER",                // 2048
-    "INDEX  TO INSERT IS NOT CORRECT",  // 4096
-    "INDEX TO DELETE IS NOT CORRECT",   // 8192
-    "NOT ENOUGH SIZE TO PUSH ELEMENT",  // 16384
-    "TOO BIG INDEX IN INDEX_INF"        // 32768
+    "NOT_ERRORS",                       // 0x000000
+    "ADDRESS DATA = NULL",              // 0x000002
+    "CALLOC RETURN NULL",               // 0x000001
+    "ADDRESS INDEX_INF = NULL",         // 0x000004
+    "FREE INDEX IS NOT FREE",           // 0x000008
+    "ORDER NEXT INDEX IS NOT TRUE",     // 0x000010
+    "ORDER FREE INDEX IS NOT TRUE",     // 0x000020
+    "INFINITE CIRCLE IN VERIFIER",      // 0x000040
+    "INSERT WITH FULL LIST" ,           // 0x000080
+    "DELETE WITH ZERO LIST",            // 0x000100
+    "ERROR IN VERIFIER",                // 0x000200
+    "INDEX TO INSERT IS NOT CORRECT",   // 0x000400
+    "INDEX TO DELETE IS NOT CORRECT",   // 0x000800
+    "TOO BIG INDEX IN INDEX_INF",       // 0x001000
+    "TOO BIG INDEX IN FREE",            // 0x002000
+    "MIXING FREE AND DATA INDEX",       // 0x004000
+    "CURRENT SIZE BIGGER CAPACITY",     // 0x008000
+    "ERROR",                            // 0x001000
 };
 // ------------------------------------------------------------------------------------------------------
 const char CHAR_BASE[] = "BASE";
