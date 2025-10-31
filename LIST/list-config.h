@@ -1,6 +1,16 @@
 #ifndef LIST_CONFIG_H
 #define LIST_CONFIG_H
 
+#define OFF 0
+#define ON 1
+
+// All check
+// -------------------------------------------------------------------------------------------------------
+#ifndef VERIFIER
+#define VERIFIER OFF
+#endif
+// -------------------------------------------------------------------------------------------------------
+
 // -------------------------------------------------------------------------------------------------------
 const int START_SIZE_LIST = 16;
 // -------------------------------------------------------------------------------------------------------
@@ -16,6 +26,7 @@ const char NAME_LOG_FILE[] = "LIST/list-log.log";
 const char NAME_DUMP_FILE[] = "LIST/list-dump.html";
 const char ADDRESS_IMG_FILES[] = "LIST/IMAGES/img";
 const char ADDRESS_IMG_HTML[] = "IMAGES/img";
+const char ADDRESS_IMAGES_DIR[] = "LIST/IMAGES";
 const char NAME_DOT_FILE[] = "LIST/graph.dot";
 // ------------------------------------------------------------------------------------------------------
 

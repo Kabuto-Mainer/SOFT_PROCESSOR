@@ -1,27 +1,29 @@
 #ifndef LIST_TYPE_H
 #define LIST_TYPE_H
 
+#include <math.h>
 
 enum list_error_t
 {
     L_NOT_ERRORS        = 0x000000,
     L_CALLOC_NULL       = 0x000001,
-    L_NULL_DATA         = 0x000002,
-    L_NULL_INDEX        = 0x000004,
-    L_FREE_NOT_FREE     = 0x000008,
-    L_BAD_INDEX_ORDER   = 0x000010,
-    L_BAD_FREE_ORDER    = 0x000020,
-    L_INFINITE_FREE     = 0x000040,
-    L_INSERT_SIZE       = 0x000080,
-    L_DELETE_SIZE       = 0x000100,
-    L_ERROR_VER         = 0x000200,
-    L_INSERT_INDEX      = 0x000400,
-    L_BAD_DEL           = 0x000800,
-    L_BIG_INDEX         = 0x001000,
-    L_BIG_FREE          = 0x002000,
-    L_MIX_INDEX_FREE    = 0x004000,
-    L_SIZE_B_CAPACITY   = 0x008000,
-    L_ERROR             = 0x010000
+    L_REALLOC_NULL      = 0x000002,
+    L_NULL_DATA         = 0x000004,
+    L_NULL_INDEX        = 0x000008,
+    L_FREE_NOT_FREE     = 0x000010,
+    L_BAD_INDEX_ORDER   = 0x000020,
+    L_BAD_FREE_ORDER    = 0x000040,
+    L_INFINITE_FREE     = 0x000080,
+    L_INSERT_SIZE       = 0x000100,
+    L_DELETE_SIZE       = 0x000200,
+    L_ERROR_VER         = 0x000400,
+    L_INSERT_INDEX      = 0x000800,
+    L_BAD_DEL           = 0x001000,
+    L_BIG_INDEX         = 0x002000,
+    L_BIG_FREE          = 0x004000,
+    L_MIX_INDEX_FREE    = 0x008000,
+    L_SIZE_B_CAPACITY   = 0x010000,
+    L_ERROR             = 0x020000
 };
 // -------------------------------------------------------------------------------------------------------
 // Необходимо именно тут для удобства
@@ -47,6 +49,8 @@ typedef int lsi_t;
 #define DUMP_FORMAT_LSI_T "%8d"
 // -------------------------------------------------------------------------------------------------------
 const lsd_t L_FREE_NUM = 0xDEDE;
+// -------------------------------------------------------------------------------------------------------
+const lsd_t L_ERR_VALUE = NAN;
 // -------------------------------------------------------------------------------------------------------
 struct index_t
 {

@@ -27,11 +27,11 @@ int main(void)
     insertAfter(&test_list, 1, 20);
     insertAfter(&test_list, 2, 30);
     // deleteAfter(&test_list, 5);
-    insertAfter(&test_list, 4, 40);
+    // insertAfter(&test_list, 3, 40);
     insertAfter(&test_list, 3, 41);
     insertAfter(&test_list, 3, 42);
 
-    // test_list.index_inf[3].next = 1000;
+    test_list.index_inf[3].next = 1000;
     // test_list.index_inf[1].next = 0;
     // printList(&test_list);
 

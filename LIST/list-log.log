@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------------
 Dump has called function "insertAfter" in "LIST/test-list.cpp:26"
-Time after start: [2] miliseconds
+Time after start: [8] miliseconds
 Reason to dump: DUMP from insertAfter before insert [10] after [0]
 
 Not errors in list
@@ -31,7 +31,7 @@ INDEX  | DATA       NEXT       PREV
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
 Dump has called function "insertAfter" in "LIST/test-list.cpp:26"
-Time after start: [156] miliseconds
+Time after start: [275] miliseconds
 Reason to dump: DUMP from insertAfter after insert [10] after [0]
 
 Not errors in list
@@ -62,7 +62,7 @@ INDEX  | DATA       NEXT       PREV
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
 Dump has called function "insertAfter" in "LIST/test-list.cpp:27"
-Time after start: [236] miliseconds
+Time after start: [486] miliseconds
 Reason to dump: DUMP from insertAfter before insert [20] after [1]
 
 Not errors in list
@@ -93,7 +93,7 @@ INDEX  | DATA       NEXT       PREV
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
 Dump has called function "insertAfter" in "LIST/test-list.cpp:27"
-Time after start: [307] miliseconds
+Time after start: [712] miliseconds
 Reason to dump: DUMP from insertAfter after insert [20] after [1]
 
 Not errors in list
@@ -124,7 +124,7 @@ INDEX  | DATA       NEXT       PREV
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
 Dump has called function "insertAfter" in "LIST/test-list.cpp:28"
-Time after start: [388] miliseconds
+Time after start: [955] miliseconds
 Reason to dump: DUMP from insertAfter before insert [30] after [2]
 
 Not errors in list
@@ -155,7 +155,7 @@ INDEX  | DATA       NEXT       PREV
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
 Dump has called function "insertAfter" in "LIST/test-list.cpp:28"
-Time after start: [467] miliseconds
+Time after start: [1190] miliseconds
 Reason to dump: DUMP from insertAfter after insert [30] after [2]
 
 Not errors in list
@@ -185,9 +185,9 @@ INDEX  | DATA       NEXT       PREV
 [  15] | [57054.00] [       4] [      14]
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
-Dump has called function "insertAfter" in "LIST/test-list.cpp:30"
-Time after start: [546] miliseconds
-Reason to dump: DUMP from insertAfter before insert [40] after [4]
+Dump has called function "insertAfter" in "LIST/test-list.cpp:31"
+Time after start: [1428] miliseconds
+Reason to dump: DUMP from insertAfter before insert [41] after [3]
 
 Not errors in list
 List stats:
@@ -216,57 +216,24 @@ INDEX  | DATA       NEXT       PREV
 [  15] | [57054.00] [       4] [      14]
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
-Dump has called function "insertAfter" in "LIST/test-list.cpp:30"
-Time after start: [625] miliseconds
-Reason to dump: ERROR from insertAfter after insert [40] after [4]
-
-Errors with list:
-    ORDER NEXT INDEX IS NOT TRUE
-List stats:
-    Name list: "test_list"
-    Place creation "LIST/test-list.cpp:22"
-    ----------------
-    Head: [       1]
-    Tail: [       3]
-    Free: [       5]
-INDEX  | DATA       NEXT       PREV
-[   0] | [57054.00] [       1] [       3]
-[   1] | [   10.00] [       2] [       0]
-[   2] | [   20.00] [       3] [       1]
-[   3] | [   30.00] [       0] [       2]
-[   4] | [   40.00] [       4] [       4]
-[   5] | [57054.00] [       6] [      15]
-[   6] | [57054.00] [       7] [       5]
-[   7] | [57054.00] [       8] [       6]
-[   8] | [57054.00] [       9] [       7]
-[   9] | [57054.00] [      10] [       8]
-[  10] | [57054.00] [      11] [       9]
-[  11] | [57054.00] [      12] [      10]
-[  12] | [57054.00] [      13] [      11]
-[  13] | [57054.00] [      14] [      12]
-[  14] | [57054.00] [      15] [      13]
-[  15] | [57054.00] [       5] [      14]
------------------------------------------------------------------------------------
------------------------------------------------------------------------------------
 Dump has called function "insertAfter" in "LIST/test-list.cpp:31"
-Time after start: [719] miliseconds
-Reason to dump: ERROR from insertAfter before insert [41] after [3]
+Time after start: [1663] miliseconds
+Reason to dump: DUMP from insertAfter after insert [41] after [3]
 
-Errors with list:
-    ORDER NEXT INDEX IS NOT TRUE
+Not errors in list
 List stats:
     Name list: "test_list"
     Place creation "LIST/test-list.cpp:22"
     ----------------
     Head: [       1]
-    Tail: [       3]
+    Tail: [       4]
     Free: [       5]
 INDEX  | DATA       NEXT       PREV
-[   0] | [57054.00] [       1] [       3]
+[   0] | [57054.00] [       1] [       4]
 [   1] | [   10.00] [       2] [       0]
 [   2] | [   20.00] [       3] [       1]
-[   3] | [   30.00] [       0] [       2]
-[   4] | [   40.00] [       4] [       4]
+[   3] | [   30.00] [       4] [       2]
+[   4] | [   41.00] [       0] [       3]
 [   5] | [57054.00] [       6] [      15]
 [   6] | [57054.00] [       7] [       5]
 [   7] | [57054.00] [       8] [       6]
@@ -281,24 +248,23 @@ INDEX  | DATA       NEXT       PREV
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
 Dump has called function "insertAfter" in "LIST/test-list.cpp:32"
-Time after start: [822] miliseconds
-Reason to dump: ERROR from insertAfter before insert [42] after [3]
+Time after start: [1901] miliseconds
+Reason to dump: DUMP from insertAfter before insert [42] after [3]
 
-Errors with list:
-    ORDER NEXT INDEX IS NOT TRUE
+Not errors in list
 List stats:
     Name list: "test_list"
     Place creation "LIST/test-list.cpp:22"
     ----------------
     Head: [       1]
-    Tail: [       3]
+    Tail: [       4]
     Free: [       5]
 INDEX  | DATA       NEXT       PREV
-[   0] | [57054.00] [       1] [       3]
+[   0] | [57054.00] [       1] [       4]
 [   1] | [   10.00] [       2] [       0]
 [   2] | [   20.00] [       3] [       1]
-[   3] | [   30.00] [       0] [       2]
-[   4] | [   40.00] [       4] [       4]
+[   3] | [   30.00] [       4] [       2]
+[   4] | [   41.00] [       0] [       3]
 [   5] | [57054.00] [       6] [      15]
 [   6] | [57054.00] [       7] [       5]
 [   7] | [57054.00] [       8] [       6]
@@ -312,27 +278,59 @@ INDEX  | DATA       NEXT       PREV
 [  15] | [57054.00] [       5] [      14]
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
+Dump has called function "insertAfter" in "LIST/test-list.cpp:32"
+Time after start: [2118] miliseconds
+Reason to dump: DUMP from insertAfter after insert [42] after [3]
+
+Not errors in list
+List stats:
+    Name list: "test_list"
+    Place creation "LIST/test-list.cpp:22"
+    ----------------
+    Head: [       1]
+    Tail: [       4]
+    Free: [       6]
+INDEX  | DATA       NEXT       PREV
+[   0] | [57054.00] [       1] [       4]
+[   1] | [   10.00] [       2] [       0]
+[   2] | [   20.00] [       3] [       1]
+[   3] | [   30.00] [       5] [       2]
+[   4] | [   41.00] [       0] [       5]
+[   5] | [   42.00] [       4] [       3]
+[   6] | [57054.00] [       7] [      15]
+[   7] | [57054.00] [       8] [       6]
+[   8] | [57054.00] [       9] [       7]
+[   9] | [57054.00] [      10] [       8]
+[  10] | [57054.00] [      11] [       9]
+[  11] | [57054.00] [      12] [      10]
+[  12] | [57054.00] [      13] [      11]
+[  13] | [57054.00] [      14] [      12]
+[  14] | [57054.00] [      15] [      13]
+[  15] | [57054.00] [       6] [      14]
+-----------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
 Dump has called function "insertAfter" in "LIST/test-list.cpp:38"
-Time after start: [922] miliseconds
+Time after start: [2308] miliseconds
 Reason to dump: ERROR from insertAfter before insert [43] after [3]
 
 Errors with list:
     ORDER NEXT INDEX IS NOT TRUE
+    TOO BIG INDEX IN INDEX_INF
 List stats:
     Name list: "test_list"
     Place creation "LIST/test-list.cpp:22"
     ----------------
     Head: [       1]
-    Tail: [       3]
-    Free: [       5]
+    Tail: [       4]
+    Free: [       6]
 INDEX  | DATA       NEXT       PREV
-[   0] | [57054.00] [       1] [       3]
+[   0] | [57054.00] [       1] [       4]
 [   1] | [   10.00] [       2] [       0]
 [   2] | [   20.00] [       3] [       1]
-[   3] | [   30.00] [       0] [       2]
-[   4] | [   40.00] [       4] [       4]
-[   5] | [57054.00] [       6] [      15]
-[   6] | [57054.00] [       7] [       5]
+[   3] | [   30.00] [    1000] [       2]
+[   4] | [   41.00] [       0] [       5]
+[   5] | [   42.00] [       4] [       3]
+[   6] | [57054.00] [       7] [      15]
 [   7] | [57054.00] [       8] [       6]
 [   8] | [57054.00] [       9] [       7]
 [   9] | [57054.00] [      10] [       8]
@@ -341,5 +339,5 @@ INDEX  | DATA       NEXT       PREV
 [  12] | [57054.00] [      13] [      11]
 [  13] | [57054.00] [      14] [      12]
 [  14] | [57054.00] [      15] [      13]
-[  15] | [57054.00] [       5] [      14]
+[  15] | [57054.00] [       6] [      14]
 -----------------------------------------------------------------------------------
