@@ -31,7 +31,7 @@ int main(void)
     insertAfter(&test_list, 3, 41);
     insertAfter(&test_list, 3, 42);
 
-    test_list.index_inf[3].next = 1000;
+    // test_list.index_inf[3].next = 1000;
     // test_list.index_inf[1].next = 0;
     // printList(&test_list);
 

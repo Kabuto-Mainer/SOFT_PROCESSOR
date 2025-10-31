@@ -100,6 +100,20 @@ int list_dump_html(list_t* list,
 // -------------------------------------------------------------------------------------------------------
 list_error_t create_graph(list_t* list);
 // -------------------------------------------------------------------------------------------------------
+int create_lines(list_t* list,
+                 lsi_t* mass_index,
+                 size_t amount_index,
+                 lsi_t* mass_free,
+                 size_t amount_free,
+                 FILE* dot_file);
+// -------------------------------------------------------------------------------------------------------
+int create_block(list_t* list,
+                 lsi_t* mass_index,
+                 size_t amount_index,
+                 lsi_t* mass_free,
+                 size_t amount_free,
+                 FILE* dot_file);
+// -------------------------------------------------------------------------------------------------------
 
 
 

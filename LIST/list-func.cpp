@@ -34,17 +34,14 @@ list_error_t list_ctr(list_t* list,
         return L_CALLOC_NULL;
     }
 
-    for (int i = 0; i < START_SIZE_LIST - 1; i++)
+    for (int i = 1; i < START_SIZE_LIST; i++)
     {
         buf_index[i].next = i + 1;
-        buf_index[i].prev = i - 1;
+        buf_index[i].prev = -1;
     }
     buf_index[0].next = 0;
     buf_index[0].prev = 1;
-    buf_index[1].prev = START_SIZE_LIST - 1;
-
-    buf_index[START_SIZE_LIST - 1].next = 1;
-    buf_index[START_SIZE_LIST - 1].prev = START_SIZE_LIST - 2;
+    buf_index[START_SIZE_LIST - 1].next = 0;
 
     for (int i = 0; i < START_SIZE_LIST; i++)
     {
@@ -61,6 +58,7 @@ list_error_t list_ctr(list_t* list,
     clean_log_file();
     clean_dir_images();
     create_head_html_file();
+
 
     return L_NOT_ERRORS;
 }
@@ -119,18 +117,15 @@ lsi_t  list_insert_after(list_t* list,
 
     index_t* index_data = list->index_inf;
     lsi_t new_index = list->free;
-
     list->free = index_data[new_index].next;
-    index_data[list->free].prev = index_data[new_index].prev;
-    index_data[index_data[new_index].prev].next = list->free;
-
-    list->data[new_index] = value;
+    // TODO Сделать реалокацию сразу после проверки
 
     index_data[new_index].next = index_data[prev_index].next;
-    index_data[prev_index].next = new_index;
     index_data[new_index].prev = prev_index;
     index_data[index_data[new_index].next].prev = new_index;
+    index_data[prev_index].next = new_index;
 
+    list->data[new_index] = value;
     list->list_inf.current_size++;
 
     return new_index;
@@ -147,13 +142,11 @@ lsi_t list_delete_current(list_t* list,
     lsi_t prev_del_index = index_data[del_index].prev;
 
     index_data[prev_del_index].next = index_data[del_index].next;
-    index_data[index_data[del_index].next].prev = prev_del_index;
-    list->data[del_index] = L_FREE_NUM;
-
+    index_data[del_index].prev = prev_del_index;
     index_data[del_index].next = list->free;
-    index_data[del_index].prev = index_data[list->free].prev;
-    index_data[index_data[list->free].prev].next = del_index;
-    index_data[list->free].prev = del_index;
+
+    index_data[del_index].prev = -1;
+    list->data[del_index] = L_FREE_NUM;
     list->free = del_index;
 
     list->list_inf.current_size--;
@@ -167,6 +160,7 @@ int list_print(list_t* list)
 {
     assert(list);
 
+    // if (listError(list) != L_NULL_DATA || listError(list) != L_NULL_INDEX)
     printf("INDEX  | DATA   NEXT   PREV\n");
     for (size_t i = 0; i < list->list_inf.capacity; i++)
     {
@@ -426,7 +420,7 @@ int def_printList(list_t* list,
 // -------------------------------------------------------------------------------------------------------
 
 
-//!Вроде сделан
+
 // Проверки
 // -------------------------------------------------------------------------------------------------------
 int list_verifier(list_t* list)
@@ -502,7 +496,7 @@ int list_verifier(list_t* list)
     index = list->free;
     for (size_t i = 0; i < list->list_inf.capacity - list->list_inf.current_size - 1; i++)
     {
-        // printf("INDEX: [%d] NEXT: [%d]\n", index, list->index_inf[index].next);
+        // printf("INDEX: [%d]\n", index);
         if ((size_t) index >= list->list_inf.capacity)
         {
             return_error |= L_BIG_FREE;
@@ -515,9 +509,9 @@ int list_verifier(list_t* list)
             break;
         }
 
-        if (index != list->index_inf[list->index_inf[index].next].prev)
+        if (list->data[index] != L_FREE_NUM || list->index_inf[index].prev != -1)
         {
-            return_error |= L_BAD_FREE_ORDER;
+            return_error |= L_NO_CORRECT_FREE;
             break;
         }
 
@@ -532,7 +526,7 @@ int list_verifier(list_t* list)
         index = list->index_inf[index].next;
     }
     // printf("INDEX: %d FREE: %d\n", index, list->free);
-    if (index != list->free)
+    if (index != 0)
     {
         return_error |= L_BAD_FREE_ORDER;
     }
@@ -611,17 +605,14 @@ int list_realloc(list_t* list)
         return -1;
     }
 
-    lsi_t index = buffer_index[list->free].prev;
     for (size_t i = old_size; i < old_size * 2 - 1; i++)
     {
-        buffer_index[i].prev = index;
+        buffer_index[i].prev = -1;
         buffer_lsd[i] = L_FREE_NUM;
         buffer_index[i].next = (int) i + 1;
-        index = (int) i;
     }
-    buffer_index[old_size * MODE_REALLOC - 1].prev = index;
+
     buffer_index[old_size * MODE_REALLOC - 1].next = list->free;
-    buffer_index[list->free].prev = (int) (old_size * MODE_REALLOC - 1);
     buffer_lsd[old_size * MODE_REALLOC - 1] = L_FREE_NUM;
 
     list->data = buffer_lsd;
@@ -630,6 +621,7 @@ int list_realloc(list_t* list)
 
     return 0;
 }
+// -------------------------------------------------------------------------------------------------------
 
 
 
@@ -728,7 +720,8 @@ int create_head_html_file(void)
 {
     FILE* html_file = fopen_file(NAME_DUMP_FILE, "w");
 
-    fprintf(html_file, "<pre style=\"font-family: 'Courier New', monospace; font-size: 14px; color: #e0e0e0; background-color: #1e1e1e; padding: 10px; border-radius: 6px;\">\n\n");
+    fprintf(html_file, "<pre style=\"font-family: 'Courier New', monospace; "
+            "font-size: 14px; color: #e0e0e0; background-color: #1e1e1e; padding: 10px; border-radius: 6px;\">\n\n");
     fclose_file(html_file);
 
     return 0;
@@ -764,14 +757,9 @@ list_error_t create_graph(list_t* list)
             "  edge [arrowhead=vee, arrowsize=0.6, penwidth=1.2];\n\n");
 
     lsi_t* mass_index_inf = (lsi_t*) calloc(list->list_inf.capacity, sizeof(lsi_t));
-    if (mass_index_inf == NULL)
-    {
-        printf("ERROR: calloc return null address in create_graph\n");
-        return L_CALLOC_NULL;
-    }
-
     lsi_t* mass_index_free = (lsi_t*) calloc(list->list_inf.capacity, sizeof(lsi_t));
-    if (mass_index_free == NULL)
+
+    if (mass_index_inf == NULL || mass_index_free == NULL)
     {
         printf("ERROR: calloc return null address in create_graph\n");
         return L_CALLOC_NULL;
@@ -779,8 +767,8 @@ list_error_t create_graph(list_t* list)
 
     size_t count_el_inf = 0;
     size_t count_el_free = 0;
-
     lsi_t index = 0;
+
     for (size_t i = 0; i < list->list_inf.current_size + 1; i++)
     {
         if ((size_t) index >= list->list_inf.capacity)
@@ -810,12 +798,7 @@ list_error_t create_graph(list_t* list)
             break;
         }
 
-        if ((size_t) list->index_inf[index].next >= list->list_inf.capacity)
-        {
-            break;
-        }
-
-        if (index != list->index_inf[list->index_inf[index].next].prev)
+        if (list->index_inf[index].prev != -1)
         {
             break;
         }
@@ -824,62 +807,12 @@ list_error_t create_graph(list_t* list)
         index = list->index_inf[index].next;
     }
 
-    for (size_t i = 0; i < list->list_inf.capacity; i++)
-    {
-        const char* color = "";
-
-        if ((int)  i == 0)
-        {
-            color = "#696969ff";
-        }
-
-        if (color[0] == '\0')
-        {
-            if ((int) i == list->index_inf[0].next)
-            {
-                color = "#cc4ec1ff";
-            }
-
-            else if ((int) i == list->index_inf[0].prev)
-            {
-                color = "#d8d535ff";
-            }
-        }
-
-        if (color[0] == '\0')
-        {
-            for (size_t idx = 0; idx < count_el_inf; idx++)
-            {
-                if ((int) i == mass_index_inf[idx])
-                {
-                    color = "#2ab8dbff";
-                    break;
-                }
-            }
-        }
-
-        if (color[0] == '\0')
-        {
-            for (size_t idx = 0; idx < count_el_free; idx++)
-            {
-                if ((int) i == mass_index_free[idx])
-                {
-                    color = "#56e65dff";
-                    break;
-                }
-            }
-        }
-
-        if (color[0] == '\0')
-        {
-            color = "#e94747ff";
-        }
-
-        fprintf(dot_file,
-                "block%zu [label=\"INDEX=%zu|DATA=" FORMAT_LSD_T "|NEXT=" FORMAT_LSI_T "|PREV=" FORMAT_LSI_T "\", fillcolor=\"%s\"];\n",
-                i, i, list->data[i], list->index_inf[i].next, list->index_inf[i].prev, color);
-
-    }
+    create_block(list,
+                 mass_index_inf,
+                 count_el_inf,
+                 mass_index_free,
+                 count_el_free,
+                 dot_file);
 
     for (size_t i = 0; i < list->list_inf.capacity - 1; i++)
     {
@@ -887,72 +820,12 @@ list_error_t create_graph(list_t* list)
     }
 
     fprintf(dot_file, "\n");
-
-    for (size_t i = 0; i < list->list_inf.capacity; i++)
-    {
-        int flag = 0;
-        for (size_t idx = 0; idx < count_el_inf; idx++)
-        {
-            if ((int) i == mass_index_inf[idx])
-            {
-                fprintf(dot_file,
-                        "block%zu -> block" FORMAT_LSI_T " [color=\"#382dd1ff\", penwidth=1.5, arrowsize=0.6, constraint=true, dir = both];\n",
-                        i, list->index_inf[i].next);
-                flag = 1;
-                break;
-            }
-        }
-
-        if (flag == 0)
-        {
-            for (size_t idx = 0; idx < count_el_free; idx++)
-            {
-                if ((int) i == mass_index_free[idx])
-                {
-                    fprintf(dot_file,
-                            "block%zu -> block" FORMAT_LSI_T " [color=\"#1dad10ff\", penwidth=1.5, arrowsize=0.6, constraint=true, dir = both];\n",
-                            i, list->index_inf[i].next);
-                    flag = 1;
-                    break;
-                }
-            }
-        }
-
-        if (flag == 0)
-        {
-            if (list->index_inf[i].prev >= (int) list->list_inf.capacity)
-            {
-                fprintf(dot_file,
-                        "block" FORMAT_LSI_T " [label=\"" FORMAT_LSI_T "\", shape=octagon, fillcolor=\"#d31414ff\"];\n",
-                        list->index_inf[i].prev, list->index_inf[i].prev);
-                fprintf(dot_file,
-                        "block" FORMAT_LSI_T " -> block%zu [color=\"#ff0505ff\", penwidth=1.5, arrowsize=0.6, constraint=true];\n",
-                        list->index_inf[i].prev, i);
-                flag = 1;
-            }
-
-            if (list->index_inf[i].next >= (int) list->list_inf.capacity)
-            {
-                fprintf(dot_file,
-                        "block" FORMAT_LSI_T " [label=\"" FORMAT_LSI_T "\", shape=octagon, fillcolor=\"#d31414ff\"];\n",
-                        list->index_inf[i].next, list->index_inf[i].next);
-                fprintf(dot_file,
-                        "block%zu -> block" FORMAT_LSI_T " [color=\"#ff0a0aff\", penwidth=1.5, arrowsize=0.6, constraint=true];\n",
-                        i, list->index_inf[i].next);
-                flag = 1;
-            }
-        }
-
-        if (flag == 0)
-        {
-            fprintf(dot_file,
-                        "block%zu -> block" FORMAT_LSI_T " [color=\"#ff0a0aff\", penwidth=1.5, arrowsize=0.6, constraint=true];\n",
-                        i, list->index_inf[i].next);
-            fprintf(dot_file,
-                        "block" FORMAT_LSI_T " -> block%zu [color=\"#ff0a0aff\", penwidth=1.5, arrowsize=0.6, constraint=true];\n",
-                        list->index_inf[i].next, i);
-        }
-    }
+    create_lines(list,
+                 mass_index_inf,
+                 count_el_inf,
+                 mass_index_free,
+                 count_el_free,
+                 dot_file);
 
     free(mass_index_inf);
     free(mass_index_free);
@@ -978,11 +851,174 @@ list_error_t create_graph(list_t* list)
     int trash = system(system_cmd);
     (void) trash;
 
+
     AMOUNT_IMAGES++;
 
     return L_NOT_ERRORS;
 }
-// -----------------------------------------------  --------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------
+
+// -------------------------------------------------------------------------------------------------------
+int create_lines(list_t* list,
+                 lsi_t* mass_index,
+                 size_t amount_index,
+                 lsi_t* mass_free,
+                 size_t amount_free,
+                 FILE* dot_file)
+{
+    assert(list);
+    assert(mass_index);
+    assert(mass_free);
+    assert(dot_file);
+
+    for (size_t i = 0; i < list->list_inf.capacity; i++)
+    {
+        int flag = 0;
+        for (size_t idx = 0; idx < amount_index; idx++)
+        {
+            if ((int) i == mass_index[idx])
+            {
+                fprintf(dot_file,
+                        "block%zu -> block" FORMAT_LSI_T " [color=\"#382dd1ff\", penwidth=1.5, arrowsize=0.6, constraint=true, dir = both];\n",
+                        i, list->index_inf[i].next);
+                flag = 1;
+                break;
+            }
+        }
+
+        if (flag == 0)
+        {
+            for (size_t idx = 0; idx < amount_free; idx++)
+            {
+                if ((int) i == mass_free[idx])
+                {
+                    fprintf(dot_file,
+                            "block%zu -> block" FORMAT_LSI_T " [color=\"#1dad10ff\", penwidth=1.5, arrowsize=0.6, constraint=true];\n",
+                            i, list->index_inf[i].next);
+                    flag = 1;
+                    break;
+                }
+            }
+        }
+// TODO   Create new fucntions for create lines
+        if (flag == 0)
+        {
+            if (list->index_inf[i].prev >= (int) list->list_inf.capacity)
+            {
+                fprintf(dot_file,
+                        "block" FORMAT_LSI_T " [label=\"" FORMAT_LSI_T "\", shape=octagon, fillcolor=\"#d31414ff\"];\n",
+                        list->index_inf[i].prev, list->index_inf[i].prev);
+                fprintf(dot_file,
+                        "block" FORMAT_LSI_T " -> block%zu [color=\"#ff0505ff\", penwidth=1.5, arrowsize=0.6, constraint=true];\n",
+                        list->index_inf[i].prev, i);
+                flag = 1;
+            }
+
+            if (list->index_inf[i].next >= (int) list->list_inf.capacity)
+            {
+                fprintf(dot_file,
+                        "block" FORMAT_LSI_T " [label=\"" FORMAT_LSI_T "\", shape=octagon, fillcolor=\"#d31414ff\"];\n",
+                        list->index_inf[i].next, list->index_inf[i].next);
+                fprintf(dot_file,
+                        "block%zu -> block" FORMAT_LSI_T " [color=\"#ff0a0aff\", penwidth=1.5, arrowsize=0.6, constraint=true];\n",
+                        i, list->index_inf[i].next);
+                flag = 1;
+            }
+        }
+
+        if (flag == 0 && i != 0)
+        {
+            fprintf(dot_file,
+                        "block%zu -> block" FORMAT_LSI_T " [color=\"#ff0a0aff\", penwidth=1.5, arrowsize=0.6, constraint=true];\n",
+                        i, list->index_inf[i].next);
+            fprintf(dot_file,
+                        "block" FORMAT_LSI_T " -> block%zu [color=\"#ff0a0aff\", penwidth=1.5, arrowsize=0.6, constraint=true];\n",
+                        list->index_inf[i].next, i);
+        }
+    }
+    return 0;
+}
+// -------------------------------------------------------------------------------------------------------
+
+// -------------------------------------------------------------------------------------------------------
+int create_block(list_t* list,
+                 lsi_t* mass_index,
+                 size_t amount_index,
+                 lsi_t* mass_free,
+                 size_t amount_free,
+                 FILE* dot_file)
+{
+    assert(list);
+    assert(mass_index);
+    assert(mass_free);
+    assert(dot_file);
+
+
+    for (size_t i = 0; i < list->list_inf.capacity; i++)
+    {
+        const char* color = "";
+
+        if ((int) i == 0)
+        {
+            color = "#696969ff";
+        }
+
+        if (color[0] == '\0')
+        {
+            if ((int) i == list->index_inf[0].next)
+            {
+                color = "#cc4ec1ff";
+            }
+
+            else if ((int) i == list->index_inf[0].prev)
+            {
+                color = "#d8d535ff";
+            }
+        }
+
+        if (color[0] == '\0')
+        {
+            for (size_t idx = 0; idx < amount_index; idx++)
+            {
+                if ((int) i == mass_index[idx])
+                {
+                    color = "#2ab8dbff";
+                    break;
+                }
+            }
+        }
+
+        if (color[0] == '\0')
+        {
+            for (size_t idx = 0; idx < amount_free; idx++)
+            {
+                if ((int) i == mass_free[idx])
+                {
+                    color = "#56e65dff";
+                    break;
+                }
+            }
+        }
+
+        if (color[0] == '\0')
+        {
+            color = "#e94747ff";
+        }
+
+        fprintf(dot_file,
+                "block%zu [label=\"INDEX=%zu|DATA=" FORMAT_LSD_T "|NEXT=" FORMAT_LSI_T "|PREV=" FORMAT_LSI_T "\", fillcolor=\"%s\"];\n",
+                i, i, list->data[i], list->index_inf[i].next, list->index_inf[i].prev, color);
+    }
+
+    fprintf(dot_file,
+            "head [label=\"HEAD\", fillcolor=\"#636363ff\"];\n");
+    fprintf(dot_file,
+            "tail [label=\"TAIL\", fillcolor=\"#636363ff\"];\n");
+    fprintf(dot_file,
+            "free [label=\"FREE\", fillcolor=\"#11a03cff\"];\n");
+    return 0;
+}
+// -------------------------------------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------------------------------------
 int list_dump_html(list_t* list,
@@ -1014,7 +1050,7 @@ int list_dump_html(list_t* list,
 
     if (list->list_inf.error_inf.current_error == L_NOT_ERRORS)
     {
-        fprintf(html_file, GREEN_COLOR ">Not errors in list</mark>\n");
+        fprintf(html_file, GREEN_COLOR "Not errors in list</mark>\n");
     }
     else
     {

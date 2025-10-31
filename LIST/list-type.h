@@ -13,7 +13,7 @@ enum list_error_t
     L_FREE_NOT_FREE     = 0x000010,
     L_BAD_INDEX_ORDER   = 0x000020,
     L_BAD_FREE_ORDER    = 0x000040,
-    L_INFINITE_FREE     = 0x000080,
+    L_NO_CORRECT_FREE   = 0x000080,
     L_INSERT_SIZE       = 0x000100,
     L_DELETE_SIZE       = 0x000200,
     L_ERROR_VER         = 0x000400,
@@ -40,18 +40,19 @@ enum return_value
 
 
 // -------------------------------------------------------------------------------------------------------
-typedef double lsd_t;
+typedef int lsd_t;
 typedef int lsi_t;
 // -------------------------------------------------------------------------------------------------------
-#define FORMAT_LSD_T "%lg"
+#define FORMAT_LSD_T "%d"
 #define FORMAT_LSI_T "%d"
-#define DUMP_FORMAT_LSD_T "%8.2f"
+#define DUMP_FORMAT_LSD_T "%8d"
 #define DUMP_FORMAT_LSI_T "%8d"
 // -------------------------------------------------------------------------------------------------------
 const lsd_t L_FREE_NUM = 0xDEDE;
 // -------------------------------------------------------------------------------------------------------
-const lsd_t L_ERR_VALUE = NAN;
+const lsd_t L_ERR_VALUE = -1000;
 // -------------------------------------------------------------------------------------------------------
+
 struct index_t
 {
     lsi_t next;
