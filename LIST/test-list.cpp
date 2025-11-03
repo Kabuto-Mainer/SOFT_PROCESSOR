@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <assert.h>
 
-#include "list-func.h"
-#include "list-config.h"
+#include "LIB/my-list.h"
 
 #include "../COMMON/color.h"
 
@@ -12,7 +11,7 @@ int dump_list(list_t list);
 
 int main(void)
 {
-    printf("Testing list\n");
+    printf("Testing list %d\n", GLOBAL);
 
     list_t test_list = {};
 
@@ -23,13 +22,15 @@ int main(void)
     list_ctr(&test_list, list_inf);
     printf("Creating completed succesfull\n");
 
-    insertAfter(&test_list, 0, 10);
-    insertAfter(&test_list, 1, 20);
+    insertAfter(&test_list, 0, 50);
+    insertAfter(&test_list, 1, 40);
     insertAfter(&test_list, 2, 30);
     // deleteAfter(&test_list, 5);
     // insertAfter(&test_list, 3, 40);
     insertAfter(&test_list, 3, 41);
     insertAfter(&test_list, 3, 42);
+
+    sortList(&test_list);
 
     // test_list.index_inf[3].next = 1000;
     // test_list.index_inf[1].next = 0;

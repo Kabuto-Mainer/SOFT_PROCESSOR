@@ -1,0 +1,16 @@
+digraph {
+  rankdir=LR;
+  bgcolor="#1e1e1e"  nodesep=0.4;
+  ranksep=0.6;
+  node [shape=Mrecord, style=filled, fontname="Helvetica"];
+  edge [arrowhead=vee, arrowsize=0.6, penwidth=1.2];
+
+block1 [label="INDEX=0x7b71ef5e0160|DATA=30|NEXT=0x7b71ef5e0130|PREV=0x7b71ef5e00d0", fillcolor="#3e85c0ff"];
+block2 [label="INDEX=0x7b71ef5e0130|DATA=20|NEXT=0x7b71ef5e0100|PREV=0x7b71ef5e0160", fillcolor="#3e85c0ff"];
+block3 [label="INDEX=0x7b71ef5e0100|DATA=10|NEXT=0x7b71ef5e00d0|PREV=0x7b71ef5e0130", fillcolor="#3e85c0ff"];
+block0 [label="INDEX=0x7b71ef5e00d0|DATA=0|NEXT=0x7b71ef5e0160|PREV=0x7b71ef5e0100", fillcolor="#39a025ff"];
+NULL [label="NULL ADDRESS", shape=octagon, fillcolor="#ff1212ff"];
+block0 -> block1 [color="#4512ffff", penwidth=1.5, arrowsize=0.6, constraint=true, dir=both];
+block1 -> block2 [color="#4512ffff", penwidth=1.5, arrowsize=0.6, constraint=true, dir=both];
+block2 -> block3 [color="#4512ffff", penwidth=1.5, arrowsize=0.6, constraint=true, dir=both];
+}

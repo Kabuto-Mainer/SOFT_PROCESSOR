@@ -5,13 +5,13 @@ digraph {
   node [shape=Mrecord, style=filled, fontname="Helvetica"];
   edge [arrowhead=vee, arrowsize=0.6, penwidth=1.2];
 
-block0 [label="INDEX=0|DATA=57054|NEXT=1|PREV=4", fillcolor="#696969ff"];
-block1 [label="INDEX=1|DATA=10|NEXT=2|PREV=0", fillcolor="#cc4ec1ff"];
-block2 [label="INDEX=2|DATA=20|NEXT=3|PREV=1", fillcolor="#2ab8dbff"];
-block3 [label="INDEX=3|DATA=30|NEXT=6|PREV=2", fillcolor="#2ab8dbff"];
-block4 [label="INDEX=4|DATA=41|NEXT=0|PREV=5", fillcolor="#d8d535ff"];
-block5 [label="INDEX=5|DATA=42|NEXT=4|PREV=6", fillcolor="#2ab8dbff"];
-block6 [label="INDEX=6|DATA=43|NEXT=5|PREV=3", fillcolor="#2ab8dbff"];
+block0 [label="INDEX=0|DATA=57054|NEXT=1|PREV=5", fillcolor="#696969ff"];
+block1 [label="INDEX=1|DATA=30|NEXT=2|PREV=0", fillcolor="#cc4ec1ff"];
+block2 [label="INDEX=2|DATA=40|NEXT=3|PREV=1", fillcolor="#2ab8dbff"];
+block3 [label="INDEX=3|DATA=41|NEXT=6|PREV=2", fillcolor="#2ab8dbff"];
+block4 [label="INDEX=4|DATA=42|NEXT=5|PREV=6", fillcolor="#2ab8dbff"];
+block5 [label="INDEX=5|DATA=50|NEXT=0|PREV=4", fillcolor="#d8d535ff"];
+block6 [label="INDEX=6|DATA=43|NEXT=4|PREV=3", fillcolor="#2ab8dbff"];
 block7 [label="INDEX=7|DATA=57054|NEXT=8|PREV=-1", fillcolor="#56e65dff"];
 block8 [label="INDEX=8|DATA=57054|NEXT=9|PREV=-1", fillcolor="#56e65dff"];
 block9 [label="INDEX=9|DATA=57054|NEXT=10|PREV=-1", fillcolor="#56e65dff"];
@@ -44,9 +44,9 @@ block0 -> block1 [color="#382dd1ff", penwidth=1.5, arrowsize=0.6, constraint=tru
 block1 -> block2 [color="#382dd1ff", penwidth=1.5, arrowsize=0.6, constraint=true, dir = both];
 block2 -> block3 [color="#382dd1ff", penwidth=1.5, arrowsize=0.6, constraint=true, dir = both];
 block3 -> block6 [color="#382dd1ff", penwidth=1.5, arrowsize=0.6, constraint=true, dir = both];
-block4 -> block0 [color="#382dd1ff", penwidth=1.5, arrowsize=0.6, constraint=true, dir = both];
-block5 -> block4 [color="#382dd1ff", penwidth=1.5, arrowsize=0.6, constraint=true, dir = both];
-block6 -> block5 [color="#382dd1ff", penwidth=1.5, arrowsize=0.6, constraint=true, dir = both];
+block4 -> block5 [color="#382dd1ff", penwidth=1.5, arrowsize=0.6, constraint=true, dir = both];
+block5 -> block0 [color="#382dd1ff", penwidth=1.5, arrowsize=0.6, constraint=true, dir = both];
+block6 -> block4 [color="#382dd1ff", penwidth=1.5, arrowsize=0.6, constraint=true, dir = both];
 block7 -> block8 [color="#1dad10ff", penwidth=1.5, arrowsize=0.6, constraint=true];
 block8 -> block9 [color="#1dad10ff", penwidth=1.5, arrowsize=0.6, constraint=true];
 block9 -> block10 [color="#1dad10ff", penwidth=1.5, arrowsize=0.6, constraint=true];
@@ -57,6 +57,6 @@ block13 -> block14 [color="#1dad10ff", penwidth=1.5, arrowsize=0.6, constraint=t
 block14 -> block15 [color="#1dad10ff", penwidth=1.5, arrowsize=0.6, constraint=true];
 block15 -> block0 [color="#1dad10ff", penwidth=1.5, arrowsize=0.6, constraint=true];
 head -> block1 [color="#cc4ec1ff", penwidth=1.5, arrowsize=0.7];
-tail -> block4 [color="#FFA500", penwidth=1.5, arrowsize=0.7];
+tail -> block5 [color="#FFA500", penwidth=1.5, arrowsize=0.7];
 free -> block7 [color="#00A500", penwidth=1.5, arrowsize=0.7];
 }

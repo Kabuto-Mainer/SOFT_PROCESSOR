@@ -91,8 +91,12 @@ disassembler:
 # Компиляция list
 list:
 	@echo -------------------------------------------------------------------------
-	g++ LIST/list-func.cpp LIST/test-list.cpp COMMON/support.cpp $(flags) -o BIN/list.exe
+	g++ LIST/list-func.cpp LIST/test-list.cpp LIST/list-dump.cpp LIST/list-user-f.cpp LIST/list-ver.cpp COMMON/support.cpp $(flags) -D'GLOBAL=ON' -o BIN/list.exe
 
+# Компиляция list-common
+list-c:
+	@echo -------------------------------------------------------------------------
+	g++ LIST-COMMON/list-func.cpp LIST-COMMON/list-test.cpp COMMON/support.cpp $(flags) -o BIN/list-c.exe
 
 
 # ----------------------------------------------------------------------------------------------------------
@@ -128,11 +132,16 @@ run-l:
 	./BIN/list.exe
 # ----------------------------------------------------------------------------------------------------------
 
+# Запуск list common
+run-lc:
+	@echo -------------------------------------------------------------------------
+	./BIN/list-c.exe
+# ----------------------------------------------------------------------------------------------------------
 
 
 # Git commit
 gitcom:
-	@(git add ASSEMBLER/ BIN/ COMMON/ DISASSEMBLER/ PROCESSOR/ Makefile myasm/ TEST/ LIST/)
+	@(git add ASSEMBLER/ BIN/ COMMON/ DISASSEMBLER/ PROCESSOR/ Makefile myasm/ TEST/ LIST/ LIST-COMMON/)
 	@echo -- Add file to git commit ---
 	@(git commit -m "$(m)")
 	@echo --- Git committing ---
