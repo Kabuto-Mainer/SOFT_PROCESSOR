@@ -7,6 +7,11 @@ list:
 	@echo Compilation list.exe
 	g++ list-func.cpp list-user-f.cpp list-dump.cpp list-ver.cpp test-list.cpp  ../COMMON/support.cpp $(flags) -D'GLOBAL=OFF' -o ../BIN/list.exe
 
+list-speed:
+	@echo Compilation list.exe
+	g++ list-func.cpp list-user-f.cpp list-dump.cpp list-ver.cpp test-list.cpp  ../COMMON/support.cpp $(flags) -D'GLOBAL=OFF' -D'VERIFIER=OFF' -o ../BIN/list.exe
+
+
 # Запуск list.exe
 run-l:
 	@echo Run list.exe

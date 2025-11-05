@@ -107,18 +107,12 @@ int list_verifier(list_t* list)
         }
         index = list->index_inf[index].next;
     }
-    // printf("INDEX: %d FREE: %d\n", index, list->free);
     if (index != 0)
     {
         return_error |= L_BAD_FREE_ORDER;
     }
 
-    if (list->list_inf.current_size == list->list_inf.capacity && return_error == L_NOT_ERRORS)
-    {
-        list_realloc(list);
-    }
-
-    else if (list->list_inf.current_size >= list->list_inf.capacity)
+    if (list->list_inf.current_size >= list->list_inf.capacity)
     {
         return_error |= L_SIZE_B_CAPACITY;
     }
@@ -173,13 +167,14 @@ int list_print_error(list_t* list)
 // -------------------------------------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------------------------------------
-int list_realloc(list_t* list)
+int list_realloc(list_t* list,
+                 size_t new_size)
 {
     assert(list);
 
     size_t old_size = list->list_inf.capacity;
-    lsd_t* buffer_lsd = (lsd_t*) realloc(list->data, sizeof(lsd_t) * old_size * MODE_REALLOC);
-    index_t* buffer_index = (index_t*) realloc(list->index_inf, sizeof(index_t) * old_size * MODE_REALLOC);
+    lsd_t* buffer_lsd = (lsd_t*) realloc(list->data, sizeof(lsd_t) * new_size);
+    index_t* buffer_index = (index_t*) realloc(list->index_inf, sizeof(index_t) * new_size);
 
     if (buffer_lsd == NULL || buffer_index == NULL)
     {
@@ -187,19 +182,27 @@ int list_realloc(list_t* list)
         return -1;
     }
 
-    for (size_t i = old_size; i < old_size * 2 - 1; i++)
+    if (new_size > old_size)
     {
-        buffer_index[i].prev = -1;
-        buffer_lsd[i] = L_FREE_NUM;
-        buffer_index[i].next = (int) i + 1;
+        for (size_t i = old_size; i < new_size; i++)
+        {
+            buffer_index[i].prev = -1;
+            buffer_lsd[i] = L_FREE_NUM;
+            buffer_index[i].next = (int) i + 1;
+        }
+        buffer_index[new_size - 1].next = 0;
+        list->free = (lsd_t) old_size;
+        list->list_inf.capacity *= MODE_REALLOC;
     }
 
-    buffer_index[old_size * MODE_REALLOC - 1].next = list->free;
-    buffer_lsd[old_size * MODE_REALLOC - 1] = L_FREE_NUM;
+    else
+    {
+        buffer_index[new_size - 1].next = 0;
+        list->list_inf.capacity /= MODE_REALLOC;
+    }
 
     list->data = buffer_lsd;
     list->index_inf = buffer_index;
-    list->list_inf.capacity *= MODE_REALLOC;
 
     return 0;
 }

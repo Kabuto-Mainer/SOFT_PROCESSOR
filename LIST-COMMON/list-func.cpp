@@ -573,6 +573,13 @@ int create_head_html_file(void)
 // -------------------------------------------------------------------------------------------------------
 int clean_dir_images(void)
 {
+    char address[200] = {};
+    sprintf(address, "%s/trash.txt", ADDRESS_IMAGES);
+
+    FILE* buffer = fopen_file(address, "w");
+    fprintf(buffer, "This file delete error of system comand\n");
+    fclose_file(buffer);
+
     char comand[200] = {};
     sprintf(comand, "rm -r %s/*", ADDRESS_IMAGES);
     int ret_value = system(comand);

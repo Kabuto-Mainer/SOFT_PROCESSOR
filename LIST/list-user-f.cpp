@@ -32,10 +32,6 @@ int def_insertAfter(list_t* list,
             *ret_ver |= L_INSERT_INDEX;
         }
 
-        if (list->list_inf.current_size >= list->list_inf.capacity)
-        {
-            *ret_ver |= L_INSERT_SIZE;
-        }
 
     }
         // printf("ERROR in insert: %d\n", list->list_inf.error_inf.current_error);
@@ -57,6 +53,15 @@ int def_insertAfter(list_t* list,
     (void) number_line;
 
 #endif // VERIFIER == ON
+
+#if AUTO_REALLOC == ON
+
+        if (list->list_inf.current_size == list->list_inf.capacity - 1)
+        {
+            list_realloc(list, list->list_inf.capacity * MODE_REALLOC);
+        }
+
+#endif // AUTO_REALLOC == ON
 
     int return_index = list_insert_after(list, prev_index, value);
 
@@ -299,6 +304,14 @@ int def_sortList(list_t* list,
     list_dump_html(list, NAME_DUMP_FILE, buffer);
 
 #endif // VERIFIER == ON
+
+// #if REALLOC_DOWN == ON
+    if (list->list_inf.current_size * MODE_REALLOC * MODE_REALLOC < list->list_inf.capacity &&
+        list->list_inf.current_size != 0)
+    {
+    printf("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj\n");
+        list_realloc(list, list->list_inf.capacity / MODE_REALLOC);
+    }
 
     return 0;
 }

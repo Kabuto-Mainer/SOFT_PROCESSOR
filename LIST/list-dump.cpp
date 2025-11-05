@@ -119,6 +119,13 @@ int create_head_html_file(void)
 // -------------------------------------------------------------------------------------------------------
 int clean_dir_images(void)
 {
+    char address[200] = {};
+    sprintf(address, "%s/trash.txt", ADDRESS_IMAGES_DIR);
+
+    FILE* buffer = fopen_file(address, "w");
+    fprintf(buffer, "This file delete error of system comand\n");
+    fclose_file(buffer);
+
     char comand[200] = {};
     sprintf(comand, "rm -r %s/*", ADDRESS_IMAGES_DIR);
     int ret_value = system(comand);
@@ -144,8 +151,8 @@ list_error_t create_graph(list_t* list)
             "  node [shape=Mrecord, style=filled, fontname=\"Helvetica\"];\n"
             "  edge [arrowhead=vee, arrowsize=0.6, penwidth=1.2];\n\n");
 
-    lsi_t* mass_index_inf = (lsi_t*) calloc(list->list_inf.capacity, sizeof(lsi_t));
-    lsi_t* mass_index_free = (lsi_t*) calloc(list->list_inf.capacity, sizeof(lsi_t));
+    lsi_t* mass_index_inf = (lsi_t*) calloc(list->list_inf.capacity + 1, sizeof(lsi_t));
+    lsi_t* mass_index_free = (lsi_t*) calloc(list->list_inf.capacity + 1, sizeof(lsi_t));
 
     if (mass_index_inf == NULL || mass_index_free == NULL)
     {
@@ -458,10 +465,13 @@ int list_dump_html(list_t* list,
         }
     }
 
-    fprintf(html_file, BLUE_COLOR "List stats:\n    Name list: \"%s\"\n    Place creation \"%s:%d\"\n    ----------------\n",
+    fprintf(html_file, BLUE_COLOR "List stats:\n    Name list:      \"%s\"\n"
+            "    Place creation: \"%s:%d\"\n    Capacity:       %zu\n    Current size:   %zu\n",
              list->list_inf.create_inf.name_list,
              list->list_inf.create_inf.name_file,
-             list->list_inf.create_inf.number_line);
+             list->list_inf.create_inf.number_line,
+             list->list_inf.capacity,
+             list->list_inf.current_size);
     fprintf(html_file, "    Head: [" DUMP_FORMAT_LSI_T "]\n    Tail: [" DUMP_FORMAT_LSI_T "]\n    Free: [" DUMP_FORMAT_LSI_T "]</mark>\n",
             list->index_inf[0].next,
             list->index_inf[0].prev,
@@ -493,7 +503,9 @@ int list_dump_html(list_t* list,
     char address[100] = {};
     sprintf(address, "%s%d.png", ADDRESS_IMG_HTML, AMOUNT_IMAGES - 1);
     // printf("ADDRESS: %s\n", address);
-    fprintf(html_file, "<img src=%s width=2000px>\n", address);
+    char size[10] = {};
+    sprintf(size, "%zu", SIZE_ONE_BLOCK * list->list_inf.capacity);
+    fprintf(html_file, "<img src=%s width=%spx>\n", address, size);
 
     fclose_file(html_file);
 

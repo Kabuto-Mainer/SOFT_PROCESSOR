@@ -13,7 +13,9 @@
 // Управление объектом
 // -------------------------------------------------------------------------------------------------------
 list_error_t list_ctr(list_t* list,
-                      list_inf_t list_inf)
+                      const char* name_list,
+                      const char* name_file,
+                      int number_line)
 {
     assert(list);
 
@@ -49,7 +51,7 @@ list_error_t list_ctr(list_t* list,
     list->data = buf_data;
     list->index_inf = buf_index;
 
-    fulling_list_inf(&list_inf, &(list->list_inf));
+    fulling_list_inf(list, name_list, name_file, number_line);
     clean_log_file();
     clean_dir_images();
     create_head_html_file();
@@ -60,29 +62,45 @@ list_error_t list_ctr(list_t* list,
 // -------------------------------------------------------------------------------------------------------
 
 // -------------------------------------------------------------------------------------------------------
-int fulling_list_inf(list_inf_t* input_list_inf,
-                     list_inf_t* list_inf)
+int fulling_list_inf(list_t* list,
+                     const char* name_list,
+                     const char* name_file,
+                     int number_line)
 {
-    assert(input_list_inf);
-    assert(list_inf);
+    assert(list);
 
-    list_inf->create_inf.name_file = input_list_inf->create_inf.name_file;
-    list_inf->create_inf.name_list = input_list_inf->create_inf.name_list;
-    list_inf->create_inf.number_line = input_list_inf->create_inf.number_line;
-    list_inf->create_inf.start_size = START_SIZE_LIST;
+    list_create_inf_t* inf_c = &(list->list_inf.create_inf);
 
-    list_inf->error_inf.current_error = L_NOT_ERRORS;
-    list_inf->error_inf.name_call_file = NULL;
-    list_inf->error_inf.name_call_func = NULL;
-    list_inf->error_inf.number_call_line = -1;
-    list_inf->current_size = 0;
-    list_inf->capacity = START_SIZE_LIST;
+// TODO Ask, why it does not work?
+    // if (name_list != NULL && name_list[0] == '&')
+    // {
+    //     inf_c->name_list = &(name_list[2]);
+    // }
+
+    // else
+    // {
+        inf_c->name_list = name_list;
+    // }
+
+    inf_c->name_list = name_list;
+    inf_c->name_file = name_file;
+    inf_c->number_line = number_line;
+    inf_c->start_size = START_SIZE_LIST;
 
     struct timeval tv;
     gettimeofday(&tv, NULL);
 
-    list_inf->create_inf.time_start = ((long long)tv.tv_sec * 1000 + tv.tv_usec / 1000) % TIME_DIV;
+    inf_c->time_start = ((long long)tv.tv_sec * 1000 + tv.tv_usec / 1000) % TIME_DIV;
 
+    list_error_inf_t* inf_e = &(list->list_inf.error_inf);
+
+    inf_e->current_error = L_NOT_ERRORS;
+    inf_e->name_call_file = NULL;
+    inf_e->name_call_func = NULL;
+    inf_e->number_call_line = -1;
+
+    list->list_inf.capacity = START_SIZE_LIST;
+    list->list_inf.current_size = 0;
 
     return 0;
 }
@@ -136,7 +154,8 @@ lsi_t list_delete_current(list_t* list,
     lsi_t prev_del_index = index_data[del_index].prev;
 
     index_data[prev_del_index].next = index_data[del_index].next;
-    index_data[del_index].prev = prev_del_index;
+    index_data[index_data[del_index].next].prev = prev_del_index;
+    // index_data[del_index].prev = prev_del_index;
     index_data[del_index].next = list->free;
 
     index_data[del_index].prev = -1;
