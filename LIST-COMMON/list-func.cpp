@@ -300,15 +300,15 @@ int create_graph(list_t* list)
             "  edge [arrowhead=vee, arrowsize=0.6, penwidth=1.2];\n\n");
 
     // Create blocks with their owns colors
-    list_node_t* index = list->fict->next;
+    list_node_t* elem = list->fict->next;
     for (size_t i = 1; i < list->size + 1; i++)
     {
         const char* color = {};
-        if (index != NULL)
+        if (elem != NULL)
         {
-            if (index->next != NULL || index->prev != NULL)
+            if (elem->next != NULL || elem->prev != NULL)
             {
-                if (index == index->next->prev)
+                if (elem == elem->next->prev)
                 {
                     color = TRUE_EL;
                 }
@@ -325,101 +325,106 @@ int create_graph(list_t* list)
             }
 
             fprintf(dot_file,
-                        "block%zu [label=\"INDEX=%p|DATA=" FORMAT_DATA "|NEXT=%p|PREV=%p\", fillcolor=\"%s\"];\n",
-                        i, index, index->data, index->next, index->prev, color);
+                        "block_%p [label=\"INDEX=%p|DATA=" FORMAT_DATA "|NEXT=%p|PREV=%p\", fillcolor=\"%s\"];\n",
+                        elem, elem, elem->data, elem->next, elem->prev, color);
         }
 
         else
         {
             color = ALL_NULL_EL;
             fprintf(dot_file,
-                    "block%zu [label=\"INDEX=%p|DATA=---|NEXT=---|PREV=---\", fillcolor=\"%s\"];\n",
-                    i, index, color);
+                    "block_%p [label=\"INDEX=%p|DATA=---|NEXT=---|PREV=---\", fillcolor=\"%s\"];\n",
+                    elem, elem, color);
         }
-        index = index->next;
+        elem = elem->next;
     }
 
     // Create block for fict element
     if (list->fict == NULL)
     {
         fprintf(dot_file,
-                "block0 [label=\"INDEX=%p|DATA=---|NEXT=---|PREV=---\", fillcolor=\"" ALL_NULL_EL "\"];\n",
-                list->fict);
+                "block_%p [label=\"INDEX=%p|DATA=---|NEXT=---|PREV=---\", fillcolor=\"" ALL_NULL_EL "\"];\n",
+                list->fict, list->fict);
     }
 
     else if (list->fict->next == NULL || list->fict->prev == NULL)
     {
         fprintf(dot_file,
-                "block0 [label=\"INDEX=%p|DATA=" FORMAT_DATA "|NEXT=%p|PREV=%p\", fillcolor=\"" NULL_EL "\"];\n",
-                list->fict, list->fict->data, list->fict->next, list->fict->prev);
+                "block_%p [label=\"INDEX=%p|DATA=" FORMAT_DATA "|NEXT=%p|PREV=%p\", fillcolor=\"" NULL_EL "\"];\n",
+                list->fict, list->fict, list->fict->data, list->fict->next, list->fict->prev);
     }
 
     else
     {
         fprintf(dot_file,
-                "block0 [label=\"INDEX=%p|DATA=" FORMAT_DATA "|NEXT=%p|PREV=%p\", fillcolor=\"" FICT_EL "\"];\n",
-                list->fict ,list->fict->data, list->fict->next, list->fict->prev);
+                "block_%p [label=\"INDEX=%p|DATA=" FORMAT_DATA "|NEXT=%p|PREV=%p\", fillcolor=\"" FICT_EL "\"];\n",
+                list->fict, list->fict ,list->fict->data, list->fict->next, list->fict->prev);
     }
 
     // Create block for NULL address
     fprintf(dot_file,
             "NULL [label=\"NULL ADDRESS\", shape=octagon, fillcolor=\"#ff1212ff\"];\n");
 
+
     // for (size_t i = 0; i < list->size; i++)
     // {
-    //     fprintf(dot_file, "block%zu -> block%zu [style=invis, weight=100];\n", i, i + 1);
+    //     fprintf(dot_file, "block_%p -> block_%p [style=invis, weight=100];\n", i, i + 1);
     // }
 
-    index = list->fict;
-    for (size_t i = 0; i < list->size; i++, index = index->next)
+    elem = list->fict;
+    for (size_t i = 0; i < list->size; i++, elem = elem->next)
     {
-        if (index == NULL)
+        if (elem == NULL)
         {
             break;
         }
 
-        if (index->next == NULL)
+        if (elem->next == NULL)
         {
             fprintf(dot_file,
-                    "block%zu -> NULL [color=\"#ff1212ff\", penwidth=1.5, arrowsize=0.6, constraint=true];\n",
-                    i);
+                    "block_%p -> NULL [color=\"#ff1212ff\", penwidth=1.5, arrowsize=0.6, constraint=true];\n",
+                    elem);
             continue;
         }
 
-        if (index->prev == NULL)
+        if (elem->prev == NULL)
         {
             fprintf(dot_file,
-                    "NULL -> block%zu [color=\"#ff1212ff\", penwidth=1.5, arrowsize=0.6, constraint=true];\n",
-                    i);
+                    "NULL -> block_%p [color=\"#ff1212ff\", penwidth=1.5, arrowsize=0.6, constraint=true];\n",
+                    elem);
             continue;
         }
 
-        if (index == index->next->prev)
+        if (elem == elem->next->prev)
         {
-            // if (index->next == list->fict)
+            // if (elem->next == list->fict)
             // {
             //     fprintf(dot_file,
-            //             "block%zu -> block0 [color=\"#4512ffff\", penwidth=1.5, arrowsize=0.6, constraint=true, dir=both];\n",
+            //             "block_%p -> block0 [color=\"#4512ffff\", penwidth=1.5, arrowsize=0.6, constraint=true, dir=both];\n",
             //             i);
             // }
             // else
             // {
             //     fprintf(dot_file,
-            //             "block%zu -> block%zu [color=\"#4512ffff\", penwidth=1.5, arrowsize=0.6, constraint=true, dir=both];\n",
+            //             "block_%p -> block_%p [color=\"#4512ffff\", penwidth=1.5, arrowsize=0.6, constraint=true, dir=both];\n",
             //             i, i + 1);
             // }
             fprintf(dot_file,
-                    "block%zu -> block%zu [color=\"#4512ffff\", penwidth=1.5, arrowsize=0.6, constraint=true, dir=both];\n",
-                    i, i + 1);
+                    "block_%p -> block_%p [color=\"#4512ffff\", penwidth=1.5, arrowsize=0.6, constraint=true, dir=both];\n",
+                    elem, elem->next);
         }
 
         else
         {
             fprintf(dot_file,
-            "block%zu -> block%zu [color=\"#ff1212ff\", penwidth=1.5, arrowsize=0.6, constraint=true];\n",
-            i, i + 1);
+            "block_%p -> block_%p [color=\"#ff1212ff\", penwidth=1.5, arrowsize=0.6, constraint=true];\n",
+            elem, elem->next);
         }
     }
+
+    fprintf(dot_file,
+            "block_%p -> block_%p [color=\"#ff1414ff\", penwidth=1.5, arrowsize=0.6, constraint=true];\n",
+            list->fict, list->fict->prev);
 
     fprintf(dot_file, "}\n");
     fclose_file(dot_file);

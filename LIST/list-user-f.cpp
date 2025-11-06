@@ -31,8 +31,6 @@ int def_insertAfter(list_t* list,
         {
             *ret_ver |= L_INSERT_INDEX;
         }
-
-
     }
         // printf("ERROR in insert: %d\n", list->list_inf.error_inf.current_error);
     if (*ret_ver != L_NOT_ERRORS)

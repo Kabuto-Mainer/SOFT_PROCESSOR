@@ -61,6 +61,7 @@ list_error_t list_ctr(list_t* list,
 }
 // -------------------------------------------------------------------------------------------------------
 
+// todo filling
 // -------------------------------------------------------------------------------------------------------
 int fulling_list_inf(list_t* list,
                      const char* name_list,
@@ -71,18 +72,16 @@ int fulling_list_inf(list_t* list,
 
     list_create_inf_t* inf_c = &(list->list_inf.create_inf);
 
-// TODO Ask, why it does not work?
-    // if (name_list != NULL && name_list[0] == '&')
-    // {
-    //     inf_c->name_list = &(name_list[2]);
-    // }
+    if (name_list != NULL && name_list[0] == '&')
+    {
+        inf_c->name_list = &(name_list[1]);
+    }
 
-    // else
-    // {
+    else
+    {
         inf_c->name_list = name_list;
-    // }
+    }
 
-    inf_c->name_list = name_list;
     inf_c->name_file = name_file;
     inf_c->number_line = number_line;
     inf_c->start_size = START_SIZE_LIST;
@@ -205,7 +204,11 @@ int list_sort(list_t* list)
     }
     size_t size = list->list_inf.current_size;
 
+#if SORT_DATA == ON
+
     sort_data(mass_data, size);
+
+#endif // SORT_DATA == 0
 
     index_data[0].next = 1;
     index_data[0].prev = (lsd_t) size;

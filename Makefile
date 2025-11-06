@@ -105,7 +105,7 @@ list-c:
 
 list-c-speed:
 	@echo -------------------------------------------------------------------------
-	g++ LIST-COMMON/list-func.cpp LIST-COMMON/list-test.cpp COMMON/support.cpp $(flags) -D'VERIFIER=OFF' -o BIN/list-c.exe
+	g++ LIST-COMMON/list-func.cpp LIST-COMMON/list-test.cpp COMMON/support.cpp $(flags) -DVERIFIER=OFF -o BIN/list-c.exe
 
 
 # ----------------------------------------------------------------------------------------------------------
@@ -150,7 +150,7 @@ run-lc:
 
 # Git commit
 gitcom:
-	@(git add ASSEMBLER/ BIN/ COMMON/ DISASSEMBLER/ PROCESSOR/ Makefile myasm/ TEST/ LIST/ LIST-COMMON/)
+	@(git add ASSEMBLER/ BIN/ COMMON/ DISASSEMBLER/ PROCESSOR/ Makefile myasm/ TEST/ LIST/ LIST-COMMON/ TREE/)
 	@echo -- Add file to git commit ---
 	@(git commit -m "$(m)")
 	@echo --- Git committing ---

@@ -6,12 +6,37 @@
 
 #include "LIB/my-list.h"
 
+#include "../SUPPORT/prog-bar.h"
+
+int test(void);
+
 const size_t MAIN_ITER = 100;
 const size_t IN_ITER = 100;
 
+// int main(void)
+// {
+//     list_t test_list = {};
+//     listCreate(&test_list);
+
+//     insertAfter(&test_list, 0, 50);
+//     test_list.index_inf[1].next = 1000;
+//     insertAfter(&test_list, 1, 40);
+//     insertAfter(&test_list, 2, 30);
+//     insertAfter(&test_list, 3, 20);
+
+//     deleteCurrent(&test_list, 2);
+
+
+//     list_dtr(&test_list);
+
+
+//     return 0;
+// }
+
+
 int main(void)
 {
-    struct timeval tv;
+    struct timeval tv = {};
     gettimeofday(&tv, NULL);
     long long time_start = ((long long)tv.tv_sec * 1000 + tv.tv_usec / 1000);
 
@@ -41,17 +66,7 @@ int main(void)
                 }
             }
 
-            printf("\rTesting [%3zu] iter: [", i);
-            for (size_t a = 0; a < iter + 1; a++)
-            {
-                putchar('O');
-            }
-
-            for (size_t a = iter + 1; a < IN_ITER; a++)
-            {
-                putchar('-');
-            }
-            putchar(']');
+            printf("\r[%3zu]: [%s]", i, PROG_BAR[iter]);
         }
         list_dtr(&test_list);
         putchar('\n');

@@ -1,0 +1,17 @@
+digraph {
+  rankdir=UD;
+  bgcolor="#1e1e1e"  nodesep=0.4;
+  ranksep=0.6;
+  node [shape=Mrecord, style=filled, fontname="Helvetica"];
+  edge [arrowhead=vee, arrowsize=0.6, penwidth=1.2];
+
+block_0x503000000100 [label="{0x503000000100|VALUE=5|BIRD=C|{LEFT=(nil)|RIGHT=(nil)}}", fillcolor="#2c8deeff"];
+block_0x503000000070 [label="{0x503000000070|VALUE=10|BIRD=C|{LEFT=0x503000000100|RIGHT=0x5030000000d0}}", fillcolor="#2c8deeff"];
+block_0x5030000000d0 [label="{0x5030000000d0|VALUE=15|BIRD=C|{LEFT=(nil)|RIGHT=(nil)}}", fillcolor="#2c8deeff"];
+block_0x503000000040 [label="{0x503000000040|VALUE=2147483647|BIRD=F|{LEFT=0x503000000070|RIGHT=0x5030000000a0}}", fillcolor="#aa00deff"];
+block_0x5030000000a0 [label="{0x5030000000a0|VALUE=20|BIRD=C|{LEFT=(nil)|RIGHT=(nil)}}", fillcolor="#2c8deeff"];
+block_0x503000000070 -> block_0x503000000100 [color="#ffea05ff", penwidth = 1.5, arrowsize = 0.6, constraint = true];
+block_0x503000000070 -> block_0x5030000000d0 [color="#de05ffff", penwidth = 1.5, arrowsize = 0.6, constraint = true];
+block_0x503000000040 -> block_0x503000000070 [color="#ffea05ff", penwidth = 1.5, arrowsize = 0.6, constraint = true];
+block_0x503000000040 -> block_0x5030000000a0 [color="#de05ffff", penwidth = 1.5, arrowsize = 0.6, constraint = true];
+}
