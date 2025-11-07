@@ -1,22 +1,22 @@
 #include <stdio.h>
 
 #include "tree-func.h"
+#include "tree-user-func.h"
 
 int main(void)
 {
     tree_t tree = {};
-    create_tree (&tree);
 
-    create_node (tree.root, 10, LEFT);
-    create_node (tree.root, 20, RIGHT);
-    create_node (tree.root->left, 15, RIGHT);
-    create_node (tree.root->left, 5, LEFT);
+    createTree (&tree);
+    addValue (&tree, 10);
+    addValue (&tree, 5);
+    addValue (&tree, 15);
+    addValue (&tree, 13);
+    addValue (&tree, 17);
+    addValue (&tree, 3);
+    addValue (&tree, 7);
 
-    dump_tree (&tree);
-
-    print_node_in (tree.root);
-
-    delete_node (tree.root);
+    deleteTree (&tree);
 
     return 0;
 }

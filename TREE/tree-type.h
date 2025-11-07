@@ -2,6 +2,10 @@
 #define TREE_TYPE_H
 
 #include <limits.h>
+#include "PARSER/parser-type.h"
+// #include "PARSER/hash-cmd.h"
+
+
 
 // Type of variables, what can be saved in tree
 // -------------------------------------------------------------------------------------------------------
@@ -17,9 +21,29 @@ const trv_t FREE_VALUE = INT_MAX;
 struct node_t
 {
     char bird;
+    int amount;
     trv_t value;
     node_t* left;
     node_t* right;
+    node_t* root;
+};
+// -------------------------------------------------------------------------------------------------------
+struct create_inf
+{
+    const char* file;
+    int line;
+    const char* name;
+
+    comand_inf_t* cmd_inf;
+    int number_dir;
+};
+// -------------------------------------------------------------------------------------------------------
+struct error_inf
+{
+    int error;
+    const char* file;
+    int line;
+    const char* func;
 };
 // -------------------------------------------------------------------------------------------------------
 struct tree_t
@@ -27,16 +51,30 @@ struct tree_t
     node_t* root;
     size_t size;
 
-    const char* dump_address;
+    create_inf create;
+    error_inf error;
 };
 // -------------------------------------------------------------------------------------------------------
 
+// -------------------------------------------------------------------------------------------------------
 enum sides
 {
     LEFT    = 'L',
     RIGHT   = 'R'
 };
+// -------------------------------------------------------------------------------------------------------
 
-
+// -------------------------------------------------------------------------------------------------------
+enum ERRORS
+{
+    NOT_ERRORS  = 0x0000,
+    BAD_ROOT    = 0x0001,
+    BAD_SORT    = 0x0002,
+    BAD_SIGN    = 0x0004,
+    BAD_AMOUNT  = 0x0008,
+    BAD_SIZE    = 0x0010,
+};
+// -------------------------------------------------------------------------------------------------------
+const int MAX_ERROR = 0x0010;
 
 #endif // TREE_TYPE_H

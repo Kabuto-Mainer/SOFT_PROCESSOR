@@ -13,11 +13,12 @@ This project is realization of standard trees with addresses connection between 
     - ~~createNode~~
     - ~~destroyTree~~
     - ~~destroyNode~~
+    - ~~addNode~~
 - **Create dump functions:**
-    - printTree *(pre..|post..|in..)*
-    - dumpTree
+    - ~~printTree *(pre..|post..|in..)*~~
+    - ~~dumpTree~~
         - Dump to log file
-        - Create graph *(from graphviz)*
+        - ~~Create graph *(from graphviz)*~~
         - Dump to html file
     - errorTree *(print errors to console)*
 ## Tasks for farthest future
@@ -25,4 +26,7 @@ This project is realization of standard trees with addresses connection between 
 - **Switch recursion to cycles with stack**
     - Create own distributor of memory
     - Rewrite tree functions to new operation principle
-
+## Ded task
+- Create own printf () for points
+- Add own color for every node (hash (point))
+    - We can make a little sign (circle or rectanlge with color)

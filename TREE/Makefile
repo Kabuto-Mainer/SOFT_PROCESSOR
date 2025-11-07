@@ -5,8 +5,15 @@ flags = -D_DEBUG -Werror -ggdb3 -lSDL2 -std=c++17 -O3 -Wall -Wextra -Weffc++ -Wa
 
 # Компиляция tree
 tree:
-	g++ main.cpp tree-dump.cpp tree-func.cpp $(flags) -o tree.exe
+	g++ main.cpp tree-dump.cpp tree-u-func.cpp tree-func.cpp PARSER/parser.cpp PARSER/common.cpp $(flags) -o BIN/tree.exe
+
+# Компиляция hash-creator
+hash-c:
+	g++ PARSER/gen-hash.cpp PARSER/common.cpp $(flags) -o BIN/hash.exe
 
 # Запуск tree
 run-t:
-	./tree.exe
+	./BIN/tree.exe
+
+run-hc:
+	./BIN/hash.exe

@@ -1,0 +1,64 @@
+digraph {
+  rankdir=UD;
+  bgcolor="#1e1e1e";
+  splines=ortho;
+  nodesep=0.4;
+  ranksep=0.6;
+  node [fontname="Helvetica", fontcolor=white, shape=plaintext];
+  edge [arrowhead=vee, arrowsize=0.6, penwidth=1.2, color=white];
+
+    block_0x503000000100 [label=<
+        <TABLE CELLSPACING="0" CELLPADDING="4">
+            <TR>
+                <TD PORT="root" BGCOLOR="#2d5c8a" COLSPAN="2"><B>0x503000000100</B></TD>
+            </TR>
+            <TR>
+                <TD BGCOLOR="#4a8c5a" COLSPAN="2"><B>VALUE = 5</B></TD>
+            </TR>
+            <TR>
+                <TD BGCOLOR="#8c4a4a" COLSPAN="2"><B>BIRD = C</B></TD>
+            </TR>
+            <TR>
+                <TD PORT="left" BGCOLOR="#8c5a2d">0x00536828</TD>
+                <TD PORT="right" BGCOLOR="#2d8a5c">0x00002472</TD>
+            </TR>
+        </TABLE>
+    >];
+
+    block_0x503000000101 [label=<
+        <TABLE CELLSPACING="0" CELLPADDING="4">
+            <TR>
+                <TD PORT="root" BGCOLOR="#2d5c8a" COLSPAN="2"><B>0x503000000101</B></TD>
+            </TR>
+            <TR>
+                <TD BGCOLOR="#4a8c5a" COLSPAN="2"><B>VALUE = 5</B></TD>
+            </TR>
+            <TR>
+                <TD BGCOLOR="#8c4a4a" COLSPAN="2"><B>BIRD = C</B></TD>
+            </TR>
+            <TR>
+                <TD PORT="left" BGCOLOR="#8c5a2d">0x00536828</TD>
+                <TD PORT="right" BGCOLOR="#2d8a5c">0x00002472</TD>
+            </TR>
+        </TABLE>
+    >];
+
+    block_0x503000000102 [label=<
+        <TABLE CELLSPACING="0" CELLPADDING="4">
+            <TR> <TD PORT="root" BGCOLOR="#2d5c8a" COLSPAN="2"><B>0x503000000102</B></TD> </TR>
+            <TR>
+                <TD BGCOLOR="#4a8c5a" COLSPAN="2"><B>VALUE = 5</B></TD>
+            </TR>
+            <TR>
+                <TD BGCOLOR="#8c4a4a" COLSPAN="2"><B>BIRD = C</B></TD>
+            </TR>
+            <TR>
+                <TD PORT="left" BGCOLOR="#8c5a2d">0x00536828</TD>
+                <TD PORT="right" BGCOLOR="#2d8a5c">0x00002472</TD>
+            </TR>
+        </TABLE>
+    >];
+    block_0x503000000100:left -> block_0x503000000101:root [color="#ffea05ff", penwidth = 1.5, arrowsize = 0.6, constraint = true]
+    block_0x503000000101:right -> block_0x503000000102:root [color="#ffea05ff", penwidth = 1.5, arrowsize = 0.6, constraint = true]
+
+}

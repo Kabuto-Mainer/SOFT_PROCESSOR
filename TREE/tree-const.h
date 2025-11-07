@@ -1,6 +1,7 @@
 #ifndef TREE_CONST_H
 #define TREE_CONST_H
 
+// Signatures in tree
 // -------------------------------------------------------------------------------------------------------
 const char SIGN_COMMON = 'C';
 // -------------------------------------------------------------------------------------------------------
@@ -8,14 +9,18 @@ const char SIGN_FICT = 'F';
 // -------------------------------------------------------------------------------------------------------
 
 
-
+// Descriptions all errors
 // -------------------------------------------------------------------------------------------------------
-const char ADDRESS_CONFIG_DUMP[] = "/home/kabuto/ProjectC/SOFT_PROCESSOR/TREE/DUMPS/.config";
-const char ADDRESS_DUMPS_DIR[] = "/home/kabuto/ProjectC/SOFT_PROCESSOR/TREE/DUMPS/DUMP";
-const char ADDRESS_DOT[] = "/home/kabuto/ProjectC/SOFT_PROCESSOR/TREE/graph.dot";
-const char ADDRESS_IMG[] = "/home/kabuto/ProjectC/SOFT_PROCESSOR/TREE/IMAGES/img";
+const char DESC_ERROR[][50] =
+{
+    "NOT ERRORS WITH TREE",
+    "BAD ROOT IN NODE",
+    "SORT FUNCTION OF TREE IS NOT CORRECT",
+    "UNCORRECT SIGNATURE",
+    "BAD AMOUNT OF VALUE IN NODE" ,
+    "BAD SIZE"
+};
 // -------------------------------------------------------------------------------------------------------
-
 
 
 #endif // TREE_CONST_H
